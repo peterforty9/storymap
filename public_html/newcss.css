@@ -1,0 +1,181 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 23-Mar-2018, 09:31:58
+    Author     : Peter
+*/
+
+
+body {
+    background-color: silver;
+    font-family:'Times New Roman', Times, serif;
+}
+  
+.ui-menu {
+    display: table-row;
+}
+.row {
+    display: table-row;
+    border: #002DA4 thin solid;
+}
+.ui-menu-item {
+    background-color: antiquewhite;
+    width: 40px;
+    display: table-cell;
+}
+
+.cell {
+    display: table-cell;
+    vertical-align: top;
+}
+.map {
+  display: table;
+  border: #002DA4 thin solid;
+  text-align: left;
+}
+#groups {
+    max-height: 80px;
+    border: #002DA4 thin solid;
+    text-align: left;
+    padding-right: 20px;
+    display: table-row;
+   
+}
+.group {
+    width: 140px;
+    min-width: 140px;
+    height: 80px;
+    border: #002DA4 thin solid;
+    text-align: left;
+    background-color: antiquewhite;
+    display: table-cell;
+    padding-left: 10px;
+}
+.grouptext {
+    width: 140px;
+    height: 80px;
+    text-align: left;
+    background-color: antiquewhite;
+    display: table-cell;
+}
+#activities {
+  min-height: 80px;
+  max-height: 80px;
+  border: #002DA4 thin solid;
+  text-align: left;
+  padding-right: 20px;
+}
+.activity {
+    width: 140px;
+    min-width: 140px;
+    height: 80px;
+    border: #002DA4 thin solid;
+    text-align: left;
+    background-color: lightsalmon;
+    padding-left: 10px;
+}
+    .activity:nth-child(10n+1) {
+        background-color: green;
+    }
+    .activity:nth-child(10n+2) {
+        background-color: yellow;
+    }
+    .activity:nth-child(3) {
+        background-color: orange;
+    }
+    .activity:nth-child(4) {
+        background-color: red;
+    }
+    .activity:nth-child(5) {
+        background-color: purple;
+    }
+    .activity:nth-child(6) {
+        background-color: blue;
+    }
+    .activity:nth-child(7) {
+        background-color: skyblue;
+    }
+    .activity:nth-child(8) {
+        background-color: lime;
+    }
+    .activity:nth-child(9) {
+        background-color: hotpink;
+    }
+    .activity:nth-child(10) {
+        background-color: black;
+    }
+
+.activitytext {
+    width: 140px;
+    min-width: 140px;
+    height: 80px;
+    text-align: left;
+    background-color: antiquewhite;
+}
+.addActivity {
+    width: 16px;
+    min-width: 16px;
+    height: 80px;
+    border: #002DA4 thin solid;
+    text-align: center;
+    vertical-align: middle;
+    background-color: moccasin;
+}
+.epic {
+    width: 150px;
+}
+.story {
+    width: 140px;
+    height: 80px;
+    border: #002DA4 thin solid;
+    text-align: left;
+    background-color: navajowhite;
+    padding-left: 10px;
+}
+.storytext {
+    width: 140px;
+    height: 80px;
+    text-align: left;
+    background-color: whitesmoke;
+}
+.stories {
+    width: 150px;
+    min-height: 5px;
+    text-align: left;
+    background-color: whitesmoke;
+    border-left: #002DA4 thin solid;
+    border-right: #002DA4 thin solid;
+}
+
+.addStory {
+    width: 150px;
+    height: 100%;
+    text-align: center;
+    border-bottom: #002DA4 thin solid;
+    border-left: #002DA4 thin solid;
+    border-right: #002DA4 thin solid;
+    background-color: whitesmoke;
+}
+textarea {
+    width: 150px;
+    height: 80px;
+    border: #002DA4 thin solid;
+    text-align: left;
+    background-color: lightgray;
+    box-sizing: border-box;
+}
+.releasename {
+    display: table-caption;
+    text-align: center;
+    caption-side: top;
+    height: 20px;
+}
+.newrelease {
+    display: table-caption;
+    caption-side: bottom;
+    text-align: center;
+    height: 20px;
+}
