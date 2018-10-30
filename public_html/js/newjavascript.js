@@ -3,38 +3,6 @@ var newepic = "<div class='epic cell'><div class='stories'></div><div class='add
 var activitystartindex;
 
 $(function () {
-    /*
-    // the diagram we are going to display
-    var request = new XMLHttpRequest();
-    request.open("GET", "adscommissions.bpmn", true);
-    request.send();
-    var bpmnXML = request.responseXML;
-
-    // BpmnJS is the BPMN viewer instance
-    var viewer = new BpmnJS({ container: '#canvas' });
-
-    // import a BPMN 2.0 diagram
-    viewer.importXML(bpmnXML, function (err) {
-        if (err) {
-            // import failed :-(
-        } else {
-            // we did well!
-
-            var canvas = viewer.get('canvas');
-            canvas.zoom('fit-viewport');
-        }
-    });
-
-    // Retrieve cache storymap
- 
-   var maptext = localStorage.storymap;
-    
-    if (maptext.length > 10) {
-        var htmlstring = atob(maptext);
-        $('#storymap').html(htmlstring);
-    }
- 
-    */
 
     $("#showgroups").click(function () { $("#groups").toggle() });
 
@@ -44,26 +12,21 @@ $(function () {
         makeActivitiesSortable();
         makeEpicsSortable();
         makeeditable();
-      //  /*
-       
-        $(document).on("focusout", ".group", function () {
+
+          $(document).on("focusout", ".group", function () {
             if ($(this).children().is(':empty')) {
                 $(this).css('background-color', 'antiquewhite');
             }
             else {
                 $(this).css('background-color', 'lightsalmon');}
-          //  alert("Left group");
+         
         });
-       //     */
-
-      //  $(".grouptext").focusout(function () { $(this).css('background-color', 'lightsalmon')});
-  //  makeMapSortable();
+     
     };
 
     function makeGroupsSortable() {
         $("#groups").sortable({
             connectWith: "#groups",
-            //cancel: ':input,button,[contenteditable]',
             cursor: "move",
             cancel: ".grouptext",
         });
@@ -73,8 +36,6 @@ $(function () {
             connectWith: ".stories, #activities",
             cursor: "move",
             cancel: ".activitytext",
-            //cancel: ':input,button,[contenteditable]',
-           
             start: function (event, ui) {
                  activitystartindex   = ui.item.index();
                 var activitystart = ($("this").length);
@@ -120,7 +81,7 @@ $(function () {
                         ui.item.addClass('story').removeClass('activity cell');
                         childtext.addClass('storytext').removeClass('activitytext');
                     } else {$("#activities").sortable("cancel");}
-                    };
+                };
             },
             
         });
@@ -129,12 +90,10 @@ function makeEpicsSortable() {
     $(".stories").sortable({
         cursor: "move",
         cancel: ".storytext",
-        //':input,button,[contenteditable]',
-    connectWith: ".stories, #activities",
-    items: 'div[class!=addStory]',
+        connectWith: ".stories, #activities",
+        items: 'div[class!=addStory]',
     start: function(event, ui) {
       pre = ui.item.index();
-
     },
     stop: function(event, ui) {
       post = ui.item.index();
@@ -169,7 +128,6 @@ function makeEpicsSortable() {
               
            // });
       }
-       
       //$("span").text("Count:" + x + " ,To:" + post + ", Count:" + actcount);
     }
   });
@@ -178,7 +136,10 @@ function makeEpicsSortable() {
         $(".storytext").attr('contenteditable', 'true');
         $(".activitytext").attr('contenteditable', 'true');
         $(".grouptext").attr('contenteditable', 'true');
+
     };
+
+
 //Listen out for newly created epics and make sortable
         $("body").on("DOMNodeInserted", ".map", makeSortable);
 
@@ -210,17 +171,19 @@ newrelease = newrelease + "</div><div class='newrelease'>+</div></div>";
  }
    
 //Save map each time it is updated
-    $(document).on("DOMNodeInserted", function () {
+ 
+    //update after input
+    $(document).on("focusout", ".storytext, .activitytext, .releasename, .grouptext", function () {
         var html = $('#storymap').clone();
         var htmlString = html.html();
-       var datauri = btoa(htmlString);
-       $("#mapdata").val(datauri);
+        var datauri = btoa(htmlString);
+        $("#mapdata").val(datauri);
         localStorage.storymap = datauri;
         var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
         $("#downloadmap").attr("href", downloadfile);
- 
-   
-    })
+        console.log("storymap saved");
+    });
+  
     //load from text box
     $(document).on("click", "#load", function () {
         var mapdata = $("#mapdata").val();
