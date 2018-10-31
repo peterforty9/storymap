@@ -1,24 +1,17 @@
 ﻿<!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
+
 <html>
 <head>
     
-    <title>TODO supply a title</title>
+    <title>Storymap</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="js/jquery-3.3.1.js"></script>
     <script type="text/javascript" src="js/jquery-ui.js"></script>
 
-    <script src="js/group-management.js"></script>
     <script src="js/activity-management.js"></script>
     <script src="js/story-management.js"></script>
-    <script src="js/tableheader-management.js"></script>
     <script src="js/newjavascript.js"></script>
-
 
     <link rel="stylesheet" href="js/jquery-ui.css" type="text/css">
     <link rel="stylesheet" type="text/css" href="newcss.css">
@@ -29,11 +22,7 @@ and open the template in the editor.
 <body>
 
     <span></span>
-    <!-- BPMN diagram container -->
-    <!--<div id="canvas"></div> -->
-
-    <!-- replace CDN url with local bpmn-js path -->
-    <script src="https://unpkg.com/bpmn-js@0.27.0-1/dist/bpmn-viewer.development.js"></script>
+  
     <div class="ui-menu">
         <a href='newmap.txt' id="downloadmap" type="text/plain" download="storymap" class="ui-menu-item">Save</a>
         <!--  <div id=load class="ui-menu-item">Load</div> -->
@@ -43,8 +32,7 @@ and open the template in the editor.
         <output id="list"></output>
     </div>
 
-    <!-- <textarea id="mapdata"></textarea>-->
-        <div id="storymap">
+    <div id="storymap">
             <div class='map table'>
                 <div id='groups' class='row'>
                     <div class='group cell'><div class="grouptext">Group 1</div></div>
