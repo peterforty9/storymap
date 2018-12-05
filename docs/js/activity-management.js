@@ -30,11 +30,13 @@ $(function () {
     //Insert new activity (and move along stories)
     $(document).on("keypress", ".activitytext", function (event) {
 
-        if (event.which == 13) {
+        if (event.which == 13 && ($(this).is(':empty')==false) ){
+            event.preventDefault();
             var activitytextid = Math.random()
             var activitystartindex = $(this).parent().index();
             var htmlData = "<div class='activity cell'><div class='activitytext' contenteditable='true' id='" + activitytextid + "'></div></div>";
-            event.preventDefault();
+            
+            //Insert activity 
             $(htmlData).insertAfter($(this).parent());
             document.getElementById(activitytextid).focus();
 
@@ -49,9 +51,10 @@ $(function () {
                 $(from).insertAfter($(this).find(".epic:eq(" + activityindex + ")"));
             });
 
-            newgroup = $("<div class='group cell'><div class='grouptext' contenteditable='true'></div></div>");
-            lastgroup = $(".group:eq(" + activityindex + ")");
-            newgroup.insertAfter(lastgroup);
+            //newgroup = $("<div class='group cell'><div class='grouptext' contenteditable='true'></div></div>");
+            //lastgroup = $(".group:eq(" + activityindex + ")");
+            //newgroup.insertAfter(lastgroup);
+            $(this).parent()
         };
     });
   

@@ -4,6 +4,15 @@ var activitystartindex;
 
 $(function () {
 
+
+    // Default export is a4 paper, portrait, using milimeters for units
+    $(document).on("click", "#downloadpdf", function ()  {
+       
+        var pdf = new jsPDF();
+        pdf.text(30, 30, 'Hello world!');
+        pdf.save('hello_world.pdf');
+    });
+
     $("#showgroups").click(function () { $("#groups").toggle() });
 
     function makeSortable() {
@@ -141,20 +150,18 @@ function makeEpicsSortable() {
 
 
 //Listen out for newly created epics and make sortable
-        $("body").on("DOMNodeInserted", ".map", makeSortable);
+$("body").on("DOMNodeInserted", ".map", makeSortable);
 
-
-
-   
+//Add new release   
 $(document).on("click", ".newrelease", function() {
   addNewRelease(this);
 });
 
-    function addNewRelease(clicked){
+function addNewRelease(clicked){
     
  var i = 0;
  var activitycount = ($("#activities > div.activity").length);
-  var newrelease = "<div class='map table'><div class='releasename' contenteditable='true'>Release/Version</div><div class='release row'>";
+  var newrelease = "<div class='release table'><div class='releasename' contenteditable='true'>Release/Version</div><div class='release row'>";
   var newepic = "<div class='epic cell'><div class='stories'></div><div class='addStory'><strong>+</strong></div></div>";
   do {
     newrelease = newrelease + newepic;
@@ -166,13 +173,10 @@ newrelease = newrelease + "</div><div class='newrelease'>+</div></div>";
   var previousrelease =  $(clicked).parent()
   
   $(newrelease).insertAfter(previousrelease);
-  
-  
+    
  }
    
 //Save map each time it is updated
- 
-    //update after input
     $(document).on("focusout", ".storytext, .activitytext, .releasename, .grouptext", function () {
         var html = $('#storymap').clone();
         var htmlString = html.html();

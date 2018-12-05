@@ -5,7 +5,7 @@ and open the template in the editor.
 */
 /* 
     Created on : 23-Mar-2018, 09:31:58
-    Author     : Peter
+    Author     : Peter Clarke
 */
 
 
@@ -36,7 +36,15 @@ body {
   border: #002DA4 thin solid;
   text-align: left;
 }
-#groups {
+.release {
+    display: table;
+    border: #002DA4 thin solid;
+    text-align: left;
+}
+.tbody {
+    display: table-row-group;
+}
+    #groups {
     max-height: 80px;
     border: #002DA4 thin solid;
     text-align: left;
@@ -77,7 +85,7 @@ body {
     background-color: lightsalmon;
     padding-left: 10px;
 }
-    .activity:nth-child(10n+1) {
+/*  .activity:nth-child(10n+1) {
         background-color: green;
     }
     .activity:nth-child(10n+2) {
@@ -107,7 +115,7 @@ body {
     .activity:nth-child(10) {
         background-color: black;
     }
-
+      */
 .activitytext {
     width: 140px;
     min-width: 140px;
@@ -174,7 +182,7 @@ textarea {
     height: 20px;
 }
 .newrelease {
-    display: table-caption;
+    display: table-footer-group;
     caption-side: bottom;
     text-align: center;
     height: 20px;
