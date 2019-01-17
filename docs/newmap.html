@@ -5,34 +5,49 @@
     <title></title>
 </head>
 <body>
-    <div id="storymap">
-        <div class='map table'>
+
+    <div id="storymap" class='table'>
+        <div class='table-header-group'>
             <div id='groups' class='row'>
-                <div class='group cell'><div class="grouptext">Group 1</div></div>
-
+                <div class='cell'></div>
+                <div class='cell' contenteditable="true">Groups</div>
+                <div class='grouprelease cell'>
+                    <div class='group'><div class="grouptext" contenteditable="true">Group</div></div>
+                </div>
             </div>
-            <div id='activities' class='row'>
-                <div class='activity cell'><div class="activitytext" contenteditable="true">Activity 1</div></div>
-                <div class='addActivity cell'>
-                    <strong>+</strong>
+            <div class='row' id="activityrow">
+                <div class='cell'></div>
+                <div class='cell' contenteditable="true">Activities</div>
+                <div class='grouprelease cell'>
+                    <ul class="activities">
+                        <li><div class='activity'><div class="activitytext" contenteditable="true">Activity 1</div></div></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tbody" id="releases">
+                <div class='releaserow row'>
+                    <div class='rowhandle cell'></div>
+                    <div class='releasename cell' contenteditable="true">Release/Version</div>
+                    <div class='grouprelease release cell'>
+                        <div class="epic">
+                            <ul class='stories'></ul>
+                            <div class='addStory'>
+                                <strong>+</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class='newrelease'>
+                <div class="row">
+                    <div class="cell"></div>
+                    <div class="addrelease cell">Add release</div>
                 </div>
             </div>
         </div>
-        <div class='map table'>
-            <div class='releasename' contenteditable="true">Release/Version</div>
 
-            <div class='release row'>
-                <div class='epic cell'>
-                    <div class='stories'>
-                        <div class='story'><div class='storytext' contenteditable='true' id='testid'></div></div>
-                    </div>
-                    <div class='addStory'>
-                        <strong>+</strong>
-                    </div>
-                </div>
-            </div>
-            <div class='newrelease'>+</div>
-        </div>
     </div>
+
 </body>
 </html>

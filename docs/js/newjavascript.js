@@ -282,7 +282,7 @@ function addNewRelease(clicked){
         var html = $('#storymap').clone();
         var htmlString = html.html();
         var datauri = btoa(htmlString);
-        $("#mapdata").val(datauri);
+        //$("#mapdata").val(datauri);
         localStorage.storymap = datauri;
         var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
         $("#downloadmap").attr("href", downloadfile);
@@ -290,17 +290,11 @@ function addNewRelease(clicked){
         hideaddstory();
     });
   
-    //load from text box
-    $(document).on("click", "#load", function () {
-        var mapdata = $("#mapdata").val();
-        //$("span").text(mapdata);
-       var htmlstring = atob(mapdata);
-        $('#storymap').html(htmlstring);
-
-    })
+   
     //open new map from html template
     $(document).on("click", "#new", function () {
         $('#storymap').load('newmap.html #storymap');
+        console.log("new map loaded");
              });
         
     //upload file
@@ -312,7 +306,7 @@ function addNewRelease(clicked){
             var text = reader.result;
             var htmlstring = text//atob(text);
             $('#storymap').html(htmlstring);
-            $("#mapdata").val(htmlstring);
+            //$("#mapdata").val(htmlstring);
             // Store
             localStorage.storymap = text;
 
@@ -322,20 +316,42 @@ function addNewRelease(clicked){
 
     $(document).getElementById(files).addEventListener('change', handleFileSelect, false);
 
-    function hideaddstory() {
+    //Load HTML from local storage
+    $(window).on('ready', function () {
+
+        var mapdata = localStorage.getItem('storymap');
+        var htmlstring = atob(mapdata);
+        $('#storymap').html(htmlstring);
+        console.log("window ready");
+    });
+
+    //load from text box
+    $(document).on("click", "load", function () {
        
+        var mapdata = localStorage.getItem('storymap');
+        var htmlstring = atob(mapdata);
+        document.getElementById("storymap").innerHTML = htmlstring;
+        console.log("load clicked");
+       // $('#storymap').html(htmlstring);
+
+    });
+    //function saveSettings() {
+    //    localStorage.storymap = $('#storymap').val();
+    //}
+
+    function hideaddstory() {
+
         //hide the add story button when stories exist
         $(".stories").each(function (index) {
             if ($(this).is(':empty')) {
-               $(this).parent().children('.addStory').show();
-               
+                $(this).parent().children('.addStory').show();
+
             } else {
-               
+
                 $(this).parent().children('.addStory').hide();
             }
-            
+
         });
 
     }
-
 });

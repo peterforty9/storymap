@@ -20,12 +20,14 @@
 </head>
 
 <body>
-<div class="layout">
+
+    <div class="layout">
         <div class="ui-menu">
             <div class="ui-menu-item" width="100">
                 <a href='newmap.txt' id="downloadmap" type="text/plain" download="storymap">Save</a>
             </div>
-            <!--<div id=new class= "ui-menu-item" >New</div>-->
+            <div id=new class= "ui-menu-item" >New</div>
+            <div id="load" class="ui-menu-item">Load</div>
             <div class="ui-menu-item">
                 <input type='file' onchange='openFile(event)' width="150">
                 <output id="list"></output>
@@ -40,7 +42,7 @@
                     <div class='grouprelease cell'>
                         <div class='group'><div class="grouptext" contenteditable="true">Group 1</div></div>
                     </div>
-                    
+
                 </div>
                 <div class='row' id="activityrow">
                     <div class='cell'></div>
@@ -50,7 +52,7 @@
                             <li><div class='activity'><div class="activitytext" contenteditable="true">Activity 1</div></div></li>
                         </ul>
                     </div>
-                                       
+
                 </div>
 
                 <div class="tbody" id="releases">
@@ -66,7 +68,7 @@
                                 </div>
                             </div>
                         </div>
-                      
+
                     </div>
 
 
@@ -80,7 +82,13 @@
             </div>
 
         </div>
-    </div>               
+    </div>
+
+    <script>
+        var n = localStorage.getItem('storymap');
+        var htmlstring = atob(n)
+        $('#storymap').html(htmlstring);
+    </script>
 
 </body>
 

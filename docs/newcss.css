@@ -20,6 +20,10 @@ body {
     font-family:'Times New Roman', Times, serif;
 }
 
+p {
+    text-wrap:normal;
+}
+
 .ui-menu {
     float:left;
     background-color: #34675C;
@@ -98,13 +102,20 @@ body {
     border-width: 2px;
     border-color: white;
     border-style: solid;
+    vertical-align: top;
 }
+
 .grouptext {
     width: 136px;
+    max-width: 136px;
     height: 76px;
+    max-height: 76px;
     text-align: left;
     background-color: #4CB5F5;
-   
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
 }
 #activityrow {
 
@@ -117,8 +128,8 @@ body {
     padding: 0;
     float: left;
     min-width: 140px;
-    min-height:80px;
-
+    min-height: 80px;
+    max-height: 80px;
 }
 
     .activities li {
@@ -135,13 +146,21 @@ body {
     border-width: 2px;
     border-color: white;
     border-style: solid;
+    vertical-align: top;
 }
 
 .activitytext {
     width: 136px;
+    max-width: 136px;
     height: 76px;
+    max-height: 76px;
     text-align: left;
     background-color: #B7B8B6;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+}
 }
 .addActivity {
     width: 16px;
@@ -180,13 +199,20 @@ body {
     border-width: 2px;
     border-color: white;
     border-style: solid;
+    vertical-align:top;
 }
 .storytext {
     width: 136px;
+    max-width: 136px;
     height: 76px;
+    max-height: 76px;
     text-align: left;
     background-color: #B3C100;
     float: left;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
 }
 .stories {
     width: 150px;
@@ -226,7 +252,7 @@ textarea {
 
 }
 .addrelease {
-    text-align: center;
+    text-align: left;
     float: left;
     width: 100%;
     color: gray;
@@ -244,10 +270,4 @@ textarea {
 
 .selected{
     opacity:0.2;
-}
-.releaserow > .cell {
-
-}
-.grouprelease {
-  
 }
