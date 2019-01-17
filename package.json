@@ -1,0 +1,27 @@
+{
+  "name": "storymap",
+  "version": "1.0.0",
+  "description": "Storymap creation",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peterforty9/storymap.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/peterforty9/storymap/issues"
+  },
+  "homepage": "https://github.com/peterforty9/storymap#readme",
+  "dependencies": {
+    "html-to-image": "^0.1.0",
+    "jspdf": "^1.4.1"
+  }
+}

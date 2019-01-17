@@ -1,36 +1,19 @@
-var pre, post, to;
-var newepic = "<div class='epic cell'><div class='stories'></div><div class='addStory'><strong>+</strong></div></div>";
+var pre, stopindex, to;
+var newepic = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
 var activitystartindex;
+var activitystartgroup;
+var startgroup;
 
 $(function () {
-
-
-    // Default export is a4 paper, portrait, using milimeters for units
-    $(document).on("click", "#downloadpdf", function ()  {
-       
-        var pdf = new jsPDF();
-        pdf.text(30, 30, 'Hello world!');
-        pdf.save('hello_world.pdf');
-    });
-
-    $("#showgroups").click(function () { $("#groups").toggle() });
+    
+   // $("#showgroups").click(function () { $("#groups").toggle() });
 
     function makeSortable() {
-
         makeGroupsSortable();
         makeActivitiesSortable();
         makeEpicsSortable();
+        makereleasessortable();
         makeeditable();
-
-          $(document).on("focusout", ".group", function () {
-            if ($(this).children().is(':empty')) {
-                $(this).css('background-color', 'antiquewhite');
-            }
-            else {
-                $(this).css('background-color', 'lightsalmon');}
-         
-        });
-     
     };
 
     function makeGroupsSortable() {
@@ -38,106 +21,210 @@ $(function () {
             connectWith: "#groups",
             cursor: "move",
             cancel: ".grouptext",
+            items: ".grouprelease",
+
+            start: function (event, ui) {
+
+                clone = $(ui.item[0].outerHTML).clone();
+                startgroup = (ui.item.index()) + 1;
+
+            },
+
+            placeholder: {
+                element: function (clone, ui) {
+                    return $('<div class="selected">' + clone[0].innerHTML + '</div>');
+                },
+                update: function () {
+                    return;
+                }
+            },
+            stop: function (event, ui) {
+
+                stopindex = ui.item.index();
+
+                var targetgroup = (ui.item.index()) + 1;
+               
+                if (targetgroup < startgroup) {
+
+                    $("#activityrow").each(function (index) {
+                        ($(this).find(" .cell:nth-child(" + startgroup + ")")).insertBefore($(this).find(" .cell:nth-child(" + targetgroup + ")"));
+                    });
+
+                    $(".releaserow").each(function (index) {
+                        ($(this).find(" .cell:nth-child(" + startgroup + ")")).insertBefore($(this).find(" .cell:nth-child(" + targetgroup + ")"));
+                    });
+
+
+                } else if (targetgroup >= startgroup) {
+
+                    $("#activityrow").each(function (index) {
+                        ($(this).find(" .cell:nth-child(" + startgroup + ")")).insertAfter($(this).find(" .cell:nth-child(" + targetgroup + ")"));
+                    });
+
+                    $(".releaserow").each(function (index) {
+                        ($(this).find(" .cell:nth-child(" + startgroup + ")")).insertAfter($(this).find(" .cell:nth-child(" + targetgroup + ")"));
+                    });
+
+                    }
+                
+            }
+        });
+    }
+    function makereleasessortable() {
+        $("#releases").sortable({
+            connectWith: "#releases",
+            cursor: "move",
+            handle: ".rowhandle",
+            cancel: ".epic, .releasename, .newrelease",
         });
     }
     function makeActivitiesSortable() {
-        $("#activities").sortable({
-            connectWith: ".stories, #activities",
+        $(".activities").sortable({
+
+            connectWith: ".stories, .activities",
             cursor: "move",
             cancel: ".activitytext",
+
             start: function (event, ui) {
-                 activitystartindex   = ui.item.index();
-                var activitystart = ($("this").length);
+                clone = $(ui.item[0].outerHTML).clone();
+                activitystartindex = ui.item.index();
+                activitystartgroup = (ui.item.parent().parent().index()) + 1;
                
+            },
+            placeholder: {
+                element: function (clone, ui) {
+                    return $('<li class="selected">' + clone[0].innerHTML + '</li>');
+                },
+                update: function () {
+                    return;
+                }
             },
             stop: function (event, ui) {
                 var activitytargetindex = ui.item.index();
-                var post2 = ui.item.parent().attr("id");
-                var childtext = ui.item.children();
+                var targetepic = activitytargetindex + 1;
+                var fromepic = activitystartindex + 1;
+                var activitytargetgroup = (ui.item.parent().parent().index()) + 1;
+                var stayedinactivities = ui.item.parent().hasClass("activities");
+                var childtext = ui.item.children().children();
+                var actcount = ($("#activityrow .cell:nth-child(" + activitytargetgroup + ") .activity").length);
+                var lastactivity = false
+
+                if (targetepic == actcount){ lastactivity = true };
+               
                 //move epics in line with activity movement
-                if (post2 === "activities" && activitytargetindex > activitystartindex) {
-
-                    $("div.release").each(function (index) {
-                        $(this).find(".epic:eq(" + activitystartindex + ")").insertAfter($(this).find(".epic:eq(" + activitytargetindex + ")"));
+                //Activity moved witin same group / Higher up
+                if (stayedinactivities == true && activitytargetgroup === activitystartgroup && activitytargetindex > activitystartindex) {
+                    $(".releaserow").each(function (index) {
+                        $(this).find(" .cell:nth-child(" + activitystartgroup + ") .epic:nth-child(" + fromepic + ")").insertAfter($(this).find(" .cell:nth-child(" + activitytargetgroup + ") .epic:nth-child(" + targetepic + ")"));
                     });
+                    //Activity moved witin same group / Lower down
+                } else if (stayedinactivities == true && ((activitytargetgroup === activitystartgroup && activitytargetindex <= activitystartindex))) {
 
-                } else if (post2 === "activities") {
-
-                    $("div.release").each(function (index) {
-                        $(this).find(".epic:eq(" + activitystartindex + ")").insertBefore($(this).find(".epic:eq(" + activitytargetindex + ")"));
+                    $(".releaserow").each(function (index) {
+                        $(this).find(" .cell:nth-child(" + activitystartgroup + ") .epic:nth-child(" + fromepic + ")").insertBefore($(this).find(" .cell:nth-child(" + activitytargetgroup + ") .epic:nth-child(" + targetepic + ")"));
                     });
-                } else if (post2 != "activities"){
+                    //Activity to different group / NOT To last column
+                } else if (stayedinactivities == true && (activitytargetgroup != activitystartgroup) && lastactivity == false) {
+                    $(".releaserow").each(function (index) {
+                        $(this).find(" .cell:nth-child(" + activitystartgroup + ") .epic:nth-child(" + fromepic + ")").insertBefore($(this).find(" .cell:nth-child(" + activitytargetgroup + ") .epic:nth-child(" + targetepic  + ")"));
+                    });
+                     //Activity to different group / last column
+                } else if (stayedinactivities == true && (activitytargetgroup != activitystartgroup) && lastactivity && actcount > 1) {
+                    $(".releaserow").each(function (index) {
+                        $(this).find(" .cell:nth-child(" + activitystartgroup + ") .epic:nth-child(" + fromepic + ")").insertAfter($(this).find(" .cell:nth-child(" + activitytargetgroup + ") .epic:nth-child(" + activitytargetindex + ")"));
+                    });
+                    //Activity to different group / No activities exist
+                } else if (stayedinactivities == true && (activitytargetgroup != activitystartgroup) && actcount == 1) {
+                    $(".releaserow").each(function (index) {
+                        $(this).find(" .cell:nth-child(" + activitystartgroup + ") .epic:nth-child(" + fromepic + ")").appendTo($(this).find(" .cell:nth-child(" + activitytargetgroup + ")"));
+                    });
+                }else if (stayedinactivities != true) {
                     var storycount = 0;
-                    var groupempty = $(".group:eq(" + activitystartindex  + ")").children().is(':empty');
-
-                    $("div.release").each(function (index) {
-                        if ($(this).find(".epic:eq(" + activitystartindex  + ")").children().is(':empty')) {
+                                    
+                    $(".releaserow").each(function (index) {
+                    
+                        if ($(this).find(" .cell:nth-child(" + activitystartgroup + ") .epic:nth-child(" + fromepic + ") .stories").is(':empty')) {
                             storycount = storycount + 0;
-                            $('span').text = storycount;
                             }
                         else {
                             storycount = storycount + 1;
-                            $('span').text = storycount;
                             }
                     });
-
-                    if (groupempty && storycount === 0) {
-                        $(".group:eq(" + activitystartindex + ")").remove();
-                        $("div.release").each(function (index) {
-                        $(this).find(".epic:eq(" + activitystartindex + ")").remove();
+                    //Only allow to convert an activity to a story if it nas no stories
+                    if (storycount === 0) {
+                        
+                        $(".releaserow").each(function (index) {
+                            $(this).find(" .cell:nth-child(" + activitystartgroup + ") .epic:nth-child(" + fromepic + ")").remove();
                         });
-
-                        ui.item.addClass('story').removeClass('activity cell');
+                        //Change class from activity to story
+                        ui.item.children().addClass('story').removeClass('activity');
                         childtext.addClass('storytext').removeClass('activitytext');
-                    } else {$("#activities").sortable("cancel");}
+
+                    } else {$(".activities").sortable("cancel");}
                 };
             },
             
         });
     }
-function makeEpicsSortable() {
+  
+    function makeEpicsSortable() {
     $(".stories").sortable({
         cursor: "move",
         cancel: ".storytext",
-        connectWith: ".stories, #activities",
-        items: 'div[class!=addStory]',
-    start: function(event, ui) {
-      pre = ui.item.index();
-    },
-    stop: function(event, ui) {
-      post = ui.item.index();
-      var x = 0;
-        var post2 = ui.item.parent().attr("id");
-        var childtext = ui.item.children();
-      var actcount = ($("#activities > div.activity").length);
-      to = $(".epic").get(post);
-      toend = $(".epic").get(post - 1);
-      if (post2 === "activities" && post < actcount) {
-          ui.item.addClass('activity cell').removeClass('story');
-          childtext.addClass('activitytext').removeClass('storytext');
-       
-            $( "div.release" ).each(function( index ) {
-            
-                $(newepic).insertBefore($(this).find(".epic:eq(" + post + ")"));
-                
-            });
-          var newgroup = $("<div class='group cell'><div class='grouptext' contenteditable='true'></div></div>");
-          lastgroup = $("div .group:last-child");
-          newgroup.insertAfter(lastgroup);
-
-      } else if (post2 === "activities" && post === actcount) {
-          ui.item.addClass('activity cell').removeClass('story');
-          childtext.addClass('activitytext').removeClass('storytext');
-     
-          $(newepic).insertAfter($("div .epic:last-child"));
-          var newgroup = $("<div class='group cell'><div class='grouptext' contenteditable='true'></div></div>");
-          lastgroup = $("div .group:last-child");
-          newgroup.insertAfter(lastgroup);
+        connectWith: ".stories, .activities",
         
-              
-           // });
-      }
-      //$("span").text("Count:" + x + " ,To:" + post + ", Count:" + actcount);
+    start: function(event, ui) {
+     
+        clone = $(ui.item[0].outerHTML).clone();
+    
+        },
+
+        placeholder: {
+            element: function (clone, ui) {
+                return $('<li class="selected">' + clone[0].innerHTML + '</li>');
+            },
+            update: function () {
+                return;
+            }
+        },
+    stop: function(event, ui) {
+
+        stopindex = ui.item.index();
+
+        var targetgroup = (ui.item.parent().parent().index()) + 1;
+        var targetepic = stopindex + 1;
+
+        var movedtoactivities = ui.item.parent().hasClass("activities");
+
+        if (movedtoactivities == true) {
+
+            var childtext = ui.item.children().children();
+            var actcount = $("#activityrow .cell:nth-child(" + targetgroup + ") .activities li").length;
+
+            if (actcount > 1 && targetepic < actcount) {
+                ui.item.children().addClass('activity').removeClass('story');
+                childtext.addClass('activitytext').removeClass('storytext');
+
+                $(".releaserow").each(function (index) {
+                    $(newepic).insertBefore($(this).find(" .cell:nth-child(" + targetgroup + ") .epic:nth-child(" + targetepic + ")"));
+                });
+
+
+            } else if (actcount > 1 && targetepic === actcount) {
+                ui.item.children().addClass('activity').removeClass('story');
+                childtext.addClass('activitytext').removeClass('storytext');
+                $(".releaserow").each(function (index) {
+                    $(newepic).insertAfter($(this).find(" .cell:nth-child(" + targetgroup + ") .epic:last-child"));
+                });
+
+            } else if (actcount == 1) {
+                ui.item.children().addClass('activity').removeClass('story');
+                childtext.addClass('activitytext').removeClass('storytext');
+                $(".releaserow").each(function (index) {
+                    $(newepic).appendTo($(this).find(" .cell:nth-child(" + targetgroup + ")"));
+                });
+            }
+        }
     }
   });
 }
@@ -150,29 +237,43 @@ function makeEpicsSortable() {
 
 
 //Listen out for newly created epics and make sortable
-$("body").on("DOMNodeInserted", ".map", makeSortable);
+$("body").on("DOMNodeInserted", "#storymap", makeSortable);
 
 //Add new release   
-$(document).on("click", ".newrelease", function() {
+$(document).on("click", ".addrelease", function() {
   addNewRelease(this);
 });
 
 function addNewRelease(clicked){
     
- var i = 0;
- var activitycount = ($("#activities > div.activity").length);
-  var newrelease = "<div class='release table'><div class='releasename' contenteditable='true'>Release/Version</div><div class='release row'>";
-  var newepic = "<div class='epic cell'><div class='stories'></div><div class='addStory'><strong>+</strong></div></div>";
-  do {
-    newrelease = newrelease + newepic;
-    i++;
-    }
-    while (i < activitycount);
+    var i = 0;
+    var k = 0;
+    var m;
+   
+    var groupcount = (($("#groups div.cell").length)-2);
+    var newrelease = "<div class='releaserow row'><div class='rowhandle cell'></div><div class='releasename cell' contenteditable='true'>Release/Version</div>";
+    var newgroupstart = "<div class='grouprelease cell'>";
+    var newgroupend = "</div>";
 
-newrelease = newrelease + "</div><div class='newrelease'>+</div></div>";
-  var previousrelease =  $(clicked).parent()
+    do {
+        m = 3 + k;
+        newrelease = newrelease + newgroupstart;
+        var activitycount = ($("#activityrow .cell:nth-child(" + m + ") .activity").length);
+        
+        do {
+            newrelease = newrelease + newepic;
+            i++;
+        }
+        while (i < activitycount);
+
+        i = 0;
+        newrelease = newrelease + newgroupend;
+        k++;
+    }
+    while (k < groupcount);
+    newrelease = newrelease + newgroupend + "</div>";
   
-  $(newrelease).insertAfter(previousrelease);
+    $(newrelease).insertAfter($("div .releaserow:last-of-type"));
     
  }
    
@@ -186,6 +287,7 @@ newrelease = newrelease + "</div><div class='newrelease'>+</div></div>";
         var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
         $("#downloadmap").attr("href", downloadfile);
         console.log("storymap saved");
+        hideaddstory();
     });
   
     //load from text box
@@ -219,5 +321,21 @@ newrelease = newrelease + "</div><div class='newrelease'>+</div></div>";
     };
 
     $(document).getElementById(files).addEventListener('change', handleFileSelect, false);
+
+    function hideaddstory() {
+       
+        //hide the add story button when stories exist
+        $(".stories").each(function (index) {
+            if ($(this).is(':empty')) {
+               $(this).parent().children('.addStory').show();
+               
+            } else {
+               
+                $(this).parent().children('.addStory').hide();
+            }
+            
+        });
+
+    }
 
 });

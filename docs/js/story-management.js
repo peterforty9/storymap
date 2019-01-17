@@ -6,13 +6,13 @@
     var newStoryText
 
     
-    //Create new story when clicked
+    //Create new story when addStory clicked
     $(document).on("click", ".addStory", function () {
         var storytextid = Math.random()
-        var htmlData = "<div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "'></div></div>";
+        var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "'></div></div></li>";
       
-        if (($(this).parent().find("div .story").length > 0)) {
-            $(htmlData).insertAfter($(this).parent().find("div .story:last-child"));
+        if (($(this).parent().find("li .story").length > 0)) {
+            $(htmlData).insertAfter($(this).parent().find("li:last-child"));
         }
         else {
             ($(this).parent().children(".stories")).append(htmlData);
@@ -27,20 +27,28 @@
 
         if (event.which == 13) {
             event.preventDefault();
-            var storytextid = Math.random()
-            var htmlData = "<div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "'></div></div>";
-            $(htmlData).insertAfter($(this).parent());
-            document.getElementById(storytextid).focus();
-            document.getElementById(storytextid).removeAttribute("id");
+            if ($(this).is(':empty')) { deletestory($(this)) }
+                else {
+                var storytextid = Math.random()
+                var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "'></div></div></li>";
+                $(htmlData).insertAfter($(this).parent().parent());
+                document.getElementById(storytextid).focus();
+                document.getElementById(storytextid).removeAttribute("id");
+                };
             };
-                   
-       
+        
     });
 
     //Remove empty story
-    $(document).on("focusout", ".storytext", function () {
-        if ($(this).is(':empty')) { $(this).parent().remove(); };
-    });
+   $(document).on("focusout", ".storytext", function () {
+       if ($(this).is(':empty')) {deletestory($(this))}
+      
+   });
 
+    function deletestory(thisObj){
+
+         thisObj.parent().parent().remove();
+
+    }
   
  });
