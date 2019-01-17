@@ -6,37 +6,6 @@ $(function () {
     var newactivityText
     var newactivity
 
-    //Insert new group
-    $(document).on("keypress", ".grouptext", function (event) {
-
-        if (event.which == 13) {
-            event.preventDefault();
-            var group = $(this).parent().parent();
-            var groupstartindex = $(this).parent().parent().index();
-            var groupnumber = groupstartindex + 1;
-           
-            var activitylist = $('#activityrow .cell:nth-child(' + groupnumber + ')');
-
-            var grouptextid = Math.random();
-            var htmlData = "<div class='grouprelease cell'><div class='group'><div class='grouptext contenteditable='true' id='" + grouptextid + "'></div></div></div>";
-            var activitylisthtml = "<div class='grouprelease cell'><ul class='activities'></ul></div>"
-            var groupreleasehtml = "<div class='grouprelease release cell'></div>"
-
-            //Insert releasegroups
-
-            $(".releaserow").each(function (index) {
-                $(groupreleasehtml).insertAfter($(this).find(" .cell:nth-child(" + groupnumber + ")"));
-            });
-
-
-            //Insert group
-            $(htmlData).insertAfter(group);
-            $(activitylisthtml).insertAfter(activitylist);
-
-            document.getElementById(grouptextid).focus();
-        }
-    });
-   
     //Insert new activity (and move along stories)
     $(document).on("keypress", ".activitytext", function (event) {
 
@@ -128,5 +97,5 @@ $(function () {
 
         });
     };
-    
+
 });
