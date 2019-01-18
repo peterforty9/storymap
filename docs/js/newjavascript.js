@@ -5,7 +5,7 @@ var activitystartgroup;
 var startgroup;
 
 $(function () {
-    
+
    // $("#showgroups").click(function () { $("#groups").toggle() });
 
     function makeSortable() {
