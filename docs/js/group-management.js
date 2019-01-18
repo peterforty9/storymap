@@ -11,6 +11,11 @@ $(function () {
             var groupnumber = groupstartindex + 1;
             var activitylist = $('#activityrow .cell:nth-child(' + groupnumber + ')');
 
+            if (event.shiftKey) {
+                appendNewActivity(groupnumber)
+                event.stopPropagation();
+            } else {
+                
             if (hasactivities(groupnumber) == false && $(this).is(':empty')) {
 
                 //Remove group
@@ -46,6 +51,7 @@ $(function () {
 
                 document.getElementById(grouptextid).focus();
             }
+            }
         }
     });
    
@@ -58,6 +64,28 @@ $(function () {
             return true;
         }
 
+    };
+
+
+    //Append new activity
+    function appendNewActivity(groupnumber) {
+        var activitytextid = Math.random();
+        var htmlData = "<li><div class='activity'><div class='activitytext' contenteditable='true' id='" + activitytextid + "'></div></div></li>";
+        var activitylist = $('#activityrow .cell:nth-child(' + groupnumber + ') .activities' );
+
+        //Insert activity 
+        $(htmlData).appendTo(activitylist);
+        document.getElementById(activitytextid).focus();
+
+        //Insert new epic
+
+        var from;
+
+        from = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
+
+        $(".releaserow").each(function (index) {
+            $(from).insertAfter($(this).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activityindex + ")"));
+        });
     };
     
 });
