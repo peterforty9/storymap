@@ -84,7 +84,7 @@ $(function () {
         from = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
 
         $(".releaserow").each(function (index) {
-            $(from).insertAfter($(this).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activityindex + ")"));
+            $(from).appendTo($(this).find(" .cell:nth-child(" + groupnumber + ")"));
         });
     };
     
