@@ -65,11 +65,11 @@ p {
     border-spacing: 3px;
 }
 #tablecontainer {
-    display:block;
-    white-space:normal;
-    border-collapse: separate;
-    border-spacing: 3px;
-    height:70%;
+    height: 70%;
+    white-space: nowrap; /* this does the trick */
+    overflow: hidden; /* this prevents the grey divs from overflowing */
+    vertical-align: top;
+    display: inline-block;
 }
 #infobox {
     display: block;
@@ -171,19 +171,7 @@ p {
     white-space: normal;
     overflow: hidden;
 }
-.activitydetails {
-    visibility:hidden;
-    width: 136px;
-    max-width: 136px;
-    height: 76px;
-    max-height: 76px;
-    text-align: left;
-    background-color: #B7B8B6;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    white-space: normal;
-    overflow: hidden;
-}
+
 .addActivity {
     width: 16px;
     min-width: 16px;
@@ -236,19 +224,7 @@ p {
     white-space: normal;
     overflow: hidden;
 }
-.storydetails {
-    width: 50px;
-    max-width: 50px;
-    height: 50px;
-    max-height: 50px;
-    text-align: left;
-    background-color: #B3C100;
-    float: left;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    white-space: normal;
-    overflow: hidden;
-}
+
 .stories {
     width: 150px;
     min-height: 10px;
