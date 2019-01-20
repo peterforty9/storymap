@@ -1,5 +1,7 @@
 ﻿
 $(function () {
+    var textbox;
+
     //GROUP MANAGEMENT
 
     //Toggle groups
@@ -22,7 +24,7 @@ $(function () {
 
         if (event.which == 13 && event.ctrlKey) {
             event.preventDefault();
-            appendNewActivity(groupnumber)
+            appendNewActivity(groupnumber);
             event.stopPropagation();
         }
         else if (event.which == 13) {
@@ -62,7 +64,7 @@ $(function () {
     function insertGroup(groupnumber) {
         var grouptextid = Math.random();
         var activitylist = $('#activityrow .cell:nth-child(' + groupnumber + ')');
-        var htmlData = "<div class='grouprelease cell'><div class='group'><div class='grouptext contenteditable='true' id='" + grouptextid + "'></div></div></div>";
+        var htmlData = "<div class='grouprelease cell'><div class='group'><div class='grouptext contenteditable='true' id='" + grouptextid + "' data-details=''></div></div></div>";
         var activitylisthtml = "<div class='grouprelease cell'><ul class='activities'></ul></div>"
         var groupreleasehtml = "<div class='grouprelease release cell'></div>"
         var group = $("#groups div.cell:nth-child(" + (groupnumber) + ")")
@@ -83,7 +85,7 @@ $(function () {
     //Append new activity
     function appendNewActivity(groupnumber) {
         var activitytextid = Math.random();
-        var htmlData = "<li><div class='activity'><div class='activitytext' contenteditable='true' id='" + activitytextid + "'></div></div></li>";
+        var htmlData = "<li><div class='activity'><div class='activitytext' contenteditable='true' id='" + activitytextid + "' data-details=''></div></div></li>";
         var activitylist = $('#activityrow .cell:nth-child(' + groupnumber + ') .activities');
 
         //Insert activity 
@@ -138,7 +140,7 @@ $(function () {
 
     function insertNewActivity(activitynumber, groupnumber) {
         var activitytextid = Math.random();
-        var htmlData = "<li><div class='activity'><div class='activitytext' contenteditable='true' id='" + activitytextid + "'></div></div></li>";
+        var htmlData = "<li><div class='activity'><div class='activitytext' contenteditable='true' id='" + activitytextid + "' data-details=''></div></div></li>";
         var activity = $("#activityrow").find(".cell:nth-child(" + groupnumber + ") .activities li").eq(activitynumber-1 );
             //Insert activity 
             $(htmlData).insertAfter($(activity));
@@ -159,7 +161,7 @@ $(function () {
     function appendNewStory(activitynumber, groupnumber) {
 
         var storytextid = Math.random()
-        var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "'></div></div></li>";
+        var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "' data-details=''></div></div></li>";
 
         $(".releaserow").each(function (index) {
             $(htmlData).appendTo($(this).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ") .stories"));
@@ -228,7 +230,7 @@ $(function () {
     //Create new story when addStory clicked
     $(document).on("click", ".addStory", function () {
         var storytextid = Math.random()
-        var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "'></div></div></li>";
+        var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "' data-details=''></div></div></li>";
 
         if (($(this).parent().find("li .story").length > 0)) {
             $(htmlData).insertAfter($(this).parent().find("li:last-child"));
@@ -238,7 +240,7 @@ $(function () {
         };
 
         document.getElementById(storytextid).focus();
-        document.getElementById(storytextid).removeAttribute("id");
+        //document.getElementById(storytextid).removeAttribute("id");
     });
 
     //Create new story when enter key pressed
@@ -253,17 +255,18 @@ $(document).on("keydown", ".storytext", function (event) {
         if (event.shiftKey && event.which == 13) { //Insert new activity
             event.preventDefault();
             insertNewActivity(activitynumber, groupnumber);
-                
-        } else if (event.which == 13) {
+            event.stopPropagation();
+        }else if (event.which == 13) { //Insert story
             event.preventDefault();
             if ($(this).is(':empty')) { deletestory($(this)) }
             else {
                 var storytextid = Math.random()
-                var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "'></div></div></li>";
+                var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "' data-details=''></div></div></li>";
                 $(htmlData).insertAfter($(this).parent().parent());
                 document.getElementById(storytextid).focus();
-                document.getElementById(storytextid).removeAttribute("id");
+                //document.getElementById(storytextid).removeAttribute("id");
             };
+            event.stopPropagation();
         };
 
     });
@@ -281,6 +284,32 @@ $(document).on("keydown", ".storytext", function (event) {
 
     }
 
+    //Display description in description panel
+    $(document).on("focus", ".storytext, .activitytext, .grouptext", function (event) {
+        var currentText = $(this).text();
+        $("#blockname").text(currentText);
+        var detailsText = $(this).data("details");
+        textbox = $(this).attr("id");
+        $("#blockdetails").html(detailsText);
+    }); 
+    $(document).on("keyup", ".storytext, .activitytext, .grouptext", function (event) {
+        var currentText = $(this).text();
+        $("#blockname").text(currentText);
+     });
+    $(document).on("keyup", "#blockdetails", function (event) {
+        var detailsText = $("#blockdetails").html();
 
-
-});
+        var element = document.getElementById(textbox);
+        $(element).data("details", detailsText);
+       
+    });
+    /*
+    $(document).on("focus", "#blockcomments", function (event) {
+        var oldcomments = $("#blockcomments").html()  ;
+        var date = new Date($.now());
+        oldcomments = oldcomments + " " + date;
+        $("#blockcomments").html(oldcomments);
+    });
+    */
+ });
+ 

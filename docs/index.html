@@ -21,21 +21,33 @@
 <body>
 
     <div class="layout">
-        <div class="ui-menu">
-            <div class="ui-menu-item" width="100">
-                <a href='newmap.txt' id="downloadmap" type="text/plain" download="storymap">Save</a>
-            </div>
-            <div id=new class="ui-menu-item">New</div>
-            <div id="menuGroups" class="ui-menu-item"> Groups </div>
-            <div id="load" class="ui-menu-item"> Load </div>
-            <div class="ui-menu-item">
-                <input type='file' onchange='openFile(event)' width="150">
-                <output id="list"></output>
-            </div>
-        </div>
 
-        <div id="storymap" class='table'></div>
-       
+        <div id="tablecontainer">
+            <div class="ui-menu">
+                <div class="ui-menu-item" width="100">
+                    <a href='newmap.txt' id="downloadmap" type="text/plain" download="storymap">Save</a>
+                </div>
+                <div id=new class="ui-menu-item">New</div>
+                <div id="menuGroups" class="ui-menu-item"> Groups </div>
+                <div id="load" class="ui-menu-item"> Load </div>
+                <div class="ui-menu-item">
+                    <input type='file' onchange='openFile(event)' width="150">
+                    <output id="list"></output>
+                </div>
+            </div>
+            <div id="storymap" class='table'></div>
+        </div>
+        <div id="infobox">
+            <div id="blocknametitle" class="title">Block title</div>
+            <div id="textboxid"></div>
+            <div id="blockname"></div>
+            <div id="blockdetailstitle" class="title">Block details</div>
+            <div id="blockdetails" contenteditable="true"></div>
+            <!--
+            <div id="blockcommentstitle" class="title">Comments</div>
+            <div id="blockcomments" contenteditable="true"></div>
+        -->
+        </div>
     </div>
 
     <script>
