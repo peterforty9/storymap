@@ -8,20 +8,15 @@ and open the template in the editor.
     Author     : Peter Clarke
 */
 .layout {
-    white-space: nowrap; /* this does the trick */
-    overflow: hidden; /* this prevents the grey divs from overflowing */
+    white-space: nowrap; 
+    overflow: hidden; 
     vertical-align: top;
     display: inline-block;
 }
 
-
 body {
     background-color: white;
-    font-family:'Times New Roman', Times, serif;
-}
-
-p {
-    text-wrap:normal;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
 .ui-menu {
@@ -72,7 +67,36 @@ p {
     display: inline-block;
 }
 #infobox {
-    display: block;
+    position: fixed;
+    bottom: 0;
+    max-width: 95%;
+    min-width: 95%;
+    max-height: 20%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color:whitesmoke;
+}
+
+    #infobox.edit {
+        max-height: 80%;
+    }
+#blockname {
+   border: 1px solid black;
+}
+#blockdetails {
+    overflow-y: auto;
+    background-color: white;
+    color: gray;
+    padding: 5px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+#blockdetails.hidden {
+    display: none;
+    height:0px;
 }
 .row {
     display: table-row;
@@ -282,7 +306,8 @@ textarea {
 .selected{
     opacity:0.2;
 }
-.title{
-    text-align:left;
-    font-weight:bold;
+.title {
+    text-align: left;
+    font-weight: bold;
+    padding: 5px;
 }
