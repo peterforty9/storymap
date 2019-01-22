@@ -326,7 +326,7 @@ $(function () {
         $(element2).val(detailsText);
 
     });
-    $(document).on("click", "#blockname", function (event) {
+    $(document).on("click", "#blockname, #toggledetails", function (event) {
         $("#blockdetails").toggleClass("hidden");
         hiddenblockdetails = $("#blockdetails").hasClass("hidden");
     });

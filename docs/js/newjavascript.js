@@ -290,13 +290,18 @@ function addNewRelease(clicked){
         hideaddstory();
     });
   
-   
+    
     //open new map from html template
     $(document).on("click", "#new", function () {
         $('#storymap').load('newmap.html #storymap');
         console.log("new map loaded");
              });
-        
+
+    //toggle details
+    //$(document).on("click", "#toggledetails", function () {
+     //   $("#blockdetails").toggleClass("hidden");
+    //});
+
     //upload file
     openFile = function (event) {
        
