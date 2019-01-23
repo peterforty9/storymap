@@ -2,7 +2,26 @@
 $(function () {
     var textbox;
     var hiddenblockdetails;
-   
+
+    //Generate object html
+    function boxhtml(boxtype, textboxid) {
+        var htmlData = "";
+        if (textboxid == null) { textboxid = Math.random() };
+        if (boxtype == "group" || boxtype == "activity" || boxtype == "story" || boxtype == "iteration") {
+            htmlData = "<div class='" + boxtype + "'><div class='" + boxtype + "text' contenteditable='true' id='" + textboxid + "'></div><input type='hidden' id='" + textboxid + "-details'></div>";
+            if (boxtype == "group") {
+                htmlData = "<div class='grouprelease cell'>" + htmlData + "</div>";
+            } else if (boxtype == "activity" || boxtype == "story") {
+                htmlData = "<li>" + htmlData + "</li>";
+                console.log(boxtype + " created (li)");
+            } else { };
+        } else if (boxtype == "epic") {
+            htmlData = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
+        } else { };
+        console.log(boxtype + " created");
+        return htmlData;
+    }
+    
     //GROUP MANAGEMENT
 
     //Toggle groups
@@ -71,7 +90,7 @@ $(function () {
     function insertGroup(groupnumber) {
         var grouptextid = Math.random();
         var activitylist = $('#activityrow .cell:nth-child(' + groupnumber + ')');
-        var htmlData = "<div class='grouprelease cell'><div class='group'><div class='grouptext contenteditable='true' id='" + grouptextid + "'></div><input type='hidden' id='" + grouptextid + "-details'></div></div>";
+        var newgrouphtml = boxhtml("group", grouptextid);
         var activitylisthtml = "<div class='grouprelease cell'><ul class='activities'></ul></div>"
         var groupreleasehtml = "<div class='grouprelease release cell'></div>"
         var group = $("#groups div.cell:nth-child(" + (groupnumber) + ")")
@@ -83,7 +102,7 @@ $(function () {
         });
 
         //Insert group
-        $(htmlData).insertAfter(group);
+        $(newgrouphtml).insertAfter(group);
         $(activitylisthtml).insertAfter(activitylist);
 
         document.getElementById(grouptextid).focus();
@@ -92,18 +111,16 @@ $(function () {
     //Append new activity
     function appendNewActivity(groupnumber) {
         var activitytextid = Math.random();
-        var htmlData = "<li><div class='activity'><div class='activitytext' contenteditable='true' id='" + activitytextid + "'></div><input type='hidden' id='" + activitytextid + "-details'></div></li>";
+        var activityhtml = boxhtml("activity", activitytextid);
         var activitylist = $('#activityrow .cell:nth-child(' + groupnumber + ') .activities');
 
         //Insert activity 
-        $(htmlData).appendTo(activitylist);
+        $(activityhtml).appendTo(activitylist);
         document.getElementById(activitytextid).focus();
 
-        //Insert new epic
+        //Append new epic
 
-        var from;
-
-        from = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
+        var from = boxhtml("epic");
 
         $(".releaserow").each(function (index) {
             $(from).appendTo($(this).find(" .cell:nth-child(" + groupnumber + ")"));
@@ -153,7 +170,7 @@ $(function () {
 
     function insertNewActivity(activitynumber, groupnumber) {
         var activitytextid = Math.random();
-        var htmlData = "<li><div class='activity'><div class='activitytext' contenteditable='true' id='" + activitytextid + "'></div><input type='hidden' id='" + activitytextid + "-details'></div></li>";
+        var htmlData = boxhtml("activity", activitytextid)
         var activity = $("#activityrow").find(".cell:nth-child(" + groupnumber + ") .activities li").eq(activitynumber - 1);
         //Insert activity 
         $(htmlData).insertAfter($(activity));
@@ -163,7 +180,7 @@ $(function () {
 
         var from;
 
-        from = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
+        from = boxhtml("epic");
 
         $(".releaserow").each(function (index) {
             $(from).insertAfter($(this).find($(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ")")));
@@ -174,8 +191,7 @@ $(function () {
     function appendNewStory(activitynumber, groupnumber) {
 
         var storytextid = Math.random()
-        var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "'></div><input type='hidden' id='" + storytextid + "-details'></div></li>";
-
+        var htmlData = boxhtml("story", storytextid);
         $(".releaserow").each(function (index) {
             $(htmlData).appendTo($(this).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ") .stories"));
         });
@@ -196,14 +212,15 @@ $(function () {
         var activitystartindex = activityline.index();
         var groupstartindex = activityline.parent().parent().index();
         var activityindex = activitystartindex + 1;
-        var groupnumber = groupstartindex + 1;
+        var groupnumber = groupstartindex;
 
         var activityempty = $(activityline).find(" .activity .activitytext").is(':empty');
         var storycount = 0;
 
         //See if any stories exist in any of the releases
         $(".releaserow").each(function (index) {
-            if ($(this).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activityindex + ") .stories").is(':empty')) {
+            
+            if (epicEmpty(index, groupnumber, activityindex)) {
                 storycount = storycount + 0;
             }
             else {
@@ -213,6 +230,15 @@ $(function () {
         });
         if (activityempty && storycount === 0) { return true }
     }
+
+    //Check Epic has no stories
+    function epicEmpty(rowindex, groupnumber, activitynumber) {
+        groupnumber = groupnumber + 1
+        console.log("Rowindex:" + rowindex + " groupcell:" + groupnumber + " activitynumber:" + activitynumber);
+        var empty = ($($(".releaserow").eq(rowindex)).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ") .stories").is(':empty')) 
+        console.log(empty);
+        return empty;
+    };
 
     //Remove activity li and underlying epics
     function removeactivity(thisObj) {
@@ -243,8 +269,7 @@ $(function () {
     //Create new story when addStory clicked
     $(document).on("click", ".addStory", function () {
         var storytextid = Math.random()
-        var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "'></div><input type='hidden' id='" + storytextid + "-details'></div></li>";
-
+        var htmlData = boxhtml("story", storytextid);
         if (($(this).parent().find("li .story").length > 0)) {
             $(htmlData).insertAfter($(this).parent().find("li:last-child"));
         }
@@ -253,7 +278,6 @@ $(function () {
         };
 
         document.getElementById(storytextid).focus();
-        //document.getElementById(storytextid).removeAttribute("id");
     });
 
     //Create new story when enter key pressed
@@ -280,10 +304,10 @@ $(function () {
             if ($(this).is(':empty')) { deletestory($(this)) }
             else {
                 var storytextid = Math.random()
-                var htmlData = "<li><div class='story'><div class='storytext' contenteditable='true' id='" + storytextid + "' data-details=''></div><input type='hidden' id='" + storytextid + "-details' value=''></div></li>";
+                var htmlData = boxhtml("story", storytextid);
                 $(htmlData).insertAfter($(this).parent().parent());
                 document.getElementById(storytextid).focus();
-                //document.getElementById(storytextid).removeAttribute("id");
+               
             };
             event.stopPropagation();
         };
@@ -302,6 +326,103 @@ $(function () {
         thisObj.parent().parent().remove();
 
     }
+
+    // RELEASE MANAGEMENT
+
+    //Add new release   
+    $(document).on("click", ".addrelease", function () {
+        addNewRelease();
+    });
+
+    function addNewRelease(iterationtextid) {
+
+        var i = 0;
+        var k = 0;
+        var m;
+
+        var groupcount = (($("#groups div.cell").length) - 1);
+        var iteration = boxhtml("iteration",iterationtextid)
+        var newrelease = "<div class='releaserow row'><div class='releasename cell'>" + iteration + "</div>";
+        var newgroupstart = "<div class='grouprelease cell'>";
+        var newgroupend = "</div>";
+
+        do {
+            m = 2 + k;
+            newrelease = newrelease + newgroupstart;
+            var activitycount = ($("#activityrow .cell:nth-child(" + m + ") .activity").length);
+
+            do {
+                newrelease = newrelease + newepic;
+                i++;
+            }
+            while (i < activitycount);
+
+            i = 0;
+            newrelease = newrelease + newgroupend;
+            k++;
+        }
+        while (k < groupcount);
+        newrelease = newrelease + newgroupend + "</div>";
+
+        $(newrelease).insertAfter($("div .releaserow:last-of-type"));
+
+    }
+
+    //Create new row when enter key pressed
+    $(document).on("keydown", ".iterationtext", function (event) {
+        var rowindex = $(this).parent().parent().parent().index();
+        console.log("on keydown row index:" + rowindex);
+        if (event.which == 13) { //Insert row
+            event.preventDefault();
+            if ($(this).is(':empty') && emptyIteration(rowindex)) {
+                $($(".releaserow").eq(rowindex)).remove();
+                console.log("row deleted");
+        }
+            else {
+                var iterationtextid = Math.random()
+                addNewRelease(iterationtextid)
+                document.getElementById(iterationtextid).focus();
+
+            };
+            event.stopPropagation();
+        };
+    });
+
+    function emptyIteration(rowindex) {
+        var storycount = 0
+        var activitynumber = 1;
+        var groupnumber = 1;
+        var m;
+
+        var groupcount = (($("#groups div.cell").length)-1);
+        
+        do {
+            m = 1 + groupnumber;
+            
+            var activitycount = ($("#activityrow .cell:nth-child(" + m + ") .activity").length);
+
+            do {
+                if (epicEmpty(rowindex, groupnumber, activitynumber)) {
+                    console.log("No story at - Rowindex:" + rowindex + " groupnumber:" + groupnumber + " activitynumber:" + activitynumber);
+                    storycount = storycount + 0;
+                } else
+                {
+                    console.log("Story found at - Rowindex:" + rowindex + " groupnumber:" + groupnumber + " activitynumber:" + activitynumber);
+                    storycount = storycount + 1
+                };
+                console.log("Storycount:" + storycount);
+
+                activitynumber++;
+            }
+            while (activitynumber <= activitycount);
+
+            activitynumber = 1;
+            groupnumber++;
+        }
+        while (groupnumber <= groupcount);
+        if (storycount == 0) return true; 
+       
+    };
 
     //Display description in description panel
     $(document).on("focus", ".storytext, .activitytext, .grouptext", function (event) {

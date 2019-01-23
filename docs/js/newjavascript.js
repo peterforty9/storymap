@@ -74,8 +74,8 @@ $(function () {
         $("#releases").sortable({
             connectWith: "#releases",
             cursor: "move",
-            handle: ".rowhandle",
-            cancel: ".epic, .releasename, .newrelease",
+            handle: ".iteration",
+            cancel: ".epic, .newrelease, .iterationtext",
         });
     }
     function makeActivitiesSortable() {
@@ -239,44 +239,6 @@ $(function () {
 //Listen out for newly created epics and make sortable
 $("body").on("DOMNodeInserted", "#storymap", makeSortable);
 
-//Add new release   
-$(document).on("click", ".addrelease", function() {
-  addNewRelease(this);
-});
-
-function addNewRelease(clicked){
-    
-    var i = 0;
-    var k = 0;
-    var m;
-   
-    var groupcount = (($("#groups div.cell").length)-2);
-    var newrelease = "<div class='releaserow row'><div class='rowhandle cell'></div><div class='releasename cell' contenteditable='true'>Release/Version</div>";
-    var newgroupstart = "<div class='grouprelease cell'>";
-    var newgroupend = "</div>";
-
-    do {
-        m = 3 + k;
-        newrelease = newrelease + newgroupstart;
-        var activitycount = ($("#activityrow .cell:nth-child(" + m + ") .activity").length);
-        
-        do {
-            newrelease = newrelease + newepic;
-            i++;
-        }
-        while (i < activitycount);
-
-        i = 0;
-        newrelease = newrelease + newgroupend;
-        k++;
-    }
-    while (k < groupcount);
-    newrelease = newrelease + newgroupend + "</div>";
-  
-    $(newrelease).insertAfter($("div .releaserow:last-of-type"));
-    
- }
-   
 //Save map each time it is updated
     $(document).on("focusout", ".storytext, .activitytext, .releasename, .grouptext", function () {
         var html = $('#storymap').clone();
