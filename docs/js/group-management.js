@@ -3,12 +3,23 @@ $(function () {
     var textbox;
     var hiddenblockdetails;
 
+    //Edit textbox details
+    $(document).on("keydown", ".textbox", function (event) {
+        if (event.shiftKey && event.ctrlKey && event.which == 13) {
+            hiddenblockdetails = $("#blockdetails").hasClass("hidden");
+            $("#blockdetails").removeClass("hidden");
+            $('#blockdetails').focus();
+            event.stopPropagation();
+
+        }
+    });
+
     //Generate object html
     function boxhtml(boxtype, textboxid) {
         var htmlData = "";
         if (textboxid == null) { textboxid = Math.random() };
         if (boxtype == "group" || boxtype == "activity" || boxtype == "story" || boxtype == "iteration") {
-            htmlData = "<div class='" + boxtype + "'><div class='" + boxtype + "text' contenteditable='true' id='" + textboxid + "'></div><input type='hidden' id='" + textboxid + "-details'></div>";
+            htmlData = "<div class='" + boxtype + "'><div class='" + boxtype + "text textbox' contenteditable='true' id='" + textboxid + "'></div><input type='hidden' id='" + textboxid + "-details'></div>";
             if (boxtype == "group") {
                 htmlData = "<div class='grouprelease cell'>" + htmlData + "</div>";
             } else if (boxtype == "activity" || boxtype == "story") {
@@ -42,18 +53,12 @@ $(function () {
         var groupnumber = groupstartindex + 1;
         var activitylist = $('#activityrow .cell:nth-child(' + groupnumber + ')');
 
-        if (event.shiftKey && event.ctrlKey && event.which == 13) {
-            hiddenblockdetails = $("#blockdetails").hasClass("hidden");
-            $("#blockdetails").removeClass("hidden");
-            $('#blockdetails').focus();
-            event.stopPropagation();
-
-        } else if (event.which == 13 && event.ctrlKey) {
+        if (event.which == 13 && event.ctrlKey && (event.shiftKey == false)) {
             event.preventDefault();
             appendNewActivity(groupnumber);
             event.stopPropagation();
         }
-        else if (event.which == 13) {
+        else if (event.which == 13 && ((event.shiftKey && event.ctrlKey) == false)) {
             event.preventDefault();
 
             if (hasactivities(groupnumber) == false && $(this).is(':empty')) {
@@ -143,17 +148,11 @@ $(function () {
         var groupstartindex = $(this).parent().parent().parent().parent().index();
         var activitynumber = activitystartindex + 1;
         var groupnumber = groupstartindex + 1;
-        if (event.shiftKey && event.ctrlKey && event.which == 13) {
-            hiddenblockdetails = $("#blockdetails").hasClass("hidden");
-            $("#blockdetails").removeClass("hidden");
-            $('#blockdetails').focus();
-            event.stopPropagation();
-
-        } else if (event.ctrlKey && event.which == 13) { //Append new story
+        if (event.ctrlKey && event.which == 13 && (event.shiftKey == false)) { //Append new story
             event.preventDefault();
             appendNewStory(activitynumber, groupnumber);
             event.stopPropagation();
-        } else if (event.shiftKey && event.which == 13 && $("#groups").is(":visible")) { //Insert new group (if groups visible)
+        } else if (event.shiftKey && event.which == 13 && $("#groups").is(":visible") && (event.ctrlKey == false)) { //Insert new group (if groups visible)
             event.preventDefault();
             insertGroup(groupnumber);
             event.stopPropagation();
@@ -287,8 +286,6 @@ $(function () {
 
     //Create new story when enter key pressed
     $(document).on("keydown", ".storytext", function (event) {
-
-        //var activity = $(this).parent().parent();
         var activityindex = $(this).parent().parent().parent().parent().index();
         var groupindex = $(this).parent().parent().parent().parent().parent().index();
         var rowindex = $(this).parent().parent().parent().parent().parent().parent().index();
@@ -296,21 +293,15 @@ $(function () {
         var activitynumber = activityindex + 1;
         var groupnumber = groupindex + 1;
 
-        if (event.shiftKey && event.ctrlKey && event.which == 13) { //edit details
-            hiddenblockdetails = $("#blockdetails").hasClass("hidden");
-            $("#blockdetails").removeClass("hidden");
-            $('#blockdetails').focus();
-            event.stopPropagation();
-
-        } else if (event.shiftKey && event.which == 13) { //Insert new activity
+        if (event.shiftKey && event.which == 13 && (event.ctrlKey == false)) { //Insert new activity
             event.preventDefault();
             insertNewActivity(activitynumber, groupnumber);
             event.stopPropagation();
-        } else if (event.ctrlKey && event.which == 13) { //Append new story to next release
+        } else if (event.ctrlKey && event.which == 13 && (event.shiftKey == false)) { //Append new story to next release
             event.preventDefault();
             appendNewStory(activitynumber, groupnumber, ctrlrowindex);
             event.stopPropagation();
-        } else if (event.which == 13) { //Insert story
+        } else if (event.which == 13 && ((event.shiftKey && event.ctrlKey) == false)) { //Insert story
             event.preventDefault();
             if ($(this).is(':empty')) { deletestory($(this)) }
             else {
@@ -383,7 +374,7 @@ $(function () {
     $(document).on("keydown", ".iterationtext", function (event) {
         var rowindex = $(this).parent().parent().parent().index();
         console.log("on keydown row index:" + rowindex);
-        if (event.which == 13) { //Insert row
+        if (event.which == 13 && ((event.shiftKey && event.ctrlKey) == false)) { //Insert row
             event.preventDefault();
             if ($(this).is(':empty') && emptyIteration(rowindex)) {
                 $($(".releaserow").eq(rowindex)).remove();
@@ -436,7 +427,7 @@ $(function () {
     };
 
     //Display description in description panel
-    $(document).on("focus", ".storytext, .activitytext, .grouptext", function (event) {
+    $(document).on("focus", ".textbox", function (event) {
         var currentText = $(this).text();
         $("#blockname").text(currentText);
 
@@ -447,7 +438,7 @@ $(function () {
         $("#blockname").css('background-color', bgcolor); //make title colour the same as the block type
                 
     });
-    $(document).on("keyup", ".storytext, .activitytext, .grouptext", function (event) {
+    $(document).on("keyup", ".textbox", function (event) {
         var currentText = $(this).text();
         $("#blockname").text(currentText);
     });
