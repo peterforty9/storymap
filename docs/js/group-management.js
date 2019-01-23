@@ -188,13 +188,18 @@ $(function () {
 
     };
 
-    function appendNewStory(activitynumber, groupnumber) {
+    function appendNewStory(activitynumber, groupnumber, rowindex) {
 
         var storytextid = Math.random()
         var htmlData = boxhtml("story", storytextid);
+        if (rowindex == null) rowindex = 0; 
+        $(htmlData).appendTo($(".releaserow").eq(rowindex).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ") .stories"));
+        
+        /* Might need this for different table type e.g. grid
         $(".releaserow").each(function (index) {
             $(htmlData).appendTo($(this).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ") .stories"));
         });
+        */
         document.getElementById(storytextid).focus();
     };
 
@@ -286,6 +291,8 @@ $(function () {
         //var activity = $(this).parent().parent();
         var activityindex = $(this).parent().parent().parent().parent().index();
         var groupindex = $(this).parent().parent().parent().parent().parent().index();
+        var rowindex = $(this).parent().parent().parent().parent().parent().parent().index();
+        var ctrlrowindex = rowindex + 1;
         var activitynumber = activityindex + 1;
         var groupnumber = groupindex + 1;
 
@@ -298,6 +305,10 @@ $(function () {
         } else if (event.shiftKey && event.which == 13) { //Insert new activity
             event.preventDefault();
             insertNewActivity(activitynumber, groupnumber);
+            event.stopPropagation();
+        } else if (event.ctrlKey && event.which == 13) { //Append new story to next release
+            event.preventDefault();
+            appendNewStory(activitynumber, groupnumber, ctrlrowindex);
             event.stopPropagation();
         } else if (event.which == 13) { //Insert story
             event.preventDefault();
