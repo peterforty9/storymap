@@ -7,7 +7,10 @@ and open the template in the editor.
     Created on : 23-Mar-2018, 09:31:58
     Author     : Peter Clarke
 */
+
+
 .layout {
+    
     white-space: nowrap; 
     overflow: hidden; 
     vertical-align: top;
@@ -19,14 +22,22 @@ body {
     font-family:Arial, Helvetica, sans-serif;
 }
 
-
-
-
 .ui-menu {
+    position: fixed;
+    top: 0;
+    max-width: 99%;
+    min-width: 99%;
+    background-color: whitesmoke;
+    /*
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
     float:left;
     background-color: #34675C;
     width:99%;
     width:99vw;
+        */
 }
 .ui-menu-item {
     background-color: #34675C;
@@ -57,19 +68,29 @@ body {
         color: white;
         text-decoration: none;
     }
+
+#board {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+}
 #storymap {
     display: table;
     border-collapse: separate;
     border-spacing: 3px;
+    width: 100%;
 }
+/*
 #tablecontainer {
     height: 70%;
-    white-space: nowrap; /* this does the trick */
-    overflow: hidden; /* this prevents the grey divs from overflowing */
+    white-space: nowrap; 
+    overflow: hidden;
     vertical-align: top;
     display: inline-block;
     padding-bottom:2em;
+    width:100%;
 }
+    */
 #infobox {
     position: fixed;
     bottom: 0;
@@ -134,7 +155,7 @@ body {
     min-width: 136px;
     height: 76px;
     text-align: left;
-    background-color: #4CB5F5;
+    background-color: whitesmoke;
     float: left;
     padding-left: 10px;
     border-width: 2px;
@@ -148,12 +169,12 @@ body {
     max-width: 136px;
     height: 76px;
     max-height: 76px;
-    text-align: left;
-    background-color: #4CB5F5;
+    background-color: whitesmoke;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
     overflow: hidden;
+    writing-mode: vertical-rl;
 }
 .group {
     width: 136px;
@@ -204,7 +225,7 @@ body {
     width: 136px;
     height: 76px;
     text-align: left;
-    background-color: #B7B8B6;
+    background-color: whitesmoke;
     padding-left: 10px;
     border-width: 2px;
     border-color: white;
@@ -213,29 +234,47 @@ body {
 }
 
 .activitiesheadingtext {
-    width: 136px;
-    max-width: 136px;
+    width: 68px;
+    max-width: 68px;
     height: 76px;
     max-height: 76px;
     text-align: left;
-    background-color: #B7B8B6;
+    background-color: whitesmoke;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
     overflow: hidden;
+    writing-mode: vertical-rl;
+    display:inline-block;
 }
-.activity {
-    display: inline-block;
-    width: 136px;
-    height: 76px;
+.rowsheadingtext {
+    width: 68px;
+    max-width: 68px;
+    max-height: 76px;
     text-align: left;
-    background-color: #B7B8B6;
-    padding-left: 10px;
-    border-width: 2px;
-    border-color: white;
-    border-style: solid;
-    vertical-align: top;
+    height: 76px;
+    background-color: whitesmoke;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    float: left;
 }
+    
+    .activity {
+        display: inline-block;
+        /*width: 136px;*/
+        height: 76px;
+        text-align: left;
+        background-color: #B7B8B6;
+        padding-left: 10px;
+        border-width: 2px;
+        border-color: white;
+        border-style: solid;
+        vertical-align: top;
+    }
 
 .activitytext {
     width: 136px;
@@ -261,7 +300,7 @@ body {
 .epic {
     display: inline-block;
     vertical-align: top;
-    width: 150px;
+   /* width: 150px; */
 }
 .epic ul {
     white-space: nowrap;
@@ -332,7 +371,7 @@ body {
 }
 
 .stories {
-    width: 150px;
+    /*width: 150px;*/
     min-height: 10px;
     text-align: left;
     float: left;

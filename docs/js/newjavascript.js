@@ -241,21 +241,45 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
 
 //Save map each time it is updated
     $(document).on("focusout", ".storytext, .activitytext, .releasename, .grouptext", function () {
-        var html = $('#storymap').clone();
+        var html = $('#board').clone();
         var htmlString = html.html();
         var datauri = btoa(htmlString);
-        //$("#mapdata").val(datauri);
+        //Save to local storage
         localStorage.storymap = datauri;
+        createColumnJSON();
+
+        //Save downloadable file
         var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
         $("#downloadmap").attr("href", downloadfile);
         console.log("storymap saved");
         hideaddstory();
     });
-  
+    //Create json objects 
+
+    function createColumnJSON() {
+
+            jsonObj = [];
+            $(".activities .textbox").each(function () {
+                var id = $(this).attr("id");
+                var title = $(this).text();
+                var details = $(this).next();
+
+                item = {}
+                item["boxid"] = id;
+                item["columntitle"] = title;
+                item["columndetails"] = details;
+
+                jsonObj.push(item);
+
+            });
+      
+        console.log(jsonObj)
+    }
+
     
     //open new map from html template
     $(document).on("click", "#new", function () {
-        $('#storymap').load('newmap.html #storymap');
+        $('#board').load('newmap.html #storymap');
         console.log("new map loaded");
              });
 
@@ -272,7 +296,7 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
         reader.onload = function () {
             var text = reader.result;
             var htmlstring = text//atob(text);
-            $('#storymap').html(htmlstring);
+            $('#board').html(htmlstring);
             //$("#mapdata").val(htmlstring);
             // Store
             localStorage.storymap = text;
@@ -288,20 +312,11 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
 
         var mapdata = localStorage.getItem('storymap');
         var htmlstring = atob(mapdata);
-        $('#storymap').html(htmlstring);
+        $('#board').html(htmlstring);
         console.log("window ready");
     });
 
-    //load from text box
-    $(document).on("click", "load", function () {
-       
-        var mapdata = localStorage.getItem('storymap');
-        var htmlstring = atob(mapdata);
-        document.getElementById("storymap").innerHTML = htmlstring;
-        console.log("load clicked");
-       // $('#storymap').html(htmlstring);
-
-    });
+   
     //function saveSettings() {
     //    localStorage.storymap = $('#storymap').val();
     //}

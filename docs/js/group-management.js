@@ -3,6 +3,35 @@ $(function () {
     var textbox;
     var hiddenblockdetails;
 
+  
+    //update number of activity columns
+    $(document).on("click", "#col4", function () {
+        $("head link#columns").attr("href", "fourcolumns.css");
+        /*
+        $('.activity').css('width', '286px');
+        $('.stories').css('width', '300px');
+        $('.epic').css('width', '300px');
+        */
+        console.log("load clicked");
+        /*
+         var mapdata = localStorage.getItem('storymap');
+         var htmlstring = atob(mapdata);
+         document.getElementById("storymap").innerHTML = htmlstring;
+        
+         */
+        // $('#storymap').html(htmlstring);
+
+    });
+    $(document).on("click", "#col1", function () {
+        $("head link#columns").attr("href", "singlecolumn.css");
+    });
+    $(document).on("click", "#col3", function () {
+        $("head link#columns").attr("href", "threecolumns.css");
+    });
+    $(document).on("click", "#col2", function () {
+        $("head link#columns").attr("href", "twocolumns.css");
+    });
+
     //Edit textbox details
     $(document).on("keydown", ".textbox", function (event) {
         if (event.shiftKey && event.ctrlKey && event.which == 13) {
@@ -460,7 +489,6 @@ $(function () {
     $(document).on("focus", "#blockdetails", function (event) {
         $("#infobox").addClass("edit");
     });
-
     $(document).on("keydown", "#blockdetails", function (event) {
 
         if (event.shiftKey && event.ctrlKey && event.which == 13) { //back to home block
