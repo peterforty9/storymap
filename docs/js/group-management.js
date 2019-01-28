@@ -266,9 +266,11 @@ $(function () {
 
     //Check Epic has no stories
     function epicEmpty(rowindex, groupnumber, activitynumber) {
+        var empty
         groupnumber = groupnumber + 1
         console.log("Rowindex:" + rowindex + " groupcell:" + groupnumber + " activitynumber:" + activitynumber);
-        var empty = ($($(".releaserow").eq(rowindex)).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ") .stories").is(':empty')) 
+        var activitycount = ($("#activityrow .cell:nth-child(" + groupnumber + ") .activity").length);
+        if (activitycount == 0 || $($(".releaserow").eq(rowindex)).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ") .stories").is(':empty')) empty = true;
         console.log(empty);
         return empty;
     };
@@ -381,13 +383,14 @@ $(function () {
             m = 2 + k;
             newrelease = newrelease + newgroupstart;
             var activitycount = ($("#activityrow .cell:nth-child(" + m + ") .activity").length);
-
-            do {
-                newrelease = newrelease + newepic;
-                i++;
-            }
-            while (i < activitycount);
-
+            console.log("group " + k + " has " + activitycount + " activities");
+            if (activitycount > 0) {
+                do {
+                    newrelease = newrelease + newepic;
+                    i++;
+                }
+                while (i < activitycount);
+            };
             i = 0;
             newrelease = newrelease + newgroupend;
             k++;

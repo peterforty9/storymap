@@ -246,6 +246,7 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
         var datauri = btoa(htmlString);
         //Save to local storage
         localStorage.storymap = datauri;
+        getGroups();
         createColumnJSON();
 
         //Save downloadable file
@@ -255,26 +256,75 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
         hideaddstory();
     });
     //Create json objects 
+    function getGroups() {
+        groups = [];
+        $(".group .textbox").each(function () {
+            var id = $(this).attr("id");
+            var title = $(this).text();
+            var details = $(this).next();
 
-    function createColumnJSON() {
+            item = {}
+            item["boxid"] = id;
+            item["title"] = title;
+            item["details"] = details;
 
+            groups.push(item);
+        });
+        console.log("groups");
+        console.log(groups);
+    }
+    
+
+    function createColumnJSON() 
+    {
+        activityObj = []
+
+        $(".activities").each(function () {
             jsonObj = [];
-            $(".activities .textbox").each(function () {
+          ($(this).find(".textbox")).each(function () {
                 var id = $(this).attr("id");
                 var title = $(this).text();
                 var details = $(this).next();
 
                 item = {}
                 item["boxid"] = id;
-                item["columntitle"] = title;
-                item["columndetails"] = details;
+                item["title"] = title;
+                item["details"] = details;
 
                 jsonObj.push(item);
 
             });
-      
-        console.log(jsonObj)
-    }
+
+            activityObj.push(jsonObj);
+          
+        });
+        console.log("activities");
+        console.log(activityObj);
+
+        rowsObj = [];
+        $(".releaserow").each(function () {
+            rowObj = [];
+            ($(this).find(".epic")).each(function () {
+                epicObj = [];
+                ($(this).find(".textbox")).each(function () {
+                var id = $(this).attr("id");
+                var title = $(this).text();
+                var details = $(this).next();
+
+                item = {}
+                item["boxid"] = id;
+                item["title"] = title;
+                item["details"] = details;
+
+                epicObj.push(item);
+                });
+                rowObj.push(epicObj);
+            });
+            rowsObj.push(rowObj);
+            console.log("rows");
+            console.log(rowsObj);
+        });
+    };
 
     
     //open new map from html template

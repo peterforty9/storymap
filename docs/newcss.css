@@ -249,16 +249,10 @@ body {
 }
 .rowsheadingtext {
     width: 68px;
-    max-width: 68px;
-    max-height: 76px;
-    text-align: left;
-    height: 76px;
-    background-color: whitesmoke;
+    max-width: 6                                                              8px;                                                                                                                                                                                                                                                                                                                
     overflow-wrap: break-word;
-    word-wrap: break-word;
-    white-space: normal;
-    overflow: hidden;
-    display: inline-block;
+    word-wrap: break-word;     
+    white-space: normal;   
     vertical-align: bottom;
     float: left;
 }
@@ -267,7 +261,7 @@ body {
         display: inline-block;
         /*width: 136px;*/
         height: 76px;
-        text-align: left;
+        text-align: left;                                   
         background-color: #B7B8B6;
         padding-left: 10px;
         border-width: 2px;
