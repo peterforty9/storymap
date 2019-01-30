@@ -71,7 +71,9 @@ $(function () {
 
     function toggleGroups() {
         $("#groups").toggle();
-
+        $(".rowsheadingtext").toggle();
+        $(".iteration").toggle();
+        $(".addrelease").toggle();
     }
 
     //Insert new group from group

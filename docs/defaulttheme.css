@@ -1,0 +1,116 @@
+﻿body {
+}
+.group {
+    width: 100%;
+    height: 76px;
+    text-align: left;
+    background-color: #B7B8B6;
+    float: left;
+    
+    /*
+    padding-left: 10px;
+    padding-right: 0px;
+    border-width: 2px;
+    border-color: white;
+    border-style: solid;
+    */
+    vertical-align: top;
+}
+
+.grouptext {
+    width: 136px;
+    max-width: 136px;
+    height: 76px;
+    max-height: 76px;
+    margin-left:10px;
+    text-align: left;
+    background-color: transparent;
+    color:white;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+}
+.activity {
+    display: inline-block;
+    width: 136px;
+    height: 76px;
+    text-align: left;
+    background-color: #4CB5F5;
+    padding-left: 10px;
+    margin-right: 2px;
+    margin-left: 2px;
+    /*
+    border-width: 2px;
+    border-color: white;
+    border-style: solid;
+        */
+    vertical-align: top;
+}
+
+.activitytext {
+    width: 136px;
+    max-width: 136px;
+    height: 76px;
+    max-height: 76px;
+    text-align: left;
+    background-color: transparent;
+    color:white;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+}
+.iteration {
+    float: left;
+    width: 136px;
+    height: 100%;
+    text-align: left;
+    background-color: #34675C;
+    color: white;
+    padding-left: 10px;
+    border-width: 2px;
+    border-color: white;
+    border-style: solid;
+    vertical-align: top;
+  
+}
+.iterationtext {
+    width: 136px;
+    max-width: 136px;
+    height: 100%;
+    text-align: left;
+    background-color: transparent;
+    color: white;
+    float: left;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+}
+.story {
+    float: left;
+    width: 136px;
+    height: 76px;
+    text-align: left;
+    background-color: #B3C100;
+    padding-left: 10px;
+    margin-right: 2px;
+    margin-left: 2px;
+    vertical-align: top;
+}
+
+.storytext {
+    width: 136px;
+    max-width: 136px;
+    height: 76px;
+    max-height: 76px;
+    text-align: left;
+    background-color: transparent;
+    color: white;
+    float: left;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+}
