@@ -159,6 +159,7 @@ $(function () {
                         //Change class from activity to story
                         ui.item.children().addClass('story').removeClass('activity');
                         childtext.addClass('storytext').removeClass('activitytext');
+                        hideaddstory(); //update add story buttons
 
                     } else {$(".activities").sortable("cancel");}
                 };
@@ -195,7 +196,7 @@ $(function () {
         var targetepic = stopindex + 1;
 
         var movedtoactivities = ui.item.parent().hasClass("activities");
-
+        hideaddstory(); //update add story buttons
         if (movedtoactivities == true) {
 
             var childtext = ui.item.children().children();
@@ -246,17 +247,17 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
         var datauri = btoa(htmlString);
         //Save to local storage
         localStorage.storymap = datauri;
-        getGroups();
+        //getGroups();
         createColumnJSON();
 
         //Save downloadable file
         var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
         $("#downloadmap").attr("href", downloadfile);
         console.log("storymap saved");
-        hideaddstory();
+        
     });
     //Create json objects 
-    function getGroups() {
+    /*function getGroups() {
         groups = [];
         $(".group .textbox").each(function () {
             var id = $(this).attr("id");
@@ -273,10 +274,30 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
         console.log("groups");
         console.log(groups);
     }
-    
-
+    */
     function createColumnJSON() 
     {
+        board = []
+        // Create groups
+        groups = [];
+        $(".group .textbox").each(function () {
+            var id = $(this).attr("id");
+            var title = $(this).text();
+            var details = $(this).next().attr("value");
+
+            item = {}
+            item["boxid"] = id;
+            item["title"] = title;
+            item["details"] = details;
+
+            groups.push(item);
+           
+        });
+        board.push(groups);
+        console.log("groups");
+        console.log(groups);
+
+        /////
         activityObj = []
 
         $(".activities").each(function () {
@@ -284,7 +305,7 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
           ($(this).find(".textbox")).each(function () {
                 var id = $(this).attr("id");
                 var title = $(this).text();
-                var details = $(this).next();
+              var details = $(this).next().attr("value");
 
                 item = {}
                 item["boxid"] = id;
@@ -296,20 +317,36 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
             });
 
             activityObj.push(jsonObj);
+            
           
         });
         console.log("activities");
         console.log(activityObj);
+        board.push(activityObj);
 
         rowsObj = [];
         $(".releaserow").each(function () {
             rowObj = [];
+            var iteration = ($(this).find(".iterationtext"));
+            var id = $(iteration).attr("id");
+            var title = $(iteration).text();
+            var details = $(iteration).next().attr("value");
+
+            item = {}
+            item["boxid"] = id;
+            item["title"] = title;
+            item["details"] = details;
+
+            rowObj.push(item);
+
+            ($(this).find(".grouprelease")).each(function () {
+                rowgroupObj = [];
             ($(this).find(".epic")).each(function () {
                 epicObj = [];
                 ($(this).find(".textbox")).each(function () {
                 var id = $(this).attr("id");
                 var title = $(this).text();
-                var details = $(this).next();
+                    var details = $(this).next().attr("value");
 
                 item = {}
                 item["boxid"] = id;
@@ -318,25 +355,24 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
 
                 epicObj.push(item);
                 });
-                rowObj.push(epicObj);
+                rowgroupObj.push(epicObj);
+            });
+                rowObj.push(rowgroupObj);
             });
             rowsObj.push(rowObj);
-            console.log("rows");
-            console.log(rowsObj);
         });
+        console.log("rows");
+        console.log(rowsObj);
+        board.push(rowsObj);
+        console.log("board");
+        console.log(board);
     };
-
     
     //open new map from html template
     $(document).on("click", "#new", function () {
         $('#board').load('newmap.html #storymap');
         console.log("new map loaded");
              });
-
-    //toggle details
-    //$(document).on("click", "#toggledetails", function () {
-     //   $("#blockdetails").toggleClass("hidden");
-    //});
 
     //upload file
     openFile = function (event) {
@@ -366,12 +402,7 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
         console.log("window ready");
     });
 
-   
-    //function saveSettings() {
-    //    localStorage.storymap = $('#storymap').val();
-    //}
-
-    function hideaddstory() {
+     function hideaddstory() {
 
         //hide the add story button when stories exist
         $(".stories").each(function (index) {
@@ -385,5 +416,8 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
 
         });
 
-    }
+     }
+
+
+
 });

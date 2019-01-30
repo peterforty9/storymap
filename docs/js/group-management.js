@@ -221,7 +221,8 @@ $(function () {
         var storytextid = Math.random()
         var htmlData = boxhtml("story", storytextid);
         if (rowindex == null) rowindex = 0; 
-        $(htmlData).appendTo($(".releaserow").eq(rowindex).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ") .stories"));
+        var stories = ($(".releaserow").eq(rowindex).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + activitynumber + ") .stories"));
+        $(htmlData).appendTo(stories);
         
         /* Might need this for different table type e.g. grid
         $(".releaserow").each(function (index) {
@@ -229,6 +230,8 @@ $(function () {
         });
         */
         document.getElementById(storytextid).focus();
+        //Hide "add story"
+        $(stories).parent().children('.addStory').hide();
     };
 
     //Delete empty activity when focus lost
@@ -305,6 +308,7 @@ $(function () {
     $(document).on("click", ".addStory", function () {
         var storytextid = Math.random()
         var htmlData = boxhtml("story", storytextid);
+
         if (($(this).parent().find("li .story").length > 0)) {
             $(htmlData).insertAfter($(this).parent().find("li:last-child"));
         }
@@ -313,6 +317,7 @@ $(function () {
         };
 
         document.getElementById(storytextid).focus();
+        $(this).hide();
     });
 
     //Create new story when enter key pressed
@@ -340,7 +345,7 @@ $(function () {
                 var htmlData = boxhtml("story", storytextid);
                 $(htmlData).insertAfter($(this).parent().parent());
                 document.getElementById(storytextid).focus();
-               
+                                         
             };
             event.stopPropagation();
         };
@@ -355,9 +360,14 @@ $(function () {
 
     //Delete story
     function deletestory(thisObj) {
-
+        var stories = thisObj.parent().parent().parent();
+        var laststory = $(stories).length;
         thisObj.parent().parent().remove();
 
+        //Show "add story" if it was the last story in the epic
+        if (laststory == 1) {
+            $(stories).parent().children('.addStory').show();
+        };
     }
 
     // RELEASE MANAGEMENT
