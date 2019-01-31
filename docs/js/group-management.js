@@ -71,6 +71,13 @@ $(function () {
 
     function toggleGroups() {
         $("#groups").toggle();
+    }
+    //Toggle rowss
+    $(document).on("click", "#menuRows", function () {
+        toggleRows();
+    });
+
+    function toggleRows() {
         $(".rowsheadingtext").toggle();
         $(".iteration").toggle();
         $(".addrelease").toggle();

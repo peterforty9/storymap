@@ -159,7 +159,7 @@ body {
 }
 
 .groupsheading {
-    width: 150px;
+    max-width: 150px;
     height: 76px;
     text-align: left;
     float: right;
@@ -206,7 +206,7 @@ body {
         display: inline-block;
     }
 .activitiesheading {
-    width:150px;
+    max-width:150px;
     height: 76px;
     text-align: left;
     float: right;
@@ -234,12 +234,18 @@ body {
 }
 .rowsheadingtext {
     width: 150px;
-    max-width: 150px;                                                                                                                                                                                                                                                                                                                
+    max-width: 150px;
     overflow-wrap: break-word;
-    word-wrap: break-word;     
-    white-space: normal;   
+    word-wrap: break-word;
+    white-space: normal;
     vertical-align: bottom;
     float: left;
+    text-align: center;
+    background-color: #34675C;
+    color: white;
+    overflow: hidden;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 .itemsheadingtext {
     width: 150px;
@@ -263,7 +269,10 @@ body {
 .epic {
     display: inline-block;
     vertical-align: top;
-   /* width: 150px; */
+    height:100%;
+    float:left;
+    white-space:normal;
+    overflow:hidden;
 }
 .epic ul {
     white-space: nowrap;
@@ -290,12 +299,12 @@ body {
 
 .addStory {
     width: 150px;
-    height: 5px;
+    height: 100%;
     text-align: center;
     vertical-align:top;
     height:100%;
     float:left;
-    color:#34675C;
+    color:gainsboro;
     cursor:pointer;
 }
 textarea {
