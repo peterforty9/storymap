@@ -11,8 +11,7 @@
     <script type="text/javascript" src="js/jquery-ui.js"></script>
 
     <script src="js/group-management.js"></script>
-    <script src="js/newjavascript.js"></script>
-
+    
     <link rel="stylesheet" href="js/jquery-ui.css" type="text/css">
     <link rel="stylesheet" type="text/css" href="newcss.css">
     <link rel="stylesheet" type="text/css" href="defaulttheme.css">
@@ -21,43 +20,8 @@
 </head>
 
 <body>
-
-    <div class="layout">
-     
-        <div class="ui-menu">
-            <div class="ui-menu-item" width="100">
-                <a href='newmap.txt' id="downloadmap" type="text/plain" download="storymap">Save</a>
-            </div>
-            <div id=new class="ui-menu-item">New</div>
-            <div id="menuGroups" class="ui-menu-item"> Groups </div>
-            <div id="menuRows" class="ui-menu-item"> Rows </div>
-            <div id="col1" class="ui-menu-item"> 1 Col </div>
-            <div id="col2" class="ui-menu-item"> 2 Col </div>
-            <div id="col3" class="ui-menu-item"> 3 Col </div>
-            <div id="col4" class="ui-menu-item"> 4 Col </div>
-            <div id="toggledetails" class="ui-menu-item"> View details </div>
-            <div class="ui-menu-item">
-                <input type='file' onchange='openFile(event)' width="150">
-                <output id="list"></output>
-            </div>
-        </div>
-        <div id="board"></div>
-        <div id="infobox">
-            <div id="blockname" class="title"></div>
-            <div id="blockdetails" contenteditable="true" class="hidden"></div>
-            <!--
-            <div id="blockcommentstitle" class="title">Comments</div>
-            <div id="blockcomments" contenteditable="true"></div>
-        -->
-        </div>
-    </div>
-
-    <script>
-        var n = localStorage.getItem('storymap');
-        var htmlstring = atob(n)
-        $('#board').html(htmlstring);
-    </script>
-
+   
+   
 </body>
 
 

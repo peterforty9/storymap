@@ -8,23 +8,13 @@ and open the template in the editor.
     Author     : Peter Clarke
 */
 
-#storymap {
-    -moz-transform: scale(1.0, 1.0); 
-    zoom: 1.0; 
-    zoom: 100%; 
-}
-
-.layout {
-    
-    white-space: nowrap; 
-    overflow: hidden; 
-    vertical-align: top;
-    display: inline-block;
-}
 
 body {
     background-color: white;
-    font-family:Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
+    white-space: nowrap;
+    vertical-align: top;
+    display: inline-block;
 }
 
 .ui-menu {
@@ -33,16 +23,7 @@ body {
     max-width: 99%;
     min-width: 99%;
     background-color: whitesmoke;
-    /*
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
 
-    float:left;
-    background-color: #34675C;
-    width:99%;
-    width:99vw;
-        */
 }
 .ui-menu-item {
     background-color: #34675C;
@@ -75,27 +56,17 @@ body {
     }
 
 #board {
+    display: table;
     padding-top: 15px;
     padding-bottom: 15px;
     width: 100%;
-}
-#storymap {
-    display: table;
     border-collapse: separate;
     border-spacing: 6px;
-    width: 100%;
+    -moz-transform: scale(1.0, 1.0);
+    zoom: 1.0;
+    zoom: 100%;
 }
-/*
-#tablecontainer {
-    height: 70%;
-    white-space: nowrap; 
-    overflow: hidden;
-    vertical-align: top;
-    display: inline-block;
-    padding-bottom:2em;
-    width:100%;
-}
-    */
+
 #infobox {
     position: fixed;
     bottom: 0;
@@ -140,16 +111,16 @@ body {
     display: table-cell;
     vertical-align: top;
     width:150px;
+}
 
-}
-.map {
-  display: table;
-  text-align: left;
-}
 .grouprelease {
     width: 80px;
 }
-.tbody {
+
+#theader {
+    display: table-header-group;
+}
+#rows {
     display: table-row-group;
 }
 
@@ -166,7 +137,6 @@ body {
     background-color: transparent;
     padding-left: 4px;
     vertical-align: top;
-    
 }
 
 .groupsheadingtext {
@@ -187,10 +157,7 @@ body {
     float: right;
 }
 
-#activityrow {
-
-}
-.activities {
+.columnheader {
     overflow-x: hidden;
     overflow-y: hidden;
     list-style-type: none;
@@ -202,10 +169,10 @@ body {
     max-height: 80px;
 }
 
-    .activities li {
+    .columnheader li {
         display: inline-block;
     }
-.activitiesheading {
+.columnheaderheading {
     max-width:150px;
     height: 76px;
     text-align: left;
@@ -215,7 +182,7 @@ body {
     vertical-align: top;
 }
 
-.activitiesheadingtext {
+.columnheaderheadingtext {
     max-width:150px;
     height: 76px;
     text-align: left;
@@ -256,7 +223,6 @@ body {
     vertical-align: bottom;
     float: left;
 }
-    
 
 .addActivity {
     width: 16px;
