@@ -368,7 +368,7 @@ $(function () {
                 var fromepic = activitystartindex + 1;
                 var activitytargetgroup = (ui.item.parent().parent().index()) + 1;
                 var stayedincolumnheader = ui.item.parent().hasClass("columnheader");
-                var childtext = ui.item.children().children();
+                var childtext = ui.item.find(".textbox");
                 var actcount = groupcolumncount(activitytargetgroup);
                 var lastactivity = false
 
@@ -420,7 +420,7 @@ $(function () {
                             $(this).find(" .cell:nth-child(" + activitystartgroup + ") .epic:nth-child(" + fromepic + ")").remove();
                         });
                         //Change class from activity to story
-                        ui.item.children().addClass('story').removeClass('activity');
+                        ui.item.find(".activity").addClass('story').removeClass('activity');
                         childtext.addClass('storytext').removeClass('activitytext');
                         hideaddstory(); //update add story buttons
 
@@ -456,7 +456,7 @@ $(function () {
                 stopindex = ui.item.index();
 
                 var targetgroup = (ui.item.parent().parent().index()) + 1;
-                var targetepic = stopindex;
+                var targetepic = stopindex + 1;
 
                 var movedtocolumnheader = ui.item.parent().hasClass("columnheader");
                 hideaddstory(); //update add story buttons
@@ -465,7 +465,7 @@ $(function () {
                     var childtext = ui.item.children().children();
                     var actcount = groupcolumncount(targetgroup);
 
-                    if (actcount > 1 && targetepic < actcount) {
+                    if (actcount > 1 && targetepic <= actcount) {
                         ui.item.children().addClass('activity').removeClass('story');
                         childtext.addClass('activitytext').removeClass('storytext');
 
@@ -474,7 +474,7 @@ $(function () {
                         });
 
 
-                    } else if (actcount > 1 && targetepic === actcount) {
+                    } else if (actcount > 1 && targetepic > actcount) {
                         ui.item.children().addClass('activity').removeClass('story');
                         childtext.addClass('activitytext').removeClass('storytext');
                         $(".releaserow").each(function (index) {
