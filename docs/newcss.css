@@ -238,7 +238,7 @@ body {
     display: inline-block;
     vertical-align: top;
     height:100%;
-    float:left;
+   /* float:left; */
     white-space:normal;
     overflow:hidden;
 }
