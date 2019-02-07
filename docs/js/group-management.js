@@ -1,5 +1,5 @@
 ﻿var pre, stopindex, to;
-var newepic = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
+//var newepic = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
 var groupindex;
 var activitystartindex;
 var activitystartgroup;
@@ -573,7 +573,7 @@ $(function () {
         var grouptextid = guid();
         var activitylist = $('#columnheaderrow .cell:nth-child(' + groupnumber + ')');
         var newgrouphtml = boxhtml("group", grouptextid);
-        var activitylisthtml = "<div class='grouprelease cell'><ul class='columnheader'></ul></div>"
+        var activitylisthtml = "<div class='grouprelease cell'><ul class='columnheader'></ul><div class='addColumn'><strong>+</strong></div></div>"
         var groupreleasehtml = "<div class='grouprelease release cell'></div>"
         var group = $("#groups div.cell:nth-child(" + (groupnumber) + ")")
 
@@ -602,10 +602,10 @@ $(function () {
     }
 
     //Append new column
-    function appendNewActivity(groupnumber) {
+    function appendNewActivity(cellnumber) {
         var activitytextid = guid();
         var activityhtml = boxhtml("activity", activitytextid);
-        var activitylist = $('#columnheaderrow .cell:nth-child(' + groupnumber + ') .columnheader');
+        var activitylist = $('#columnheaderrow .cell:nth-child(' + cellnumber + ') .columnheader');
 
         //Insert column 
         $(activityhtml).appendTo(activitylist);
@@ -619,9 +619,10 @@ $(function () {
         var from = boxhtml("epic");
 
         $(".releaserow").each(function (index) {
-            $(from).appendTo($(this).find(" .cell:nth-child(" + groupnumber + ")"));
+            $(from).appendTo($(this).find(" .cell:nth-child(" + cellnumber + ")"));
 
         });
+        hideaddColumn();
     };
 
     //////////// ACTIVITY MANAGEMENT /////////////////
@@ -631,6 +632,23 @@ $(function () {
     var editableactivity
     var newactivityText
     var newactivity
+
+    //Hide addColumn
+    function hideaddColumn() {
+
+        //hide the add story button when stories exist
+        $(".columnheader").each(function (index) {
+            if ($(this).is(':empty')) {
+                $(this).parent().children('.addColumn').show();
+
+            } else {
+
+                $(this).parent().children('.addColumn').hide();
+            }
+
+        });
+
+    }
 
     //Activity text return functions
     $(document).on("keydown", ".activitytext", function (event) {
@@ -761,6 +779,7 @@ $(function () {
         thisObj.remove();
         // Update columns array
         updateColumnsObj();
+        hideaddColumn();
 
         //Remove epics
         $(".releaserow").each(function (index) {
@@ -769,6 +788,13 @@ $(function () {
 
         });
     };
+
+    //Create new column when addColumn clicked
+    $(document).on("click", ".addColumn", function () {
+        var cellnumber = $(this).parent().index() + 1;
+        appendNewActivity(cellnumber);
+        $(this).hide();
+    });
 
     ///////////// STORY MANAGEMENT /////////////////
 
