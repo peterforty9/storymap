@@ -80,15 +80,19 @@ $(function () {
 
     //Toggle groups
     $(document).on("click", "#menuGroups", function () {
-        toggleGroups();
-        //var x = document.getElementById("#menuGroups").checked;
+      //  toggleGroups();
+        document.getElementById("menuGroups").checked ? $("#groups").show() : $("#groups").hide()
+        
     });
     function toggleGroups() {
         $("#groups").toggle();
     }
     //Toggle rows
     $(document).on("click", "#menuRows", function () {
-        toggleRows();
+      //  toggleRows();
+        document.getElementById("menuRows").checked ? $(".rowsheadingtext").show() : $(".rowsheadingtext").hide();
+        document.getElementById("menuRows").checked ? $(".iteration").show() : $(".iteration").hide();
+        document.getElementById("menuRows").checked ? $(".addrelease").show() : $(".addrelease").hide();
     });
     function toggleRows() {
         $(".rowsheadingtext").toggle();
