@@ -38,7 +38,7 @@ $(function () {
 
     //<div class='ui-menu-item' width='100'><a href='newmap.txt' id='downloadmap' type='text/plain' download='board'>Save</a></div>
    // $("body").prepend("<div class='ui-menu'><div id = 'quick' class= 'ui-menu-item'> Quick edit |</div><div id = new class= 'ui-menu-item' > New |</div ><div id='menuGroups' class='ui-menu-item'> Groups |</div> <div id='menuRows' class='ui-menu-item'> Rows |</div> <div id='col1' class='ui-menu-item'> 1 Col |</div> <div id='col2' class='ui-menu-item'> 2 Col |</div> <div id='col3' class='ui-menu-item'> 3 Col </div> <div id='col4' class='ui-menu-item'> 4 Col </div> <div id='toggledetails' class='ui-menu-item'> View details </div> <div class='ui-menu-item'><input type='file' onchange='openFile(event)' width='150'><output id='list'></output></div></div>")
-    $("body").prepend("<div class='ui-menu'><label class='container' id = new>New</label><label class='container'>Quick edit<input type='checkbox' id = 'quick' checked='checked'><span class='checkmark'></span></label><label class='container'>Groups<input type='checkbox' id='menuGroups'><span class='checkmark'></span></label><label class='container'>Rows<input type='checkbox' id='menuRows'><span class='checkmark'></span></label><label class='container'>Block details<input type='checkbox' id='toggledetails'><span class='checkmark'></span></label></div>");
+    $("body").prepend("<div class='ui-menu'><label class='container' id = new>New</label><label class='container'>Quick edit<input type='checkbox' id = 'quick' checked='checked'><span class='checkmark'></span></label><label class='container'>Groups<input type='checkbox' id='menuGroups'><span class='checkmark'></span></label><label class='container'>Rows<input type='checkbox' id='menuRows'><span class='checkmark'></span></label><label class='container'>Block details<input type='checkbox' id='toggledetails'><span class='checkmark'></span></label><label class='container' id = 'colwidth'>Column width</label></div>");
     $("body").append("<div id ='board'></div>");
     $("body").append("<div id='infobox'><div id='blockname' class='title'></div> <div id='blockdetails' contenteditable='true' class='hidden'></div></div>");
 
@@ -97,18 +97,16 @@ $(function () {
     }
 
     // Update number of column columns
-    $(document).on("click", "#col4", function () {
-        $("head link#columns").attr("href", "fourcolumns.css");
+  
+    $(document).on("click", "#colwidth", function () {
+
+        $("head link#columns").attr("href", function (i, attr) {
+            return attr == "singlecolumn.css" ? "twocolumns.css" : (
+                attr == "twocolumns.css" ? "threecolumns.css" : (
+                    attr == "threecolumns.css" ? "fourcolumns.css" : "singlecolumn.css"))
+        });
     });
-    $(document).on("click", "#col1", function () {
-        $("head link#columns").attr("href", "singlecolumn.css");
-    });
-    $(document).on("click", "#col3", function () {
-        $("head link#columns").attr("href", "threecolumns.css");
-    });
-    $(document).on("click", "#col2", function () {
-        $("head link#columns").attr("href", "twocolumns.css");
-    });
+  
 /*
     //Load HTML from local storage
     $(window).on('ready', function () {
