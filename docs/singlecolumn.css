@@ -7,4 +7,6 @@
 .epic {
     width: 150px;
 }
-
+.columnheader li {
+    width: 150px;
+}

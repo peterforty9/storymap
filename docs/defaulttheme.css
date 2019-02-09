@@ -40,12 +40,8 @@
     padding-left: 10px;
     margin-right: 2px;
     margin-left: 2px;
-    /*
-    border-width: 2px;
-    border-color: white;
-    border-style: solid;
-        */
     vertical-align: top;
+    overflow: hidden;
 }
 
 .columntext {
