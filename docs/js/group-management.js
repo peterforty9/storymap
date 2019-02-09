@@ -352,7 +352,8 @@ $(function () {
                 columnstartgroup = (ui.item.parent().parent().index()) + 1;
 
             },
-    /*        placeholder: {
+      //    /*  
+           placeholder: {
                 element: function (clone, ui) {
                  //   return $('<li class="selected">' + clone[0].innerHTML + '</li>');
                     return $('<li class="selected"></li>');
@@ -360,7 +361,8 @@ $(function () {
                 update: function () {
                     return;
                 } 
-            },*/
+            },
+         //   */
             stop: function (event, ui) {
                 var columntargetindex = ui.item.index();
                 var targetepic = columntargetindex + 1;
@@ -441,14 +443,16 @@ $(function () {
 
             },
 
-     /*       placeholder: {
+   //  /*       
+            placeholder: {
                 element: function (clone, ui) {
                     return $('<li class="selected"></li>');
                 },
                 update: function () {
                     return;
                 }
-            },*/
+            },
+    //       */
             stop: function (event, ui) {
 
                 var newepic = boxhtml("epic")

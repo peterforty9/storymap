@@ -35,13 +35,12 @@
     display: inline-block;
     width: 136px;
     height: 76px;
+    max-height: 76px;
     text-align: left;
     background-color: #4CB5F5;
     padding-left: 10px;
-    margin-right: 2px;
-    margin-left: 2px;
+    margin: 2px;
     vertical-align: top;
-    overflow: hidden;
 }
 
 .columntext {

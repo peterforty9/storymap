@@ -193,7 +193,7 @@ body {
 #columnheaderrow .grouprelease.cell {
     position: sticky;
     top: 22px;
-    background-color: white;
+   
 }
 #rows {
     display: table-row-group;
@@ -244,8 +244,7 @@ body {
 }
 
     .columnheader li {
-    /*  display: inline-block;*/
-    float:left;
+      display: inline-block;
     }
 .columnheaderheading {
   
@@ -387,12 +386,8 @@ textarea {
 }
 
 .selected {
-    display:flex;
-    opacity:0.3;
-    width: 146px;
-    height: 76px;
-    background-color: darkgray;
-    margin: 2px;
+    opacity: 0.2;
+    background-color:green;
 }
 .title {
     text-align: left;
