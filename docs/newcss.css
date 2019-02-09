@@ -386,7 +386,12 @@ textarea {
 }
 
 .selected {
-    opacity: 0.2;
+    display:flex;
+    opacity:0.3;
+    width: 146px;
+    height: 76px;
+    background-color: darkgray;
+    margin: 2px;
 }
 .title {
     text-align: left;

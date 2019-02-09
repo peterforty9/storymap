@@ -111,17 +111,6 @@ $(function () {
         });
     });
   
-/*
-    //Load HTML from local storage
-    $(window).on('ready', function () {
-
-        var mapdata = localStorage.getItem('board');
-        var htmlstring = atob(mapdata);
-        $('#board').html(htmlstring);
-        console.log("window ready");
-
-    });
-    */
     //upload file
     openFile = function (event) {
 
@@ -154,8 +143,6 @@ $(function () {
         var datauri = btoa(htmlString);
         //Save to local storage
         localStorage.board = datauri;
-        //getGroups();
-      //  createColumnJSON();
 
         //Save downloadable file
         var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
@@ -302,14 +289,14 @@ $(function () {
 
             start: function (event, ui) {
 
-                clone = $(ui.item[0].outerHTML).clone();
+              //  clone = $(ui.item[0].outerHTML).clone();
                 startgroup = (ui.item.index()) + 1;
                
             },
 
             placeholder: {
                 element: function (clone, ui) {
-                    return $('<div class="selected">' + clone[0].innerHTML + '</div>');
+                    return $('<div class="selected"></div>');
                 },
                 update: function () {
                     return;
@@ -360,19 +347,20 @@ $(function () {
             cancel: ".columntext",
 
             start: function (event, ui) {
-                clone = $(ui.item[0].outerHTML).clone();
+               // clone = $(ui.item[0].outerHTML).clone();
                 columnstartindex = ui.item.index();
                 columnstartgroup = (ui.item.parent().parent().index()) + 1;
 
             },
-            placeholder: {
+    /*        placeholder: {
                 element: function (clone, ui) {
-                    return $('<li class="selected">' + clone[0].innerHTML + '</li>');
+                 //   return $('<li class="selected">' + clone[0].innerHTML + '</li>');
+                    return $('<li class="selected"></li>');
                 },
                 update: function () {
                     return;
-                }
-            },
+                } 
+            },*/
             stop: function (event, ui) {
                 var columntargetindex = ui.item.index();
                 var targetepic = columntargetindex + 1;
@@ -449,18 +437,18 @@ $(function () {
 
             start: function (event, ui) {
 
-                clone = $(ui.item[0].outerHTML).clone();
+             //   clone = $(ui.item[0].outerHTML).clone();
 
             },
 
-            placeholder: {
+     /*       placeholder: {
                 element: function (clone, ui) {
-                    return $('<li class="selected">' + clone[0].innerHTML + '</li>');
+                    return $('<li class="selected"></li>');
                 },
                 update: function () {
                     return;
                 }
-            },
+            },*/
             stop: function (event, ui) {
 
                 var newepic = boxhtml("epic")
@@ -507,8 +495,7 @@ $(function () {
         var x = document.getElementById("quick").checked;
         if (x) {
             $(".textbox").attr('contenteditable', 'true');
-        //    $(".textbox").onclick = "";
-        //    $(".textbox").onblur = "";
+     
         }
         else {
             $(".stories").sortable({ cancel: "" });
@@ -517,8 +504,6 @@ $(function () {
             $("#rows").sortable({ cancel: "" });
             $(".textbox").attr('contenteditable', 'false');
             console.log("textbox clicked");
-          //  $(".textbox").attr('onclick','listenForDoubleClick(this);');
-         //   $(".textbox").attr('onblur', 'this.contentEditable=false');
             
         }
     };
