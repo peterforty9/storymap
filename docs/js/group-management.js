@@ -1,5 +1,4 @@
 ﻿var pre, stopindex, to;
-//var newepic = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
 var groupindex;
 var columnstartindex;
 var columnstartgroup;
@@ -36,8 +35,6 @@ $(function () {
 
     //generate menu
 
-    //<div class='ui-menu-item' width='100'><a href='newmap.txt' id='downloadmap' type='text/plain' download='board'>Save</a></div>
-   // $("body").prepend("<div class='ui-menu'><div id = 'quick' class= 'ui-menu-item'> Quick edit |</div><div id = new class= 'ui-menu-item' > New |</div ><div id='menuGroups' class='ui-menu-item'> Groups |</div> <div id='menuRows' class='ui-menu-item'> Rows |</div> <div id='col1' class='ui-menu-item'> 1 Col |</div> <div id='col2' class='ui-menu-item'> 2 Col |</div> <div id='col3' class='ui-menu-item'> 3 Col </div> <div id='col4' class='ui-menu-item'> 4 Col </div> <div id='toggledetails' class='ui-menu-item'> View details </div> <div class='ui-menu-item'><input type='file' onchange='openFile(event)' width='150'><output id='list'></output></div></div>")
     $("body").prepend("<div class='ui-menu'><label class='container' id = new>New</label><label class='container'>Quick edit<input type='checkbox' id = 'quick' checked='checked'><span class='checkmark'></span></label><label class='container'>Groups<input type='checkbox' id='menuGroups'><span class='checkmark'></span></label><label class='container'>Rows<input type='checkbox' id='menuRows'><span class='checkmark'></span></label><label class='container'>Block details<input type='checkbox' id='toggledetails'><span class='checkmark'></span></label><label class='container' id = 'colwidth'>Column width</label></div>");
     $("body").append("<div id ='board'></div>");
     $("body").append("<div id='infobox'><div id='blockname' class='title'></div> <div id='blockdetails' contenteditable='true' class='hidden'></div></div>");
@@ -57,35 +54,37 @@ $(function () {
         blocktitlearray.length = 0
 
         $("#board").empty();
-        var theader = "<div id='theader'></div>";
-        var groups = "<div id='groups' class='row'><div class='cell'><div class='groupsheading' id = 'groupsheading'><div class='groupsheadingtext textbox'>Groups</div><input type='hidden' id='groups1-details'></div></div></div>";
-        var columns = "<div class='row' id='columnheaderrow'><div class='cell'><div class='columnheaderheading' id='columnheader1'><div class='columnheaderheadingtext textbox'>Activities</div><input type='hidden' id='columnheader1-details'></div></div></div>";
-        var rowheading = "<div class='row' id='headingrow'><div class='rowsheading cell' id='rows1'><div class='rowsheadingtext textbox'>Rows</div><input type='hidden' id='rows1-details'></div><div class='cell'><div class='itemsheadingtext textbox' id='items1'>Stories</div><input type='hidden' id='items1-details'></div></div>";
-        var tbody = "<div id='rows'></div>";
-        var addrow = "<div class='newrelease'><div class='row'><div class='addrelease cell'>Add release</div></div></div>";
-        $("#board").prepend(theader);
-        $("#theader").prepend(groups);
-        $("#theader").append(columns);
-        $("#theader").append(rowheading);
-        $("#board").append(tbody);
+        var boardheader = "<div id='boardheader'></div>";
+        var groups = "<div id='headingcontainer'>" +
+                        "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
+                        "<div class='columnheaderheading' id='columnheader1'><div class='columnheaderheadingtext textbox'>Activities</div></div>" +
+                        "</div><div id='grouparraycontainer'></div>";
+        var rowheading = "<div class='row' id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
+
+        var rows = "<div id='rows'></div>";
+        var addrow = "<div class='newrelease'><div class='addrelease cell'>Add release</div></div>";
+        $("#board").prepend(boardheader);
+        $("#boardheader").prepend(groups);
+        $("#board").append(rowheading);
+        $("#board").append(rows);
         $("#board").append(addrow);
 
-        insertGroup("1");
+        insertGroup("-1");
         addNewRelease();
-        appendNewcolumn("2");
+        appendNewcolumn("0");
         toggleGroups();
-        toggleRows();
+     //   toggleRows();
 
     }
 
     //Toggle groups
     $(document).on("click", "#menuGroups", function () {
       //  toggleGroups();
-        document.getElementById("menuGroups").checked ? $("#groups").show() : $("#groups").hide()
+        document.getElementById("menuGroups").checked ? $(".group").show() : $(".group").hide()
         
     });
     function toggleGroups() {
-        $("#groups").toggle();
+        $("#group").toggle();
     }
     //Toggle rows
     $(document).on("click", "#menuRows", function () {
@@ -188,8 +187,9 @@ $(function () {
 
         $(".columnheader").each(function () {
             columngroupObj = [];
-            var groupIndex = $(this).parent().index();
-            var groupId = $("#groups div.cell:nth-child(" + (groupIndex + 1) + ")").children().attr("id");
+            //var groupIndex = $(this).parent().index();
+            var groupId = $(this).parent().parent().find(".group").attr("id");
+                //$("#groups div.cell:nth-child(" + (groupIndex + 1) + ")").children().attr("id");
                    
             ($(this).find(".column")).each(function () {
                 var columnid = $(this).attr("id");
@@ -236,7 +236,7 @@ $(function () {
                 ($(this).find(".epic")).each(function () {
                 var columnnumber = ($(this).index()) + 1;
                     storyObj = [];
-                    var columnId = $("#columnheaderrow div.cell:nth-child(" + (groupIndex + 1) + ")").find(".columnheader li:nth-child(" + columnnumber + ") .column").attr("id");
+                    var columnId = $(".groupcontainer:nth-child(" + (groupIndex + 1) + ")").find(".columnheader li:nth-child(" + columnnumber + ") .column").attr("id");
                     ($(this).find(".story")).each(function () {
                         var itemid = $(this).attr("id");
                         storyObj.push(itemid);
@@ -265,7 +265,25 @@ $(function () {
 
     };
    
-//    */
+    //Generate object html
+    function boxhtml(boxtype, textboxid) {
+        var htmlData = "";
+        if (textboxid == null) { textboxid = guid() };
+        if (boxtype == "group" || boxtype == "column" || boxtype == "story" || boxtype == "iteration") {
+            htmlData = "<div class='" + boxtype + "' id='" + textboxid + "'><div class='" + boxtype + "text textbox' ></div></div>";
+            if (boxtype == "group") {
+                htmlData = "<div class='groupcontainer'>" + htmlData + 
+                    "<div class='groupcolumns'><ul class='columnheader'></ul></div></div>";
+            } else if (boxtype == "column" || boxtype == "story") {
+                htmlData = "<li>" + htmlData + "</li>";
+                console.log(boxtype + " created (li)");
+            } else { };
+        } else if (boxtype == "epic") {
+            htmlData = "<div class='epic'><ul class='stories'></ul></div>";
+        } else { };
+        console.log(boxtype + " created");
+        return htmlData;
+    }
 
     ////////// BLOCK MOVEMENT ////////////////
 
@@ -279,21 +297,20 @@ $(function () {
         makereleasessortable();
         makeeditable();
     };
-
     function makeGroupsSortable() {
-        $("#groups").sortable({
-            connectWith: "#groups",
+        $("#boardheader").sortable({
+            connectWith: "#boardheader",
             cursor: "move",
-            cancel: ".grouptext",
-            items: ".grouprelease",
+            cancel: ".textbox, .groupcolumns",
+            items: ".groupcontainer",
 
             start: function (event, ui) {
 
               //  clone = $(ui.item[0].outerHTML).clone();
-                startgroup = (ui.item.index()) + 1;
-               
+               // startgroup = (ui.item.index()) + 1;
+                startgroupindex = ui.item.index();
             },
-
+/*
             placeholder: {
                 element: function (clone, ui) {
                     return $('<div class="selected"></div>');
@@ -302,28 +319,22 @@ $(function () {
                     return;
                 }
             },
+            */
             stop: function (event, ui) {
                 updateGroupsObj();  // Update group array
-                var targetgroup = (ui.item.index()) + 1;
-                if (targetgroup < startgroup) {
+               // var targetgroup = (ui.item.index()) + 1;
+                var targetgroupindex = ui.item.index();
+                if (targetgroupindex < startgroupindex) {
 
-                    $("#columnheaderrow").each(function (index) {
-                        ($(this).find(" .cell:nth-child(" + startgroup + ")")).insertBefore($(this).find(" .cell:nth-child(" + targetgroup + ")"));
+                    $(".rowgroups").each(function (index) {
+                        ($(this).find(" .grouprelease:eq(" + startgroupindex + ")")).insertBefore($(this).find(" .grouprelease:eq(" + targetgroupindex + ")"));
                     });
 
-                    $(".releaserow").each(function (index) {
-                        ($(this).find(" .cell:nth-child(" + startgroup + ")")).insertBefore($(this).find(" .cell:nth-child(" + targetgroup + ")"));
-                    });
+                } else if (targetgroupindex >= startgroupindex) {
 
 
-                } else if (targetgroup >= startgroup) {
-
-                    $("#columnheaderrow").each(function (index) {
-                        ($(this).find(" .cell:nth-child(" + startgroup + ")")).insertAfter($(this).find(" .cell:nth-child(" + targetgroup + ")"));
-                    });
-
-                    $(".releaserow").each(function (index) {
-                        ($(this).find(" .cell:nth-child(" + startgroup + ")")).insertAfter($(this).find(" .cell:nth-child(" + targetgroup + ")"));
+                    $(".rowgroups").each(function (index) {
+                        ($(this).find(" .grouprelease:eq(" + startgroupindex + ")")).insertAfter($(this).find(" .grouprelease:eq(" + targetgroupindex + ")"));
                     });
 
                 }
@@ -349,10 +360,10 @@ $(function () {
             start: function (event, ui) {
                // clone = $(ui.item[0].outerHTML).clone();
                 columnstartindex = ui.item.index();
-                columnstartgroup = (ui.item.parent().parent().index()) + 1;
-
+                columnstartgroupindex = ui.item.parents(".groupcontainer").index();
+                ui.placeholder.width('150px');
             },
-      //    /*  
+  //        /*  
            placeholder: {
                 element: function (clone, ui) {
                  //   return $('<li class="selected">' + clone[0].innerHTML + '</li>');
@@ -362,140 +373,156 @@ $(function () {
                     return;
                 } 
             },
-         //   */
+  //          */
             stop: function (event, ui) {
                 var columntargetindex = ui.item.index();
                 var targetepic = columntargetindex + 1;
-                var fromepic = columnstartindex + 1;
-                var columntargetgroup = (ui.item.parent().parent().index()) + 1;
-                var stayedincolumnheader = ui.item.parent().hasClass("columnheader");
+                var columntargetgroupindex;
+                var stayedincolumnheader = ui.item.parents().hasClass("columnheader");
                 var childtext = ui.item.find(".textbox");
-                var actcount = groupcolumncount(columntargetgroup);
-                var lastcolumn = false
+                var actcount;
+                var lastcolumn = false;
+                var storycount = 0;
 
-                if (targetepic == actcount) { lastcolumn = true };
+                if (stayedincolumnheader === true) {
+                    columntargetgroupindex = ui.item.parents(".groupcontainer").index();
+                    actcount = groupcolumncount(columntargetgroupindex);
+                } else {
+                    columntargetgroupindex = ui.item.parents(".grouprelease").index();
+                    actcount = groupcolumncount(columntargetgroupindex);
+                }
+
+                if (targetepic === actcount) { lastcolumn = true };
 
                 //move epics in line with column movement
-                //column moved witin same group / Higher up
-                if (stayedincolumnheader == true && columntargetgroup === columnstartgroup && columntargetindex > columnstartindex) {
-                    $(".releaserow").each(function (index) {
-                        $(this).find(" .cell:nth-child(" + columnstartgroup + ") .epic:nth-child(" + fromepic + ")").insertAfter($(this).find(" .cell:nth-child(" + columntargetgroup + ") .epic:nth-child(" + targetepic + ")"));
-                    });
-                    //column moved witin same group / Lower down
-                } else if (stayedincolumnheader == true && ((columntargetgroup === columnstartgroup && columntargetindex <= columnstartindex))) {
+                $(".rowgroups").each(function (index) {
+                    var startepic = $(this).find(".grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")");
+                    var targetepic = $(this).find(".grouprelease:eq(" + columntargetgroupindex + ") .epic:eq(" + columntargetindex + ")");
+                    var targetgroup = $(this).find(".grouprelease:eq(" + columntargetgroupindex + ") .cell-flex-container");
 
-                    $(".releaserow").each(function (index) {
-                        $(this).find(" .cell:nth-child(" + columnstartgroup + ") .epic:nth-child(" + fromepic + ")").insertBefore($(this).find(" .cell:nth-child(" + columntargetgroup + ") .epic:nth-child(" + targetepic + ")"));
-                    });
-                    //column to different group / NOT To last column
-                } else if (stayedincolumnheader == true && (columntargetgroup != columnstartgroup) && lastcolumn == false) {
-                    $(".releaserow").each(function (index) {
-                        $(this).find(" .cell:nth-child(" + columnstartgroup + ") .epic:nth-child(" + fromepic + ")").insertBefore($(this).find(" .cell:nth-child(" + columntargetgroup + ") .epic:nth-child(" + targetepic + ")"));
-                    });
-                    //column to different group / last column
-                } else if (stayedincolumnheader == true && (columntargetgroup != columnstartgroup) && lastcolumn && actcount > 1) {
-                    $(".releaserow").each(function (index) {
-                        $(this).find(" .cell:nth-child(" + columnstartgroup + ") .epic:nth-child(" + fromepic + ")").insertAfter($(this).find(" .cell:nth-child(" + columntargetgroup + ") .epic:nth-child(" + columntargetindex + ")"));
-                    });
-                    //column to different group / No columnheader exist
-                } else if (stayedincolumnheader == true && (columntargetgroup != columnstartgroup) && actcount == 1) {
-                    $(".releaserow").each(function (index) {
-                        $(this).find(" .cell:nth-child(" + columnstartgroup + ") .epic:nth-child(" + fromepic + ")").appendTo($(this).find(" .cell:nth-child(" + columntargetgroup + ")"));
-                    });
-                } else if (stayedincolumnheader != true) {
-                    var storycount = 0;
+                    if (stayedincolumnheader == true) {
 
-                    $(".releaserow").each(function (index) {
+                        if (columntargetgroupindex === columnstartgroupindex && columntargetindex > columnstartindex) { //column moved within same group / higher up
+                            startepic.insertAfter(targetepic);
+                            console.log("column moved within same group / higher up");
+                        }
+                        else if (columntargetgroupindex === columnstartgroupindex && columntargetindex <= columnstartindex) { //column moved within same group / Lower down
+                            startepic.insertBefore(targetepic);
+                            console.log("column moved within same group / Lower down");
+                        }
+                        else if ((columntargetgroupindex != columnstartgroupindex) && lastcolumn == false) { //column to different group / NOT To last column
+                            startepic.insertBefore(targetepic);
+                            console.log("column to different group / NOT To last column");
+                        }
+                        else if ((columntargetgroupindex != columnstartgroupindex) && lastcolumn && actcount > 1) {  //column to different group / last column
+                            startepic.appendTo(targetgroup);
+                            console.log("column to different group / last column");
+                        }
+                        else if ((columntargetgroupindex != columnstartgroupindex) && actcount == 1) { //column to different group / No columnheader exist
+                            startepic.appendTo(targetgroup);
+                            console.log("column to different group / No columnheader exist");
+                        }
+                    }
 
-                        if ($(this).find(" .cell:nth-child(" + columnstartgroup + ") .epic:nth-child(" + fromepic + ") .stories").is(':empty')) {
+                    else { //if column moved to item
+
+                        if (startepic.find(".stories").is(':empty')) {
                             storycount = storycount + 0;
                         }
                         else {
                             storycount = storycount + 1;
                         }
+                    }
+                });
+
+                //Only allow to convert an column to a story if it nas no stories
+                console.log("Total story count: " + storycount);
+
+                if (storycount === 0 && stayedincolumnheader === false) {
+
+                    $(".rowgroups").each(function (index) {
+                        $(this).find(" .grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")").remove();
                     });
-                    //Only allow to convert an column to a story if it nas no stories
-                    if (storycount === 0) {
+                    //Change class from column to story
+                    ui.item.find(".column").addClass('story').removeClass('column');
+                    childtext.addClass('storytext').removeClass('columntext');
+                    //  hideaddstory(); //update add story buttons
 
-                        $(".releaserow").each(function (index) {
-                            $(this).find(" .cell:nth-child(" + columnstartgroup + ") .epic:nth-child(" + fromepic + ")").remove();
-                        });
-                        //Change class from column to story
-                        ui.item.find(".column").addClass('story').removeClass('column');
-                        childtext.addClass('storytext').removeClass('columntext');
-                        hideaddstory(); //update add story buttons
-
-                    } else { $(".columnheader").sortable("cancel"); }
-                };
+                } else if (storycount > 0 && stayedincolumnheader === false) { $(".columnheader").sortable("cancel"); }
+               
             },
 
         });
     }
     function makeEpicsSortable() {
         $(".stories").sortable({
+       //     placeholder: "ui-sortable-placeholder",
             cursor: "move",
             cancel: ".storytext",
             connectWith: ".stories, .columnheader",
-
+          
             start: function (event, ui) {
-
+             //   ui.placeholder.html("<li class='selected'></li>");
              //   clone = $(ui.item[0].outerHTML).clone();
-
+               
+                    ui.placeholder.width(ui.item.width());
+                
             },
 
-   //  /*       
+ //    /*       
             placeholder: {
-                element: function (clone, ui) {
+                element: function () {
                     return $('<li class="selected"></li>');
                 },
                 update: function () {
                     return;
                 }
             },
-    //       */
+  //         */
             stop: function (event, ui) {
 
                 var newepic = boxhtml("epic")
                 stopindex = ui.item.index();
-
-                var targetgroup = (ui.item.parent().parent().index()) + 1;
+                var targetgroupindex = (ui.item.parents(".groupcontainer").index());
+                var targetgroup = targetgroupindex + 1;
                 var targetepic = stopindex + 1;
+                var targetepicindex = stopindex;
 
-                var movedtocolumnheader = ui.item.parent().hasClass("columnheader");
-                hideaddstory(); //update add story buttons
+                var movedtocolumnheader = ui.item.parents().hasClass("columnheader");
+              //  hideaddstory(); //update add story buttons
                 if (movedtocolumnheader == true) {
 
                     var childtext = ui.item.children().children();
-                    var actcount = groupcolumncount(targetgroup);
+                    var actcount = groupcolumncount(targetgroupindex);
 
                     if (actcount > 1 && targetepic <= actcount) {
                         ui.item.children().addClass('column').removeClass('story');
                         childtext.addClass('columntext').removeClass('storytext');
 
-                        $(".releaserow").each(function (index) {
-                            $(newepic).insertBefore($(this).find(" .cell:nth-child(" + targetgroup + ") .epic:nth-child(" + targetepic + ")"));
+                        $(".rowgroups").each(function (index) {
+                            $(newepic).insertBefore($(this).find(" .grouprelease:eq(" + targetgroupindex + ") .epic:eq(" + targetepicindex + ")"));
                         });
 
 
                     } else if (actcount > 1 && targetepic > actcount) {
                         ui.item.children().addClass('column').removeClass('story');
                         childtext.addClass('columntext').removeClass('storytext');
-                        $(".releaserow").each(function (index) {
-                            $(newepic).insertAfter($(this).find(" .cell:nth-child(" + targetgroup + ") .epic:last-child"));
+                        $(".rowgroups").each(function (index) {
+                            $(newepic).insertAfter($(this).find(" .grouprelease:eq(" + targetgroupindex + ") .epic:last-child"));
                         });
 
                     } else if (actcount == 1) {
                         ui.item.children().addClass('column').removeClass('story');
                         childtext.addClass('columntext').removeClass('storytext');
-                        $(".releaserow").each(function (index) {
-                            $(newepic).appendTo($(this).find(" .cell:nth-child(" + targetgroup + ")"));
+                        $(".rowgroups").each(function (index) {
+                            $(newepic).appendTo($(this).find(" .grouprelease:eq(" + targetgroupindex + ") .cell-flex-container"));
                         });
                     }
                 }
             }
         });
     }
-    function makeeditable() {
+    function makeeditable() { //quick edit functionality
         var x = document.getElementById("quick").checked;
         if (x) {
             $(".textbox").attr('contenteditable', 'true');
@@ -524,13 +551,14 @@ $(function () {
             $('#blockname').attr('contenteditable', 'true');
             $('#blockname').focus();
         }
+        event.stopPropagation();
     });
-
+    $(document).on("click", ".story", function (event) {
+          event.stopPropagation();
+    });
     $(document).on("click", "#quick", function (event) {
         makeSortable()
     });
-
-    //Edit textbox details
     $(document).on("keydown", ".textbox", function (event) {
         if (event.shiftKey && event.ctrlKey && event.which == 13) {
             hiddenblockdetails = $("#blockdetails").hasClass("hidden");
@@ -539,28 +567,12 @@ $(function () {
             event.stopPropagation();
 
         }
-    });
+    });  //Edit textbox details
 
-    //Generate object html
-    function boxhtml(boxtype, textboxid) {
-        var htmlData = "";
-        if (textboxid == null) { textboxid = guid() };
-        if (boxtype == "group" || boxtype == "column" || boxtype == "story" || boxtype == "iteration") {
-            htmlData = "<div class='" + boxtype + "' id='" + textboxid + "'><div class='" + boxtype + "text textbox' ></div><input type='hidden' id='" + textboxid + "-details'></div>";
-            if (boxtype == "group") {
-                htmlData = "<div class='grouprelease cell'>" + htmlData + "</div>";
-            } else if (boxtype == "column" || boxtype == "story") {
-                htmlData = "<li>" + htmlData + "</li>";
-                console.log(boxtype + " created (li)");
-            } else { };
-        } else if (boxtype == "epic") {
-            htmlData = "<div class='epic'><ul class='stories'></ul><div class='addStory'><strong>+</strong></div></div>";
-        } else { };
-        console.log(boxtype + " created");
-        return htmlData;
-    }
-    function groupcolumncount(group) {
-     return  ($("#columnheaderrow .cell:nth-child(" + group + ") .column").length)
+    function groupcolumncount(groupindex) {       
+        var columncount = $('.groupcontainer:eq(' + groupindex + ') .column').length;
+        console.log("Column count: " + columncount);
+        return columncount
     }
     ///////////// GROUP MANAGEMENT //////////////////
 
@@ -568,79 +580,76 @@ $(function () {
     $(document).on("keydown", ".grouptext", function (event) {
         console.log("Group return key");
         var group = $(this).parent().parent();
-        var groupstartindex = $(this).parent().parent().index();
-        var groupnumber = groupstartindex + 1;
-        var columnlist = $('#columnheaderrow .cell:nth-child(' + groupnumber + ')');
+        var groupstartindex = $('.groupcontainer').index($(this).parents('.groupcontainer'));
+        //var groupnumber = groupstartindex + 1;
+        var columnlist = $('.groupcontainer:eq(' + groupindex + ') .columnheader');
 
         if (event.which == 13 && event.ctrlKey && (event.shiftKey == false)) {
             event.preventDefault();
-            appendNewcolumn(groupnumber);
+            appendNewcolumn(groupstartindex);
             event.stopPropagation();
         }
         else if (event.which == 13 && ((event.shiftKey && event.ctrlKey) == false)) {
             event.preventDefault();
             //Remove group
-            if (groupcolumncount(groupnumber) == 0 && $(this).is(':empty')) { 
-
-                //Remove group
-                group.remove();
+            if (groupcolumncount(groupstartindex) == 0 && $(this).is(':empty')) { 
+                console.log("delete group: " + groupstartindex);
+                $(this).parents('.groupcontainer').remove(); //Remove group
                 updateGroupsObj();//Update group array
-               
-                //remove column container
-                columnlist.remove();
-              
                 updateColumnsObj();// Update column array
 
                 //Remove releaserow containers
                 $(".releaserow").each(function (index) {
 
-                    $(this).find(" .cell:nth-child(" + groupnumber + ")").remove();
+                    $(this).find(" .grouprelease.eq(" + groupstartindex + ")").remove();
 
                 });
 
-            } else { insertGroup(groupnumber) };
+            } else { insertGroup(groupstartindex) };
         }
     });
 
      //Insert new group
-    function insertGroup(groupnumber) {
+    function insertGroup(groupindex) {
+        //var groupindex = groupnumber - 1
         var grouptextid = guid();
-        var columnlist = $('#columnheaderrow .cell:nth-child(' + groupnumber + ')');
         var newgrouphtml = boxhtml("group", grouptextid);
-        var columnlisthtml = "<div class='grouprelease cell'><ul class='columnheader'></ul><div class='addColumn'><strong>+</strong></div></div>"
-        var groupreleasehtml = "<div class='grouprelease release cell'></div>"
-        var group = $("#groups div.cell:nth-child(" + (groupnumber) + ")")
+        var groupreleasehtml = "<div class='grouprelease'><div class='cell-flex-container'></div></div>";
 
+        if (groupindex >= 0) {
+            var previousgroup = $(".groupcontainer").eq(groupindex);
+            $(newgrouphtml).insertAfter(previousgroup);
+        } else
+        {
+            $(newgrouphtml).prependTo($("#grouparraycontainer"));
+        };
         //Insert releasegroups
 
-        $(".releaserow").each(function (index) {
-            $(groupreleasehtml).insertAfter($(this).find(" .cell:nth-child(" + groupnumber + ")"));
-          //  gridarray[index].push([groupnumber - 1]);
-        //    console.log("epics group added:");
-         //   console.log(gridarray);
+        $(".rowgroups").each(function (index) {
+            $(groupreleasehtml).insertAfter($(this).find('.grouprelease:eq(' + (groupindex) + ')' ));
+          
         });
 
         //Insert group
-        $(newgrouphtml).insertAfter(group);
-        var groupindex = groupnumber - 1;
+        
         //Update groups array
         updateGroupsObj();
-       
-        //Add columnheader
-        $(columnlisthtml).insertAfter(columnlist);
-        // Update columns array
         updateColumnsObj();
        
+        //Add columnheader
+       // $(columnlisthtml).insertAfter(columnlist);
+        // Update columns array
+               
         var block = document.getElementById(grouptextid);
         $(block).find(".textbox").focus();
     }
 
     //Append new column
-    function appendNewcolumn(cellnumber) {
+    function appendNewcolumn(groupindex) {
         var columntextid = guid();
         var columnhtml = boxhtml("column", columntextid);
-        var columnlist = $('#columnheaderrow .cell:nth-child(' + cellnumber + ') .columnheader');
-
+        var columnlist = $('.groupcontainer:eq(' + groupindex + ') .columnheader');
+        console.log("groupindex to append column: " + groupindex)
         //Insert column 
         $(columnhtml).appendTo(columnlist);
         var block = document.getElementById(columntextid);
@@ -650,13 +659,16 @@ $(function () {
       
         //Append new epic
 
-        var from = boxhtml("epic");
 
-        $(".releaserow").each(function (index) {
-            $(from).appendTo($(this).find(" .cell:nth-child(" + cellnumber + ")"));
+        $(".rowgroups").each(function (index) {
+
+            var from = boxhtml("epic");
+            var flexcontainer = $(this).find('.grouprelease:eq(' + groupindex + ') .cell-flex-container');
+            $(from).appendTo(flexcontainer);
 
         });
-        hideaddColumn();
+
+    //    hideaddColumn();
     };
 
     //////////// column MANAGEMENT /////////////////
@@ -672,13 +684,13 @@ $(function () {
 
         //hide the add story button when stories exist
         $(".columnheader").each(function (index) {
-            if ($(this).is(':empty')) {
-                $(this).parent().children('.addColumn').show();
+          //  if ($(this).is(':empty')) {
+          //      $(this).parent().children('.addColumn').show();
+          
+          //  } else {
 
-            } else {
-
-                $(this).parent().children('.addColumn').hide();
-            }
+          //      $(this).parent().children('.addColumn').hide();
+         //   }
 
         });
 
@@ -687,18 +699,18 @@ $(function () {
     //column text return functions
     $(document).on("keydown", ".columntext", function (event) {
         console.log("column return key");
-        var column = $(this).parent().parent();
-        var columnindex = $(this).parent().parent().index();
-        var groupindex = $(this).parent().parent().parent().parent().index();
+        var column = $(this).parents("li");
+        var columnindex = $(this).parents("li").index();
+        var groupindex = $(this).parents('.groupcontainer').index();
         var columnnumber = columnindex + 1;
         var groupnumber = groupindex + 1;
         if (event.ctrlKey && event.which == 13 && (event.shiftKey == false)) { //Append new story
             event.preventDefault();
-            appendNewStory(columnnumber, groupnumber);
+            appendNewStory(columnindex, groupindex);
             event.stopPropagation();
-        } else if (event.shiftKey && event.which == 13 && $("#groups").is(":visible") && (event.ctrlKey == false)) { //Insert new group (if groups visible)
+        } else if (event.shiftKey && event.which == 13 && $(".group").is(":visible") && (event.ctrlKey == false)) { //Insert new group (if groups visible)
             event.preventDefault();
-            insertGroup(groupnumber);
+            insertGroup(groupindex);
             event.stopPropagation();
         } else if (event.which == 13 && (event.shiftKey && event.ctrlKey) == false) { //Insert new column
             event.preventDefault();
@@ -706,41 +718,45 @@ $(function () {
                 removecolumn(column)
             }
             else {
-                insertNewcolumn(columnnumber, groupnumber)
+                insertNewcolumn(columnindex, groupindex)
             };
         };
     });
 
-    function insertNewcolumn(columnnumber, groupnumber) {
+    function insertNewcolumn(columnindex, groupindex) {
         var columntextid = guid();
-        var columnindex = columnnumber - 1;
-        var htmlData = boxhtml("column", columntextid)
-        var column = $("#columnheaderrow").find(".cell:nth-child(" + groupnumber + ") .columnheader li").eq(columnindex);
+       // var groupindex = groupnumber - 1;
+       // var columnindex = columnnumber - 1;
+        var htmlData = boxhtml("column", columntextid);
+        var columnli = $('.groupcontainer:eq(' + groupindex + ') .columnheader li:eq('+ columnindex + ')');
         //Insert column 
-        $(htmlData).insertAfter($(column));
+        $(htmlData).insertAfter($(columnli));
         var block = document.getElementById(columntextid);
         $(block).find(".textbox").focus();
         //Update columns array
         updateColumnsObj();
 
         //Insert new epic
-
-        var from;
-
-        from = boxhtml("epic");
-
+        
         $(".releaserow").each(function (index) {
-            $(from).insertAfter($(this).find($(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + columnnumber + ")")));
+            var previousepic = ($(this).find('.rowgroups .grouprelease:eq(' + groupindex + ') .cell-flex-container .epic:eq(' + columnindex + ')'));
 
+            $(boxhtml("epic")).insertAfter($(previousepic));
+            console.log("row: " + index + " group: " + groupindex + " column: " + columnindex);
+            console.log(previousepic);
         });
 
+        console.log("InsertNewcolumn"); 
     };
-    function appendNewStory(columnnumber, groupnumber, rowindex) {
+    function appendNewStory(column, groupindex, rowindex) {
 
         var storytextid = guid();
+     //   var groupindex = groupnumber - 1;
+      //  var column = columnnumber - 1;
         var htmlData = boxhtml("story", storytextid);
         if (rowindex == null) rowindex = 0; 
-        var stories = ($(".releaserow").eq(rowindex).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + columnnumber + ") .stories"));
+        var stories = $(".rowgroups").eq(rowindex).find('.grouprelease:eq(' + groupindex + ') .epic:eq(' + column + ') .stories');
+
         $(htmlData).appendTo(stories);
         
         /* Might need this for different table type e.g. grid
@@ -751,25 +767,26 @@ $(function () {
         var block = document.getElementById(storytextid);
         $(block).find(".textbox").focus();
         //Hide "add story"
-        $(stories).parent().children('.addStory').hide();
+     //   $(stories).parent().children('.addStory').hide();
 
         //update arrays
         updateItemsObj();
     };
     //Delete empty column when focus lost
     $(document).on("focusout", ".columntext", function () {
-        var column = $(this).parent().parent();
-        if (columnempty(column)) {
-            removecolumn(column)
+        var columnli = $(this).parents("li");
+        if (columnempty(columnli)) {
+            removecolumn(columnli)
         }
 
     });
     //Check column li has no text or underlying stories
     function columnempty(columnline) {
         var columnstartindex = columnline.index();
-        var groupstartindex = columnline.parent().parent().index();
-        var columnindex = columnstartindex + 1;
-        var groupnumber = groupstartindex;
+        //var groupstartindex = columnline.parent().parent().index();
+        var groupstartindex = $(columnline).parents('.groupcontainer').index();
+        var columnnumber = columnstartindex + 1;
+       // var groupnumber = groupstartindex;
 
         var columnempty = $(columnline).find(" .column .columntext").is(':empty');
         var storycount = 0;
@@ -777,7 +794,7 @@ $(function () {
         //See if any stories exist in any of the releases
         $(".releaserow").each(function (index) {
             
-            if (epicEmpty(index, groupnumber, columnindex)) {
+            if (epicEmpty(index, groupstartindex, columnnumber)) {
                 storycount = storycount + 0;
             }
             else {
@@ -786,42 +803,47 @@ $(function () {
 
         });
         if (columnempty && storycount === 0) { return true }
+        console.log('column text empty?: ' + columnempty + 'storycount: ' + storycount);
     }
     //Check Epic has no stories
-    function epicEmpty(rowindex, groupnumber, columnnumber) {
-        var empty
-        groupnumber = groupnumber + 1
-        console.log("Rowindex:" + rowindex + " groupcell:" + groupnumber + " columnnumber:" + columnnumber);
-        var columncount = groupcolumncount(groupnumber);
-        if (columncount == 0 || $($(".releaserow").eq(rowindex)).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + columnnumber + ") .stories").is(':empty')) empty = true;
+    function epicEmpty(rowindex, groupindex, columnnumber) {
+        var empty = false
+       // groupnumber = groupnumber
+        console.log("Rowindex:" + rowindex + " groupcell:" + groupindex + " columnnumber:" + columnnumber);
+        columnindex = columnnumber - 1;
+        var columncount = groupcolumncount(groupindex);
+       // if (columncount == 0 || $($(".releaserow").eq(rowindex)).find(" .grouprelease:eq(" + groupindex + ") .epic:nth-child(" + columnnumber + ") .stories").is(':empty')) empty = true;
+        if (columncount == 0 || $(".releaserow").eq(rowindex).find('.grouprelease:eq(' + groupindex + ') .epic:eq(' + columnindex + ') .stories').is(':empty')) empty = true;
         console.log(empty);
         return empty;
     };
     //Remove column li and underlying epics
-    function removecolumn(thisObj) {
-        var columnindex = thisObj.index();
-        var groupindex = thisObj.parent().parent().index();
+    function removecolumn(columnli) {
+        var columnindex = columnli.index();
+       // var groupindex = columnli.parents().index();
+        var groupindex = $('.groupcontainer').index($(columnli).parents('.groupcontainer'));
         var columnnumber = columnindex + 1;
         var groupnumber = groupindex + 1;
 
         //Remove column
-        thisObj.remove();
+        columnli.remove();
         // Update columns array
         updateColumnsObj();
-        hideaddColumn();
+       // hideaddColumn();
 
         //Remove epics
-        $(".releaserow").each(function (index) {
+        $(".rowgroups").each(function (index) {
 
-            $(this).find(" .cell:nth-child(" + groupnumber + ") .epic:nth-child(" + columnnumber + ")").remove();
-
+          //  $(this).find(" .grouprelease:nth-child(" + groupnumber + ") .epic:nth-child(" + columnnumber + ")").remove();
+            $(this).find('.grouprelease:eq(' + groupindex + ') .epic:eq(' + columnindex + ')').remove();
+            console.log("epic removed, " + groupindex + ", " + columnindex)
         });
     };
     //Create new column when addColumn clicked
-    $(document).on("click", ".addColumn", function () {
-        var cellnumber = $(this).parent().index() + 1;
-        appendNewcolumn(cellnumber);
-        $(this).hide();
+    $(document).on("click", ".groupcolumns", function () {
+        var groupindex = $(this).parents('.groupcontainer').index();
+        appendNewcolumn(groupindex);
+     //   $(this).hide();
     });
 
     ///////////// STORY MANAGEMENT /////////////////
@@ -833,38 +855,38 @@ $(function () {
     var newStoryText
 
     //Create new story when addStory clicked
-    $(document).on("click", ".addStory", function () {
+    $(document).on("click", ".epic", function () {
         var storytextid = guid();
         var htmlData = boxhtml("story", storytextid);
 
-        if (($(this).parent().find("li .story").length > 0)) {
-            $(htmlData).insertAfter($(this).parent().find("li:last-child"));
+        if (($(this).find("li .story").length > 0)) {
+            $(htmlData).insertAfter($(this).find("li:last-child"));
         }
         else {
-            ($(this).parent().children(".stories")).append(htmlData);
+            ($(this).children(".stories")).append(htmlData);
         };
 
         var block = document.getElementById(storytextid);
         $(block).find(".textbox").focus();
-        $(this).hide();
+    //    $(this).hide();
     });
 
     //Create new story when enter key pressed
     $(document).on("keydown", ".storytext", function (event) {
-        var columnindex = $(this).parent().parent().parent().parent().index();
-        var groupindex = $(this).parent().parent().parent().parent().parent().index();
-        var rowindex = $(this).parent().parent().parent().parent().parent().parent().index();
+        var columnindex = $(this).parents(".epic").index();
+        var groupindex = $(this).parents(".grouprelease").index();
+        var rowindex = $(this).parents(".row").index();
         var ctrlrowindex = rowindex + 1;
-        var columnnumber = columnindex + 1;
-        var groupnumber = groupindex + 1;
+       // var columnnumber = columnindex + 1;
+       // var groupnumber = groupindex + 1;
 
         if (event.shiftKey && event.which == 13 && (event.ctrlKey == false)) { //Insert new column
             event.preventDefault();
-            insertNewcolumn(columnnumber, groupnumber);
+            insertNewcolumn(columnindex, groupindex);
             event.stopPropagation();
         } else if (event.ctrlKey && event.which == 13 && (event.shiftKey == false)) { //Append new story to next release
             event.preventDefault();
-            appendNewStory(columnnumber, groupnumber, ctrlrowindex);
+            appendNewStory(columnindex, groupindex, ctrlrowindex);
             event.stopPropagation();
         } else if (event.which == 13 && ((event.shiftKey && event.ctrlKey) == false)) { //Insert story
             event.preventDefault();
@@ -895,7 +917,7 @@ $(function () {
 
         //Show "add story" if it was the last story in the epic
         if (laststory == 1) {
-            $(stories).parent().children('.addStory').show();
+  //          $(stories).parent().children('.addStory').show();
         };
         //update array
         updateItemsObj();
@@ -930,15 +952,15 @@ $(function () {
         var k = 0;
         var m;
 
-        var groupcount = (($("#groups div.cell").length) - 1);
+        var groupcount = $(".group").length;
         var iteration = boxhtml("iteration",iterationtextid)
-        var newrelease = "<div class='releaserow row'><div class='releasename cell'>" + iteration + "</div>";
-        var newgroupstart = "<div class='grouprelease cell'>";
-        var newgroupend = "</div>";
+        var newrelease = "<div class='releaserow row'><div class='releasename'>" + iteration + "</div><div class='rowgroups'>";
+        var newgroupstart = "<div class='grouprelease'><div class='cell-flex-container'>";
+        var newgroupend = "</div></div>";
         var newepic = boxhtml("epic");
 
         do {
-            m = 2 + k;
+            m = k;
             newrelease = newrelease + newgroupstart;
 
             var columncount = groupcolumncount(m);
@@ -955,7 +977,7 @@ $(function () {
             k++;
         }
         while (k < groupcount);
-        newrelease = newrelease + newgroupend + "</div>";
+        newrelease = newrelease + newgroupend + "</div></div>";
 
         $(newrelease).appendTo($("#rows"));
 
@@ -991,10 +1013,10 @@ $(function () {
         var groupnumber = 1;
         var m;
 
-        var groupcount = (($("#groups div.cell").length)-1);
+        var groupcount = $(".group").length;
         
         do {
-            m = 1 + groupnumber;
+            m = groupnumber;
             
             var columncount = groupcolumncount(m);
 
@@ -1049,7 +1071,7 @@ $(function () {
         $(blockid).find(".textbox").text(currentText);
         updateBlockTitle(textbox, currentText);
     });
-
+/*
     $(document).on("keyup", ".grouptext", function (event) {
         var currentText = $(this).text();
         var groupnumber = $(this).parent().parent().index();
@@ -1058,12 +1080,12 @@ $(function () {
 
     $(document).on("keyup", ".columntext", function (event) {
         var currentText = $(this).text();
-        var groupnumber = $(this).parent().parent().parent().parent().index();
+        var groupnumber = $($(this).parent().parent().parent().parent()).length;
         var groupindex = groupnumber - 1;
 
     });
 
-
+*/
     $(document).on("keyup", "#blockdetails", function (event) {
         var detailsText = $("#blockdetails").html();
         var hiddeninput = textbox + "-details"

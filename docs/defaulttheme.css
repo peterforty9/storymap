@@ -1,12 +1,13 @@
 ﻿body {
 }
 .group {
-    width: 100%;
+    width: 136px;
     height: 76px;
     text-align: left;
     background-color: #B7B8B6;
     float: left;
-    
+    padding-left: 10px;
+    margin: 2px;
     /*
     padding-left: 10px;
     padding-right: 0px;
@@ -22,7 +23,6 @@
     max-width: 136px;
     height: 76px;
     max-height: 76px;
-    margin-left:10px;
     text-align: left;
     background-color: transparent;
     color:white;
@@ -64,9 +64,7 @@
     background-color: #34675C;
     color: white;
     padding-left: 10px;
-    border-width: 2px;
-    border-color: white;
-    border-style: solid;
+    margin:2px;
     vertical-align: top;
   
 }
