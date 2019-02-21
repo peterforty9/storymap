@@ -8,6 +8,11 @@ and open the template in the editor.
     Author     : Peter Clarke
 */
 
+:root {
+    --first-column-width: 100px;
+}
+
+
 
 body {
     background-color: white;
@@ -142,10 +147,12 @@ body {
     display: flex;
     flex-direction: row;
 }
-#headingcontainer{
-    display:flex;
-    flex-direction:column;
-    }
+#headingcontainer {
+    display: flex;
+    flex-direction: column;
+    width: var(--first-column-width);
+    margin: 2px;
+}
 .groupcontainer {
     display: flex;
     flex-direction: column;
@@ -157,56 +164,67 @@ body {
 .groupcolumns {
     display: flex;
     flex-direction: row;
-    padding-right:10px;
 }
 .rowgroups {
     display: flex;
     flex-direction: row;
 }
+.rowheader {
+    display: flex;
+    height: inherit;
+    width: var(--first-column-width);
+    margin-right: 2px;
+}
 #infobox {
     position: fixed;
     right: 0;
     top: 20px;
-    writing-mode: vertical-rl;
-    max-width: 20%;
+    width: 30%;
     min-width: 0%;
-    max-height: 99%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     background-color: whitesmoke;
+    box-shadow: -10px 0px lightgray;
 }
+    #infobox.hidden {
+        display: none;
+    }
 
     #infobox.edit {
-        max-height: 80%;
+      
     }
 #blockname {
-   border: 1px solid black;
-   height:100px;
+    border: 1px solid black;
+    height: 40px;
+    width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+    resize:none;
 }
 #blockdetails {
     overflow-y: auto;
+    width: 100%;
+    height: 80%;
     background-color: whitesmoke;
     color: gray;
     padding: 5px;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
-
 }
 
-#blockdetails.hidden {
-    display: none;
-    height:0px;
-}
+
 .row {
     /* display: table-row;*/
     display: flex;
     flex-direction: row;
+    margin:2px;   
 }
 
 .releaserow {
-    background-color: #f2f2f2;
+   
 }
 
 .cell {
@@ -218,12 +236,13 @@ body {
 .cell-flex-container {
     display: flex;
     height: 100%;
-    margin-right: 10px;
+    margin-right: 20px;
     margin-bottom: 10px;
+    background-color: white;
 }
 
 .grouprelease {
-  
+    background-color: white;
 }
 
 #theader {
@@ -231,7 +250,7 @@ body {
     display: flex;
     flex-direction: column;
 }
-#columnheaderrow .grouprelease.cell {
+#boardheader{
     position: sticky;
     top: 22px
    
@@ -249,32 +268,29 @@ body {
     background-color: white;
 }
 
-.groupsheading {
-    height: 76px;
-    width: 146px;
-    text-align: left;
-    float: right;
-    background-color: transparent;
-    vertical-align: top;
-    margin: 2px;
+#groupsheading {
+   
+    display: flex;
+    flex-direction: row;
+ 
 }
 
 .groupsheadingtext {
-    max-width: 146px;
-    height: 76px;
-    text-align: left;
-    background-color: #B7B8B6;
-    color: white;
+    width: var(--first-column-width);
+    height: 20px;
+    text-align: right;
+    background-color: transparent;
+    color: #B7B8B6;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
     overflow: hidden;
-    writing-mode: vertical-rl;
     display: inline-block;
-    text-align: center;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
     float: right;
+}
+.groupline {
+    display: flex;
+    flex-direction: row;
 }
 
 .columnheader {
@@ -291,49 +307,46 @@ body {
     .columnheader li {
         display: inline-block;
         white-space: nowrap;
-        vertical-align:top;
+        vertical-align: top;
+        margin: 2px;
     }
 .columnheaderheading {
     height: 76px;
-    width: 146px;
+    width: var(--first-column-width);
     text-align: left;
     float: right;
     background-color: transparent;
     vertical-align: top;
-    margin:2px;
+    margin: 2px;
 }
 
 .columnheaderheadingtext {
-    max-width:146px;
+    max-width: var(--first-column-width);
     height: 76px;
-    text-align: left;
-    background-color: #4CB5F5;
-    color:white;
+    text-align: right;
+    background-color: transparent;
+    color: #4CB5F5;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
     overflow: hidden;
-    writing-mode: vertical-rl;
+    /*writing-mode: vertical-rl;*/
     display: inline-block;
     text-align: center;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
     float: right;
 }
 .rowsheadingtext {
-    width: 146px;
-    max-width: 150px;
+    width: var(--first-column-width);
+    max-width: var(--first-column-width);
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
     vertical-align: bottom;
     float: left;
-    text-align: center;
-    background-color: #34675C;
-    color: white;
+    text-align: left;
+    background-color: transparent;
+    color: #34675C;
     overflow: hidden;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
     margin: 2px;
 }
 .itemsheadingtext {
@@ -344,11 +357,26 @@ body {
     white-space: normal;
     vertical-align: bottom;
     float: left;
+    margin: 2px;
+    color: #B3C100;
+    background-color:transparent;
 }
 
 .addColumn {
-    width: 10px;
-    height: 80px;
+    width: 16px;
+    height: 76px;
+    padding: 2px;
+    text-align: center;
+    background-color: transparent;
+    display: inline-block;
+    color: gainsboro;
+    cursor: pointer;
+    writing-mode: vertical-rl;
+}
+.addGroup {
+    width: 16px;
+    height: 16px;
+    padding: 2px;
     text-align: center;
     background-color: transparent;
     display: inline-block;
@@ -361,7 +389,9 @@ body {
     min-height: 80px;
     overflow: hidden;
     display: flex;
-    flex-direction:column;
+    flex-direction: column;
+    background-color: #f2f2f2;
+    margin:2px;
 }
     .epic ul {
         white-space: nowrap;

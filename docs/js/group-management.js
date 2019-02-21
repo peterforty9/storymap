@@ -35,9 +35,17 @@ $(function () {
 
     //generate menu
 
-    $("body").prepend("<div class='ui-menu'><label class='container' id = new>New</label><label class='container'>Quick edit<input type='checkbox' id = 'quick' checked='checked'><span class='checkmark'></span></label><label class='container'>Groups<input type='checkbox' id='menuGroups'><span class='checkmark'></span></label><label class='container'>Rows<input type='checkbox' id='menuRows'><span class='checkmark'></span></label><label class='container'>Block details<input type='checkbox' id='toggledetails'><span class='checkmark'></span></label><label class='container' id = 'colwidth'>Column width</label></div>");
+    $("body").prepend("<div class='ui-menu'><label class='container' id = new>New</label></label>" +
+        "<label class='container'>Groups<input type='checkbox' id='menuGroups'><span class='checkmark'></span></label>" +
+        "<label class='container'>Rows<input type='checkbox' id='menuRows'><span class='checkmark'></span></label>" +
+        "<label class='container'>Block details<input type='checkbox' id='toggledetails'><span class='checkmark'></span></label>" +
+        "<label class='container' id='colwidth'>Column width</label></div > ");
     $("body").append("<div id ='board'></div>");
-    $("body").append("<div id='infobox'><div id='blockname' class='title'></div> <div id='blockdetails' contenteditable='true' class='hidden'></div></div>");
+    $("body").append("<div id='infobox' class='hidden'>" +
+        "<textarea id='blockname' class='title' maxlength='50'></textarea>" +
+        "<div id='blockdetails' contenteditable='true'></div>" +
+        "<div><label class='container' id='savedetails'>Save</label><label class='container' id='canceldetails'>Cancel</label></div>" +
+        "</div > ");
 
     var n = localStorage.getItem('board');
     var htmlstring = atob(n)
@@ -59,7 +67,7 @@ $(function () {
                         "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
                         "<div class='columnheaderheading' id='columnheader1'><div class='columnheaderheadingtext textbox'>Activities</div></div>" +
                         "</div><div id='grouparraycontainer'></div>";
-        var rowheading = "<div class='row' id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
+        var rowheading = "<div id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
 
         var rows = "<div id='rows'></div>";
         var addrow = "<div class='newrelease'><div class='addrelease cell'>Add release</div></div>";
@@ -126,29 +134,35 @@ $(function () {
         reader.readAsText(input.files[0]);
     };
 
-    //open new map from html template
-    $(document).on("click", "#new", function () {
+
+    
+    $(document).on("click", "#new", function () { //open new map from html template
         newboard();
-        //   $('#board').load('newmap.html #storymap');
-        //  console.log("new map loaded");
+        console.log("new map loaded");
     });
 
     //////////  SAVE BOARD /////////////////
 
     //Save map each time it is updated
     $(document).on("focusout", ".textbox", function () {
+        if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
+    });
+
+    function saveToLocalStorage() {
         var html = $('#board').clone();
         var htmlString = html.html();
         var datauri = btoa(htmlString);
-        //Save to local storage
-        localStorage.board = datauri;
 
-        //Save downloadable file
-        var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
-        $("#downloadmap").attr("href", downloadfile);
+        localStorage.board = datauri;
         console.log("board saved");
 
-    });
+        //Save downloadable file
+        //var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
+        //$("#downloadmap").attr("href", downloadfile);
+  
+    } 
+
+  
     /// Update block title
     function updateBlockTitle(blockid, title) { 
         blocktitlearray[blockid] = title;
@@ -162,107 +176,85 @@ $(function () {
         console.log(blockdetailsarray);
     }
    
-    //Create json objects 
+    //Create json objects /////
 
-    function createColumnJSON(){
+    function createBoardJSON(){
         updateGroupsObj();
         updateColumnsObj();
         updateRowsObj;
         updateItemsObj();
     }
-   
-        // Create groups
-
     function updateGroupsObj() {
-            groupsarray = [];
-            $(".group").each(function () {
-                var id = $(this).attr("id");
-                groupsarray.push(id);
-            });
-            console.log("groups:");
-            console.log(groupsarray);
-        }
+        groupsarray = [];
+        $(".group").each(function () {
+            var id = $(this).attr("id");
+            groupsarray.push(id);
+        });
+        console.log("groups updated:");
+        console.log(groupsarray);
+        saveToLocalStorage();
+    }
     function updateColumnsObj() {
         columnObj = []
-
         $(".columnheader").each(function () {
             columngroupObj = [];
-            //var groupIndex = $(this).parent().index();
             var groupId = $(this).parent().parent().find(".group").attr("id");
-                //$("#groups div.cell:nth-child(" + (groupIndex + 1) + ")").children().attr("id");
-                   
             ($(this).find(".column")).each(function () {
                 var columnid = $(this).attr("id");
                 columngroupObj.push(columnid);
              });
-
             item = {}
             item[groupId] = columngroupObj;
-            
             columnObj.push(item);
-            
         });
-
-        console.log("columnheader:");
+        console.log("Columns updated:");
         console.log(columnObj);
+        saveToLocalStorage();
        // board.push({ "columns": columnObj });
     };
     function updateRowsObj() {
         rowsObj = [];
-        $(".releaserow").each(function () {
+        $(".row").each(function () {
             var iteration = ($(this).find(".iteration"));
             var blockid = $(iteration).attr("id");
             rowsObj.push(blockid);
         });
-        console.log("rows:");
+        console.log("Rows updated:");
         console.log(rowsObj);
+        saveToLocalStorage();
         //board.push({ "rows": rowsObj });
      }
     function updateItemsObj() {
-      
         itemsObj = [];
-
-        $(".releaserow").each(function () {
-           // rowObj = [];
+        $(".row").each(function () {
             var iteration = ($(this).find(".iteration"));
             var rowid = $(iteration).attr("id");
             epicObj = [];
             ($(this).find(".grouprelease")).each(function () {
                 var groupIndex = $(this).index();
-              //  var groupId = $("#groups div.cell:nth-child(" + (groupIndex + 1) + ")").children().attr("id");
-
-              //  rowgroupObj = [];
-                
                 ($(this).find(".epic")).each(function () {
-                var columnnumber = ($(this).index()) + 1;
+                    var columnindex = $(this).index();
                     storyObj = [];
-                    var columnId = $(".groupcontainer:nth-child(" + (groupIndex + 1) + ")").find(".columnheader li:nth-child(" + columnnumber + ") .column").attr("id");
+                    var columnId = $(".groupcontainer:eq(" + groupIndex + ")").find(".columnheader li:eq(" + columnindex + ") .column").attr("id");
                     ($(this).find(".story")).each(function () {
                         var itemid = $(this).attr("id");
                         storyObj.push(itemid);
                     });
-                    
                     item = {}
                     item[columnId] = storyObj;
-                   epicObj.push(item);
-
+                    epicObj.push(item);
                 });
             });
-
             item = {}
             item[rowid] = epicObj;
             itemsObj.push(item);
-
         });
-
-        //itemsObj.push(rowObj);
-        console.log("items:");
+        console.log("Items updated:");
         console.log(itemsObj);
-        
+        saveToLocalStorage();
         //board.push({ "items": itemsObj });
        // console.log("board");
         //console.log(board);
-
     };
    
     //Generate object html
@@ -270,10 +262,10 @@ $(function () {
         var htmlData = "";
         if (textboxid == null) { textboxid = guid() };
         if (boxtype == "group" || boxtype == "column" || boxtype == "story" || boxtype == "iteration") {
-            htmlData = "<div class='" + boxtype + "' id='" + textboxid + "'><div class='" + boxtype + "text textbox' ></div></div>";
+            htmlData = "<div class='" + boxtype + "' id='" + textboxid + "'><div class='" + boxtype + "text textbox' contenteditable='true'></div></div>";
             if (boxtype == "group") {
-                htmlData = "<div class='groupcontainer'>" + htmlData + 
-                    "<div class='groupcolumns'><ul class='columnheader'></ul></div></div>";
+                htmlData = "<div class='groupcontainer'><div class='groupline'>" + htmlData + "<i class='far fa-plus-square addGroup'></i></div>" +
+                    "<div class='groupcolumns'><ul class='columnheader'></ul><i class='far fa-plus-square addColumn'></i></div></div>";
             } else if (boxtype == "column" || boxtype == "story") {
                 htmlData = "<li>" + htmlData + "</li>";
                 console.log(boxtype + " created (li)");
@@ -362,6 +354,55 @@ $(function () {
                 columnstartindex = ui.item.index();
                 columnstartgroupindex = ui.item.parents(".groupcontainer").index();
                 ui.placeholder.width('150px');
+            },
+            change: function (event, ui) {
+                console.log("Over executed");
+                var columnoverindex = ui.item.index();
+                var overepic = columnoverindex + 1;
+                var columnovergroupindex;
+                var inepics = ui.placeholder.parents().hasClass("grouprelease");
+               // var actcount;
+                var storycount = 0;
+                console.log("in column?: " + inepics);
+               // if (inepics === true) {
+                   // console.log("in epics");
+                    columnovergroupindex = ui.placeholder.parents(".grouprelease").index();
+                   // actcount = groupcolumncount(columnovergroupindex);
+                
+                
+                $(".rowgroups").each(function (index) {
+                    var startepic = $(this).find(".grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")");
+                  
+                    //if column moved to item
+
+                    if (startepic.find(".stories .story").length > 0) {
+                        storycount = storycount + 1;
+                    }
+                    else {
+                        storycount = storycount + 0;
+                    }
+
+                });
+                    console.log("story count: " + storycount);
+            
+                $(".rowgroups").each(function (index) {
+                    if (storycount === 0 && inepics === true) {
+
+                        $(this).find(" .grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")").hide();
+                        console.log("Over hide");
+                    } else {
+                        $(this).find(" .grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")").show();
+                        console.log("Over show");
+                    }
+                    });
+                    //Change class from column to story
+                   // ui.item.find(".column").addClass('story').removeClass('column');
+                  //  childtext.addClass('storytext').removeClass('columntext');
+                    //  hideaddstory(); //update add story buttons
+
+                //}; //else if (storycount > 0 && stayedincolumnheader === false) { $(".columnheader").sortable("cancel"); }
+               // };
+
             },
   //        /*  
            placeholder: {
@@ -523,47 +564,54 @@ $(function () {
         });
     }
     function makeeditable() { //quick edit functionality
-        var x = document.getElementById("quick").checked;
-        if (x) {
-            $(".textbox").attr('contenteditable', 'true');
+      //  var x = document.getElementById("quick").checked;
+       // if (x) {
+          //  $(".textbox").attr('contenteditable', 'true');
      
-        }
-        else {
+     //   }
+    //    else {
             $(".stories").sortable({ cancel: "" });
             $(".columnheader").sortable({ cancel: "" });
             $("#groups").sortable({ cancel: "" });
             $("#rows").sortable({ cancel: "" });
-            $(".textbox").attr('contenteditable', 'false');
+          //  $(".textbox").attr('contenteditable', 'false');
             console.log("textbox clicked");
             
-        }
+     //   }
     };
 
     $(document).on("click", ".textbox", function (event) {
         console.log("textbox clicked");
         textbox = $(this).parent().attr("id");
+        var bgcolour = $(this).parent().css("background-color");
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
-        $("#blockname").text(currentText);
+       // $("#blockname").text(currentText);
+        $("#blockname").css("background-color", bgcolour);
+        $("#blockname").val(currentText);
+        console.log("Click on " + blockid);
         updateBlockTitle(blockid, currentText); 
-        var x = document.getElementById("quick").checked;
-        if (x === false) {
-            $('#blockname').attr('contenteditable', 'true');
-            $('#blockname').focus();
-        }
+      //  $('#blockname').focus();
+     //   var x = document.getElementById("quick").checked;
+    //    if (x === false) {
+     //       $('#blockname').attr('contenteditable', 'true');
+      //      
+      //  }
         event.stopPropagation();
     });
     $(document).on("click", ".story", function (event) {
           event.stopPropagation();
     });
-    $(document).on("click", "#quick", function (event) {
-        makeSortable()
-    });
+   // $(document).on("click", "#quick", function (event) {
+    //    makeSortable()
+   // });
     $(document).on("keydown", ".textbox", function (event) {
         if (event.shiftKey && event.ctrlKey && event.which == 13) {
-            hiddenblockdetails = $("#blockdetails").hasClass("hidden");
-            $("#blockdetails").removeClass("hidden");
+         //   hiddenblockdetails = $("#blockdetails").hasClass("hidden");
+            $("#infobox").removeClass("hidden");
             $('#blockdetails').focus();
+            hiddenblockdetails = $("#infobox").hasClass("hidden");
+            $("#toggledetails").prop('checked',true);
             event.stopPropagation();
 
         }
@@ -579,8 +627,8 @@ $(function () {
     //Insert new group from group
     $(document).on("keydown", ".grouptext", function (event) {
         console.log("Group return key");
-        var group = $(this).parent().parent();
-        var groupstartindex = $('.groupcontainer').index($(this).parents('.groupcontainer'));
+        var group = $(this).parents('.groupcontainer');
+        var groupstartindex = $(this).parents('.groupcontainer').index();
         //var groupnumber = groupstartindex + 1;
         var columnlist = $('.groupcontainer:eq(' + groupindex + ') .columnheader');
 
@@ -599,7 +647,7 @@ $(function () {
                 updateColumnsObj();// Update column array
 
                 //Remove releaserow containers
-                $(".releaserow").each(function (index) {
+                $(".row").each(function (index) {
 
                     $(this).find(" .grouprelease.eq(" + groupstartindex + ")").remove();
 
@@ -738,7 +786,7 @@ $(function () {
 
         //Insert new epic
         
-        $(".releaserow").each(function (index) {
+        $(".row").each(function (index) {
             var previousepic = ($(this).find('.rowgroups .grouprelease:eq(' + groupindex + ') .cell-flex-container .epic:eq(' + columnindex + ')'));
 
             $(boxhtml("epic")).insertAfter($(previousepic));
@@ -792,7 +840,7 @@ $(function () {
         var storycount = 0;
 
         //See if any stories exist in any of the releases
-        $(".releaserow").each(function (index) {
+        $(".row").each(function (index) {
             
             if (epicEmpty(index, groupstartindex, columnnumber)) {
                 storycount = storycount + 0;
@@ -813,7 +861,7 @@ $(function () {
         columnindex = columnnumber - 1;
         var columncount = groupcolumncount(groupindex);
        // if (columncount == 0 || $($(".releaserow").eq(rowindex)).find(" .grouprelease:eq(" + groupindex + ") .epic:nth-child(" + columnnumber + ") .stories").is(':empty')) empty = true;
-        if (columncount == 0 || $(".releaserow").eq(rowindex).find('.grouprelease:eq(' + groupindex + ') .epic:eq(' + columnindex + ') .stories').is(':empty')) empty = true;
+        if (columncount == 0 || $(".row").eq(rowindex).find('.grouprelease:eq(' + groupindex + ') .epic:eq(' + columnindex + ') .stories').is(':empty')) empty = true;
         console.log(empty);
         return empty;
     };
@@ -840,7 +888,7 @@ $(function () {
         });
     };
     //Create new column when addColumn clicked
-    $(document).on("click", ".groupcolumns", function () {
+    $(document).on("click", ".addColumn", function () {
         var groupindex = $(this).parents('.groupcontainer').index();
         appendNewcolumn(groupindex);
      //   $(this).hide();
@@ -954,7 +1002,7 @@ $(function () {
 
         var groupcount = $(".group").length;
         var iteration = boxhtml("iteration",iterationtextid)
-        var newrelease = "<div class='releaserow row'><div class='releasename'>" + iteration + "</div><div class='rowgroups'>";
+        var newrelease = "<div class='row'><div class='rowheader'>" + iteration + "</div><div class='rowgroups'>";
         var newgroupstart = "<div class='grouprelease'><div class='cell-flex-container'>";
         var newgroupend = "</div></div>";
         var newepic = boxhtml("epic");
@@ -993,7 +1041,7 @@ $(function () {
         if (event.which == 13 && ((event.shiftKey && event.ctrlKey) == false)) { //Insert row
             event.preventDefault();
             if ($(this).is(':empty') && emptyIteration(rowindex)) {
-                $($(".releaserow").eq(rowindex)).remove();
+                $($(".row").eq(rowindex)).remove();
                 console.log("row deleted");
         }
             else {
@@ -1048,7 +1096,8 @@ $(function () {
         $("#blockdetails").html("");
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
-        $("#blockname").text(currentText);
+        $("#blockname").val(currentText);
+        console.log("Focus on " + blockid);
 
         //var detailsText = $(this).next().val();
         var detailsText = blockdetailsarray[blockid]; 
@@ -1061,12 +1110,12 @@ $(function () {
     $(document).on("keyup", ".textbox", function (event) {
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
-        $("#blockname").text(currentText);
+        $("#blockname").val(currentText);
         updateBlockTitle(blockid, currentText); 
         
     });
     $(document).on("keyup", "#blockname", function (event) {
-        var currentText = $(this).text();
+        var currentText = $(this).val();
         var blockid = document.getElementById(textbox);
         $(blockid).find(".textbox").text(currentText);
         updateBlockTitle(textbox, currentText);
@@ -1094,17 +1143,20 @@ $(function () {
         updateBlockDetails(textbox, detailsText); 
 
     });
-    $(document).on("click", "#blockname, #toggledetails", function (event) {
-        $("#blockdetails").toggleClass("hidden");
-        hiddenblockdetails = $("#blockdetails").hasClass("hidden");
+    $(document).on("click", "#toggledetails", function (event) {
+        $("#infobox").toggleClass("hidden");
+        hiddenblockdetails = $("#infobox").hasClass("hidden");
     });
-    $(document).on("focusout", "#blockdetails", function (event) {
-        $("#infobox").removeClass("edit");
-        if (hiddenblockdetails) $("#blockdetails").addClass("hidden");
-    });
+
+   // $(document).on("focusout", "#blockdetails", function (event) {
+   //     $("#infobox").removeClass("edit");
+   //     if (hiddenblockdetails) $("#infobox").addClass("hidden");
+   // });
     $(document).on("focus", "#blockdetails", function (event) {
         $("#infobox").addClass("edit");
     });
+
+
     $(document).on("keydown", "#blockdetails", function (event) {
 
         if (event.shiftKey && event.ctrlKey && event.which == 13) { //back to home block
