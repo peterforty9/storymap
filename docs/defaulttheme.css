@@ -1,8 +1,11 @@
 ﻿body {
 }
+.blockselected {
+    box-shadow: 3px 3px;
+}
 .group {
     width: 100%;
-    height: 20px;
+    height: 25px;
     text-align: left;
     background-color: #B7B8B6;
     float: left;
@@ -21,8 +24,7 @@
 .grouptext {
     width: 136px;
     max-width: 136px;
-    height: 76px;
-    max-height: 76px;
+    height: 25px;
     text-align: left;
     background-color: transparent;
     color:white;

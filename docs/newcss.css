@@ -188,13 +188,38 @@ body {
     background-color: whitesmoke;
     box-shadow: -10px 0px lightgray;
 }
+#toggledetails {
+    position: fixed;
+    right: 0;
+    top: 70px;
+    right: 30%;
+    width: 50px;
+    min-width: 0%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: whitesmoke;
+    /* Safari */
+    -webkit-transform: rotate(-90deg);
+    /* Firefox */
+    -moz-transform: rotate(-90deg);
+    /* IE */
+    -ms-transform: rotate(-90deg);
+    /* Opera */
+    -o-transform: rotate(-90deg);
+    /* Internet Explorer */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+#toggledetails.hidden {
+    position: fixed;
+    right: 0;
+}
+   
     #infobox.hidden {
         display: none;
     }
 
-    #infobox.edit {
-      
-    }
+
 #blockname {
     border: 1px solid black;
     height: 40px;
@@ -277,7 +302,7 @@ body {
 
 .groupsheadingtext {
     width: var(--first-column-width);
-    height: 20px;
+    height: 25px;
     text-align: right;
     background-color: transparent;
     color: #B7B8B6;

@@ -1,15 +1,11 @@
-﻿var pre, stopindex, to;
-var groupindex;
-var columnstartindex;
-var columnstartgroup;
-var startgroup;
-board = [];
-groupsarray = [];
-columnsarray = [];
-rowsarray = [];
-itemsarray = [];
-blocktitlearray = [];
-blockdetailsarray = [];
+﻿
+board = {"columns": [], "groups": [], "items": [], "rows": [], "titles": {}, "details": {}};
+groupsObj = [];
+columnsObj = [];
+rowsObj = [];
+itemsObj = [];
+blocktitlearray = {};
+blockdetailsarray = {};
 
 $(function () {
 
@@ -38,9 +34,10 @@ $(function () {
     $("body").prepend("<div class='ui-menu'><label class='container' id = new>New</label></label>" +
         "<label class='container'>Groups<input type='checkbox' id='menuGroups'><span class='checkmark'></span></label>" +
         "<label class='container'>Rows<input type='checkbox' id='menuRows'><span class='checkmark'></span></label>" +
-        "<label class='container'>Block details<input type='checkbox' id='toggledetails'><span class='checkmark'></span></label>" +
+      //  "<label class='container'>Block details<input type='checkbox' id='toggledetails'><span class='checkmark'></span></label>" +
         "<label class='container' id='colwidth'>Column width</label></div > ");
     $("body").append("<div id ='board'></div>");
+    $("body").append("<div id='toggledetails' class='hidden'>Details</div>");
     $("body").append("<div id='infobox' class='hidden'>" +
         "<textarea id='blockname' class='title' maxlength='50'></textarea>" +
         "<div id='blockdetails' contenteditable='true'></div>" +
@@ -50,18 +47,30 @@ $(function () {
     var n = localStorage.getItem('board');
     var htmlstring = atob(n)
     $('#board').html(htmlstring);
+
+    var boarddata = localStorage.getItem("boarddata");
+    if (boarddata) {
+        board = JSON.parse(boarddata);
+    }
+    blockdetailsarray = board["details"];
+    blocktitlesarray = board["titles"];
     console.log("Local storage board loaded");
+    console.log(board);
     makeSortable();
 
     // Generate new board
     function newboard() {
-        groupsarray.length = 0;
-        columnsarray.length = 0;
-        rowsarray.length = 0;
-        itemsarray.length = 0;
-        blocktitlearray.length = 0
-
+        
         $("#board").empty();
+
+        board = { "columns": [], "groups": [], "items": [], "rows": [], "titles": {}, "details": {} };
+        groupsObj = [];
+        columnsObj = [];
+        rowsObj = [];
+        itemsObj = [];
+        blocktitlearray = {};
+        blockdetailsarray = {};2 
+
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
                         "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
@@ -82,6 +91,8 @@ $(function () {
         appendNewcolumn("0");
         toggleGroups();
      //   toggleRows();
+
+
 
     }
 
@@ -145,6 +156,10 @@ $(function () {
 
     //Save map each time it is updated
     $(document).on("focusout", ".textbox", function () {
+        var currentText = $(this).text();
+        var blockid = $(this).parent().attr("id");
+        updateBlockTitle(blockid, currentText);
+
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
     });
 
@@ -152,28 +167,45 @@ $(function () {
         var html = $('#board').clone();
         var htmlString = html.html();
         var datauri = btoa(htmlString);
-
+       
         localStorage.board = datauri;
-        console.log("board saved");
 
+       
+        //createBoardJSON();
+     //   board["items"] = itemsObj;
+     //   board["rows"] = rowsObj;
+     //   board["columns"] = columnsObj;
+      //  board["groups"] = groupsObj;
+       // board["titles"] = blocktitlearray;
+      //  board["details"] = blockdetailsarray;
+        var boarddata = JSON.stringify(board);
+        localStorage.setItem("boarddata", boarddata);
+        console.log("board saved");
+        console.log(JSON.parse(boarddata));
+        console.log(boarddata);
         //Save downloadable file
         //var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
         //$("#downloadmap").attr("href", downloadfile);
   
-    } 
+    };
 
   
     /// Update block title
     function updateBlockTitle(blockid, title) { 
+
         blocktitlearray[blockid] = title;
+        board["titles"] = blocktitlearray;
         console.log("Titles:");
-        console.log(blocktitlearray);
+       // console.log(blocktitlearray);
+        saveToLocalStorage();
     }
     /// Update block details
     function updateBlockDetails(blockid, text) {
         blockdetailsarray[blockid] = text;
+        board["details"] = blockdetailsarray;
         console.log("Details:");
-        console.log(blockdetailsarray);
+      //  console.log(blockdetailsarray);
+        saveToLocalStorage();
     }
    
     //Create json objects /////
@@ -185,17 +217,20 @@ $(function () {
         updateItemsObj();
     }
     function updateGroupsObj() {
-        groupsarray = [];
+        groupsObj = [];
         $(".group").each(function () {
             var id = $(this).attr("id");
-            groupsarray.push(id);
+            groupsObj.push(id);
         });
         console.log("groups updated:");
-        console.log(groupsarray);
+        console.log(groupsObj);
+  
+        board["groups"] = groupsObj;
+      
         saveToLocalStorage();
     }
     function updateColumnsObj() {
-        columnObj = []
+        columnsObj = []
         $(".columnheader").each(function () {
             columngroupObj = [];
             var groupId = $(this).parent().parent().find(".group").attr("id");
@@ -205,12 +240,15 @@ $(function () {
              });
             item = {}
             item[groupId] = columngroupObj;
-            columnObj.push(item);
+            columnsObj.push(item);
         });
         console.log("Columns updated:");
-        console.log(columnObj);
+        console.log(columnsObj);
+
+        board["columns"] = columnsObj;
+  
         saveToLocalStorage();
-       // board.push({ "columns": columnObj });
+      
     };
     function updateRowsObj() {
         rowsObj = [];
@@ -221,8 +259,11 @@ $(function () {
         });
         console.log("Rows updated:");
         console.log(rowsObj);
+
+        board["rows"] = rowsObj;
+  
         saveToLocalStorage();
-        //board.push({ "rows": rowsObj });
+       
      }
     function updateItemsObj() {
         itemsObj = [];
@@ -251,8 +292,11 @@ $(function () {
         });
         console.log("Items updated:");
         console.log(itemsObj);
+
+        board["items"] = itemsObj;
+
         saveToLocalStorage();
-        //board.push({ "items": itemsObj });
+        
        // console.log("board");
         //console.log(board);
     };
@@ -300,7 +344,9 @@ $(function () {
 
               //  clone = $(ui.item[0].outerHTML).clone();
                // startgroup = (ui.item.index()) + 1;
-                startgroupindex = ui.item.index();
+                ui.item.data('originIndex', ui.item.index());
+               // var startgroupindex = ui.item.data('startgroupindex')
+               // startgroupindex = ui.item.index();
             },
 /*
             placeholder: {
@@ -315,6 +361,7 @@ $(function () {
             stop: function (event, ui) {
                 updateGroupsObj();  // Update group array
                // var targetgroup = (ui.item.index()) + 1;
+                var startgroupindex = ui.item.data('originIndex');
                 var targetgroupindex = ui.item.index();
                 if (targetgroupindex < startgroupindex) {
 
@@ -345,156 +392,147 @@ $(function () {
     function makeActivitiesSortable() {
         $(".columnheader").sortable({
 
-            connectWith: ".stories, .columnheader",
+            connectWith: ".columnheader",
             cursor: "move",
             cancel: ".columntext",
+       
 
             start: function (event, ui) {
-               // clone = $(ui.item[0].outerHTML).clone();
-                columnstartindex = ui.item.index();
-                columnstartgroupindex = ui.item.parents(".groupcontainer").index();
+                // clone = $(ui.item[0].outerHTML).clone();
+               // columnstartindex = ui.item.index();
+                //columnstartplaceholderindex = ui.placeholder.index();
+                ui.item.data('originIndex', ui.item.index());
+                ui.item.data('originGroup', ui.item.parents(".groupcontainer").index());
+                ui.item.data('changeFromGroup', ui.item.parents(".groupcontainer").index());
+                ui.item.data('changeFromIndex', ui.item.index());
+              
+                //columnstartgroupindex = ui.item.parents(".groupcontainer").index();
                 ui.placeholder.width('150px');
             },
+            // /*          
             change: function (event, ui) {
-                console.log("Over executed");
-                var columnoverindex = ui.item.index();
-                var overepic = columnoverindex + 1;
-                var columnovergroupindex;
-                var inepics = ui.placeholder.parents().hasClass("grouprelease");
-               // var actcount;
-                var storycount = 0;
-                console.log("in column?: " + inepics);
-               // if (inepics === true) {
-                   // console.log("in epics");
-                    columnovergroupindex = ui.placeholder.parents(".grouprelease").index();
-                   // actcount = groupcolumncount(columnovergroupindex);
-                
-                
-                $(".rowgroups").each(function (index) {
-                    var startepic = $(this).find(".grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")");
-                  
-                    //if column moved to item
-
-                    if (startepic.find(".stories .story").length > 0) {
-                        storycount = storycount + 1;
-                    }
-                    else {
-                        storycount = storycount + 0;
-                    }
-
-                });
-                    console.log("story count: " + storycount);
-            
-                $(".rowgroups").each(function (index) {
-                    if (storycount === 0 && inepics === true) {
-
-                        $(this).find(" .grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")").hide();
-                        console.log("Over hide");
-                    } else {
-                        $(this).find(" .grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")").show();
-                        console.log("Over show");
-                    }
-                    });
-                    //Change class from column to story
-                   // ui.item.find(".column").addClass('story').removeClass('column');
-                  //  childtext.addClass('storytext').removeClass('columntext');
-                    //  hideaddstory(); //update add story buttons
-
-                //}; //else if (storycount > 0 && stayedincolumnheader === false) { $(".columnheader").sortable("cancel"); }
-               // };
-
+                console.log("Change executed");
+                var stayedincolumnheader = ui.placeholder.parents().hasClass("columnheader");
+                if (stayedincolumnheader == true) { 
+                    moveEpics(event, ui);   
+                } else { //if column moved to item
+                   // removeEpics(event, ui);
+                };  
+               
             },
-  //        /*  
-           placeholder: {
+        
+              
+            placeholder: {
                 element: function (clone, ui) {
-                 //   return $('<li class="selected">' + clone[0].innerHTML + '</li>');
+                    //   return $('<li class="selected">' + clone[0].innerHTML + '</li>');
                     return $('<li class="selected"></li>');
                 },
                 update: function () {
                     return;
-                } 
-            },
-  //          */
-            stop: function (event, ui) {
-                var columntargetindex = ui.item.index();
-                var targetepic = columntargetindex + 1;
-                var columntargetgroupindex;
-                var stayedincolumnheader = ui.item.parents().hasClass("columnheader");
-                var childtext = ui.item.find(".textbox");
-                var actcount;
-                var lastcolumn = false;
-                var storycount = 0;
-
-                if (stayedincolumnheader === true) {
-                    columntargetgroupindex = ui.item.parents(".groupcontainer").index();
-                    actcount = groupcolumncount(columntargetgroupindex);
-                } else {
-                    columntargetgroupindex = ui.item.parents(".grouprelease").index();
-                    actcount = groupcolumncount(columntargetgroupindex);
                 }
-
-                if (targetepic === actcount) { lastcolumn = true };
-
-                //move epics in line with column movement
-                $(".rowgroups").each(function (index) {
-                    var startepic = $(this).find(".grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")");
-                    var targetepic = $(this).find(".grouprelease:eq(" + columntargetgroupindex + ") .epic:eq(" + columntargetindex + ")");
-                    var targetgroup = $(this).find(".grouprelease:eq(" + columntargetgroupindex + ") .cell-flex-container");
-
-                    if (stayedincolumnheader == true) {
-
-                        if (columntargetgroupindex === columnstartgroupindex && columntargetindex > columnstartindex) { //column moved within same group / higher up
-                            startepic.insertAfter(targetepic);
-                            console.log("column moved within same group / higher up");
-                        }
-                        else if (columntargetgroupindex === columnstartgroupindex && columntargetindex <= columnstartindex) { //column moved within same group / Lower down
-                            startepic.insertBefore(targetepic);
-                            console.log("column moved within same group / Lower down");
-                        }
-                        else if ((columntargetgroupindex != columnstartgroupindex) && lastcolumn == false) { //column to different group / NOT To last column
-                            startepic.insertBefore(targetepic);
-                            console.log("column to different group / NOT To last column");
-                        }
-                        else if ((columntargetgroupindex != columnstartgroupindex) && lastcolumn && actcount > 1) {  //column to different group / last column
-                            startepic.appendTo(targetgroup);
-                            console.log("column to different group / last column");
-                        }
-                        else if ((columntargetgroupindex != columnstartgroupindex) && actcount == 1) { //column to different group / No columnheader exist
-                            startepic.appendTo(targetgroup);
-                            console.log("column to different group / No columnheader exist");
-                        }
-                    }
-
-                    else { //if column moved to item
-
-                        if (startepic.find(".stories").is(':empty')) {
-                            storycount = storycount + 0;
-                        }
-                        else {
-                            storycount = storycount + 1;
-                        }
-                    }
-                });
-
-                //Only allow to convert an column to a story if it nas no stories
-                console.log("Total story count: " + storycount);
-
-                if (storycount === 0 && stayedincolumnheader === false) {
-
-                    $(".rowgroups").each(function (index) {
-                        $(this).find(" .grouprelease:eq(" + columnstartgroupindex + ") .epic:eq(" + columnstartindex + ")").remove();
-                    });
-                    //Change class from column to story
-                    ui.item.find(".column").addClass('story').removeClass('column');
-                    childtext.addClass('storytext').removeClass('columntext');
-                    //  hideaddstory(); //update add story buttons
-
-                } else if (storycount > 0 && stayedincolumnheader === false) { $(".columnheader").sortable("cancel"); }
-               
             },
-
+                  
+            beforeStop: function (event, ui) {                
+                var stayedincolumnheader = ui.item.parents().hasClass("columnheader");                
+                if (stayedincolumnheader == true) { //move epics in line with column movement
+                  //  moveEpics(event,ui);              
+                } else { //if column moved to item
+                   // removeEpics(event, ui);    
+                   // moveEpics(event, ui, true);
+                };               
+            },
         });
     }
+
+    function moveEpics(event, ui, cancel) {
+      //  var columntargetindex = ui.placeholder.index();
+      
+        var actcount;
+        var lastcolumn = false;
+
+        var changeFromGroup = ui.item.data('changeFromGroup')
+        var originIndex = ui.item.data('originIndex');
+        var changeFromIndex = ui.item.data('changeFromIndex');
+        var originGroup = ui.item.data('originGroup');
+        if (cancel === true) {
+            var currentIndex = originIndex;
+            var currentGroup = originGroup;
+        } else {
+            var currentIndex = ui.placeholder.index();
+            var currentGroup = ui.placeholder.parents(".groupcontainer").index();
+        };
+        if ((originGroup === currentGroup) && (currentIndex > originIndex)) {
+            currentIndex -= 1;
+        };
+        var targetepic = currentIndex + 1;
+        if (originGroup === currentGroup) {
+            actcount = groupcolumncount(currentGroup);
+        } else { actcount = groupcolumncount(currentGroup) + 1 };
+
+        if (targetepic === actcount) { lastcolumn = true };
+
+        $(".rowgroups").each(function (index) {
+            var startepic = $(this).find(".grouprelease:eq(" + changeFromGroup + ") .epic:eq(" + changeFromIndex + ")");
+            var targetepic = $(this).find(".grouprelease:eq(" + currentGroup + ") .epic:eq(" + currentIndex  + ")");
+            var targetgroup = $(this).find(".grouprelease:eq(" + currentGroup + ") .cell-flex-container");
+
+            if (currentGroup === changeFromGroup && currentIndex > changeFromIndex ) { //column moved within same group / higher up
+                startepic.insertAfter(targetepic);
+                console.log("column moved within same group / higher up");
+            }
+            else if (currentGroup === changeFromGroup && currentIndex <= changeFromIndex ) { //column moved within same group / Lower down
+                startepic.insertBefore(targetepic);
+                console.log("column moved within same group / Lower down");
+            }
+            else if ((currentGroup != changeFromGroup) && lastcolumn == false) { //column to different group / NOT To last column
+                startepic.insertBefore(targetepic);
+                console.log("column to different group / NOT To last column");
+            }
+            else if ((currentGroup != changeFromGroup) && lastcolumn && actcount > 1) {  //column to different group / last column
+                startepic.appendTo(targetgroup);
+                console.log("column to different group / last column");
+            }
+            else if ((currentGroup != changeFromGroup) && actcount == 1) { //column to different group / No columnheader exist
+                startepic.appendTo(targetgroup);
+                console.log("column to different group / No columnheader exist");
+            }
+        });
+        console.log("From group:" + changeFromGroup + " Current group: " + currentGroup + " From index:" + changeFromIndex + " Current index:" + currentIndex);
+        ui.item.data('changeFromIndex', currentIndex);
+        ui.item.data('changeFromGroup', currentGroup);
+
+    };
+    function removeEpics(event, ui) {
+        var originGroup = ui.item.data('originGroup');
+        var originIndex = ui.item.data('originIndex');
+        var storycount = 0;
+        var childtext = ui.item.find(".textbox");
+        $(".rowgroups").each(function (index) {
+            var startepic = $(this).find(".grouprelease:eq(" + originGroup + ") .epic:eq(" + originIndex + ")");
+            if (startepic.find(".stories").is(':empty')) {
+                storycount = storycount + 0;
+            }
+            else {
+                storycount = storycount + 1;
+            }
+        });
+        //Only allow to convert a column to a story if it nas no stories
+        console.log("Total story count: " + storycount);
+
+        if (storycount === 0) {
+
+            $(".rowgroups").each(function (index) {
+                $(this).find(" .grouprelease:eq(" + originGroup + ") .epic:eq(" + originIndex + ")").remove();
+            });
+            //Change class from column to story
+            ui.item.find(".column").addClass('story').removeClass('column');
+            childtext.addClass('storytext').removeClass('columntext');
+
+        } else if (storycount > 0) {
+            $(".columnheader").sortable("cancel");
+
+        }
+    };
     function makeEpicsSortable() {
         $(".stories").sortable({
        //     placeholder: "ui-sortable-placeholder",
@@ -523,7 +561,7 @@ $(function () {
             stop: function (event, ui) {
 
                 var newepic = boxhtml("epic")
-                stopindex = ui.item.index();
+                var stopindex = ui.item.index();
                 var targetgroupindex = (ui.item.parents(".groupcontainer").index());
                 var targetgroup = targetgroupindex + 1;
                 var targetepic = stopindex + 1;
@@ -563,41 +601,38 @@ $(function () {
             }
         });
     }
-    function makeeditable() { //quick edit functionality
-      //  var x = document.getElementById("quick").checked;
-       // if (x) {
-          //  $(".textbox").attr('contenteditable', 'true');
-     
-     //   }
-    //    else {
+    function makeeditable() { 
             $(".stories").sortable({ cancel: "" });
             $(".columnheader").sortable({ cancel: "" });
-            $("#groups").sortable({ cancel: "" });
-            $("#rows").sortable({ cancel: "" });
-          //  $(".textbox").attr('contenteditable', 'false');
-            console.log("textbox clicked");
-            
-     //   }
+            $("#boardheader").sortable({ cancel: "" });
+        $("#rows").sortable({ cancel: "" });
+
+            console.log("make editable");
+
     };
 
     $(document).on("click", ".textbox", function (event) {
         console.log("textbox clicked");
+        $(".textbox").parent().removeClass('blockselected');
+        $(this).parent().addClass('blockselected')
         textbox = $(this).parent().attr("id");
         var bgcolour = $(this).parent().css("background-color");
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
-       // $("#blockname").text(currentText);
+
         $("#blockname").css("background-color", bgcolour);
         $("#blockname").val(currentText);
         console.log("Click on " + blockid);
-        updateBlockTitle(blockid, currentText); 
-      //  $('#blockname').focus();
-     //   var x = document.getElementById("quick").checked;
-    //    if (x === false) {
-     //       $('#blockname').attr('contenteditable', 'true');
-      //      
-      //  }
+        $("#blockdetails").html("");
+     
+        var detailsText = blockdetailsarray[blockid];
+        $("#blockdetails").html(detailsText);
         event.stopPropagation();
+    });
+    $(document).on("dblclick", ".textbox", function (event) {
+        $("#infobox").removeClass("hidden");
+        $("#toggledetails").removeClass("hidden");
+        $("#blockdetails").focus();
     });
     $(document).on("click", ".story", function (event) {
           event.stopPropagation();
@@ -609,9 +644,10 @@ $(function () {
         if (event.shiftKey && event.ctrlKey && event.which == 13) {
          //   hiddenblockdetails = $("#blockdetails").hasClass("hidden");
             $("#infobox").removeClass("hidden");
+            $("#toggledetails").removeClass("hidden");
             $('#blockdetails').focus();
             hiddenblockdetails = $("#infobox").hasClass("hidden");
-            $("#toggledetails").prop('checked',true);
+           // $("#toggledetails").prop('checked',true);
             event.stopPropagation();
 
         }
@@ -630,7 +666,7 @@ $(function () {
         var group = $(this).parents('.groupcontainer');
         var groupstartindex = $(this).parents('.groupcontainer').index();
         //var groupnumber = groupstartindex + 1;
-        var columnlist = $('.groupcontainer:eq(' + groupindex + ') .columnheader');
+        var columnlist = $('.groupcontainer:eq(' + groupstartindex + ') .columnheader');
 
         if (event.which == 13 && event.ctrlKey && (event.shiftKey == false)) {
             event.preventDefault();
@@ -1101,6 +1137,8 @@ $(function () {
 
         //var detailsText = $(this).next().val();
         var detailsText = blockdetailsarray[blockid]; 
+        $(".textbox").parent().removeClass('blockselected');
+        $(this).parent().addClass('blockselected')
         textbox = $(this).parent().attr("id");
         var bgcolor = $(this).parent().css('background-color');
         $("#blockdetails").html(detailsText);
@@ -1111,14 +1149,14 @@ $(function () {
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
         $("#blockname").val(currentText);
-        updateBlockTitle(blockid, currentText); 
+       // updateBlockTitle(blockid, currentText); 
         
     });
     $(document).on("keyup", "#blockname", function (event) {
         var currentText = $(this).val();
         var blockid = document.getElementById(textbox);
         $(blockid).find(".textbox").text(currentText);
-        updateBlockTitle(textbox, currentText);
+      //  updateBlockTitle(textbox, currentText);
     });
 /*
     $(document).on("keyup", ".grouptext", function (event) {
@@ -1135,34 +1173,32 @@ $(function () {
     });
 
 */
-    $(document).on("keyup", "#blockdetails", function (event) {
+    $(document).on("click", "#savedetails", function (event) {
         var detailsText = $("#blockdetails").html();
-        var hiddeninput = textbox + "-details"
-        var element2 = document.getElementById(hiddeninput);
-        $(element2).val(detailsText);
         updateBlockDetails(textbox, detailsText); 
-
     });
     $(document).on("click", "#toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");
+        $("#toggledetails").toggleClass("hidden");
         hiddenblockdetails = $("#infobox").hasClass("hidden");
     });
-
-   // $(document).on("focusout", "#blockdetails", function (event) {
-   //     $("#infobox").removeClass("edit");
-   //     if (hiddenblockdetails) $("#infobox").addClass("hidden");
-   // });
-    $(document).on("focus", "#blockdetails", function (event) {
-        $("#infobox").addClass("edit");
-    });
-
 
     $(document).on("keydown", "#blockdetails", function (event) {
 
         if (event.shiftKey && event.ctrlKey && event.which == 13) { //back to home block
+            var detailsText = $(this).html();
+            updateBlockDetails(textbox, detailsText);
             var block = document.getElementById(textbox);
+            $(block).find(".textbox").attr('contenteditable', 'true');
             $(block).find(".textbox").focus();
-            event.stopPropagation();
+           // if ($("#toggledetails").prop('checked') === false) $("#infobox").toggleClass("hidden");
+            
+        }
+    });
+
+    $(document).on("focusout", "#infobox", function (event) {
+        if ($("#toggledetails").prop('checked') === false && $(event.target).closest('#infobox').length == 0) {
+            $("#infobox").toggleClass("hidden");
         }
     });
    
