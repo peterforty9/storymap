@@ -632,7 +632,7 @@ $(function () {
     $(document).on("dblclick", ".textbox", function (event) {
         $("#infobox").removeClass("hidden");
         $("#toggledetails").removeClass("hidden");
-        $("#blockdetails").focus();
+        $("#infobox").focus();
     });
     $(document).on("click", ".story", function (event) {
           event.stopPropagation();
@@ -1181,6 +1181,7 @@ $(function () {
         $("#infobox").toggleClass("hidden");
         $("#toggledetails").toggleClass("hidden");
         hiddenblockdetails = $("#infobox").hasClass("hidden");
+        event.stopPropagation();
     });
 
     $(document).on("keydown", "#blockdetails", function (event) {
