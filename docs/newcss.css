@@ -21,13 +21,16 @@ body {
     vertical-align: top;
     display: inline-block;
 }
-
+i {
+    color:gray;
+    height:inherit;
+}
 /* The menu item container */
 .container {
     display: inline-block;
     position: relative;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
     margin-bottom: 12px;
     cursor: pointer;
     font-size: 15px;
@@ -94,58 +97,85 @@ body {
 .ui-menu {
     position: fixed;
     top: 0;
-    max-width: 99%;
-    min-width: 99%;
+    right: 0;
     height: 22px;
     background-color: whitesmoke;
-
+    z-index: 1000;
 }
 .ui-menu-item {
     background-color: #34675C;
-    color:white;
+    color: white;
+    display: inline-block;
+    float: right;
+}
+
+
+.arrow-down-close {
+    width: 20px;
+    height: 20px;
     display: inline-block;
 }
-   
-/* unvisited link */
-    .ui-menu-item > a:link {
-        color: white;
-        text-decoration: none;
+    .arrow-down-close:before, .arrow-down-close:after {
+        content: '';
+        display: inline-block;
+        height: 9px;
+        width: 2px;
+        background-color: black;
+        border-radius: 1px;
+        position: relative;
+        transition: 200ms ease-in-out transform;
     }
 
-/* visited link */
-    .ui-menu-item > a:visited {
-        color: white;
-        text-decoration: none;
+    .arrow-down-close:before {
+        transform: rotate(-45deg);
+        left: 2px;
+        top: 3px
+       
     }
 
-/* mouse over link */
-    .ui-menu-item > a:hover {
-        color: white;
-        text-decoration: none;
+    .arrow-down-close:after {
+        transform: rotate(45deg);
+        left: 0px;
+        top: -3px
     }
 
-/* selected link */
-    .ui-menu-item > a:active {
-        color: white;
-        text-decoration: none;
+    .arrow-down-close.open:before {
+    transform: translateY(-6px) rotate(-45deg);
+}
+
+    .arrow-down-close.open:after {
+        transform: translateY(6px) rotate(45deg);
     }
+
 
 #board {
     /* display: table;*/
     display: flex;
     flex-direction: column;
-    padding-top: 25px;
-    padding-bottom: 15px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 6px;
+ /*   border-collapse: separate;
+    border-spacing: 6px; */
     -moz-transform: scale(1.0, 1.0);
     zoom: 1.0;
     zoom: 100%;
+    position:absolute;
+    top:0px;
 }
+
+    #board.displayinfo {
+        margin-right: 300px; /* Same as the width of the sidebar */
+    }
+
 #boardheader {
     display: flex;
     flex-direction: row;
+    background-color: white;
+    position: sticky;
+    top: 0px;
 }
 #headingcontainer {
     display: flex;
@@ -164,6 +194,7 @@ body {
 .groupcolumns {
     display: flex;
     flex-direction: row;
+    height:inherit;
 }
 .rowgroups {
     display: flex;
@@ -179,35 +210,23 @@ body {
     position: fixed;
     right: 0;
     top: 20px;
-    width: 30%;
-    min-width: 0%;
+    max-width: 300px;
+    width: 300px;
     height: 100%;
+    z-index: 1; /* Stay on top */
     display: flex;
     flex-direction: column;
     overflow: hidden;
     background-color: whitesmoke;
-    border-left: 3px solid lightgray;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2), 0 8px 10px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 2px;
+    transition-property: all;
+    transition-duration: .8s;
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
 }
-#toggledetails {
-    position: fixed;
-    top: 70px;
-    right: 30%;
-    width: 30px;
-    height: 60px;
-    min-width: 0%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: whitesmoke;
-    writing-mode: vertical-rl;
-}
-#toggledetails.hidden {
-    position: fixed;
-    right: 0;
-}
-   
+
     #infobox.hidden {
-        display: none;
+        max-width:0;
     }
 
 
@@ -220,7 +239,7 @@ body {
 #blockdetails {
     overflow-y: auto;
     width: 100%;
-    height: 80%;
+    height: 500px;
     background-color: whitesmoke;
     color: gray;
     padding: 5px;
@@ -264,11 +283,7 @@ body {
     display: flex;
     flex-direction: column;
 }
-#boardheader{
-    position: sticky;
-    top: 22px
-   
-}
+
 #rows {
     /*  display: table-row-group;*/
     display: flex;
@@ -305,7 +320,27 @@ body {
 .groupline {
     display: flex;
     flex-direction: row;
+    height: 80px;
+    margin:2px;
 }
+.groupline.smaller {
+    display: flex;
+    flex-direction: row;
+    height: 25px;
+}
+.grouptext.smaller {
+    white-space: nowrap;
+    width: 136px;
+    display: flex;
+    text-overflow: ellipsis;
+}
+.columntext.smaller {
+    white-space: nowrap;
+    width: 136px;
+    display: flex;
+    text-overflow: ellipsis;
+}
+
 
 .columnheader {
    
@@ -314,8 +349,11 @@ body {
     padding: 0;
     float: left;
     min-width: 20px;
-    min-height: 80px;
-    max-height: 80px;
+    height: 80px;
+}
+.columnheader.smaller {
+   
+    height: 25px;
 }
 
     .columnheader li {
@@ -323,9 +361,10 @@ body {
         white-space: nowrap;
         vertical-align: top;
         margin: 2px;
+        height:inherit;
     }
 .columnheaderheading {
-    height: 76px;
+    height: inherit;
     width: var(--first-column-width);
     text-align: left;
     float: right;
@@ -336,7 +375,7 @@ body {
 
 .columnheaderheadingtext {
     max-width: var(--first-column-width);
-    height: 76px;
+    height:inherit;
     text-align: right;
     background-color: transparent;
     color: #4CB5F5;
@@ -378,7 +417,7 @@ body {
 
 .addColumn {
     width: 16px;
-    height: 76px;
+    height: inherit;
     padding: 2px;
     text-align: center;
     background-color: transparent;

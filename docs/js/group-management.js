@@ -29,20 +29,26 @@ $(function () {
     }
 
 
-    //generate menu
+    //generate page
 
-    $("body").prepend("<div class='ui-menu'><label class='container' id = new>New</label></label>" +
-        "<label class='container'>Groups<input type='checkbox' id='menuGroups'><span class='checkmark'></span></label>" +
-        "<label class='container'>Rows<input type='checkbox' id='menuRows'><span class='checkmark'></span></label>" +
-      //  "<label class='container'>Block details<input type='checkbox' id='toggledetails'><span class='checkmark'></span></label>" +
-        "<label class='container' id='colwidth'>Column width</label></div > ");
+    $("body").prepend("<div class='ui-menu'>" +
+        "<label class='container' id=new><i class='fas fa-table'></i></label>" +
+   //     "<label class='container'>Groups<input type='checkbox' id='menuGroups'><span class='checkmark'></span></label>" +
+   //     "<label class='container'>Rows<input type='checkbox' id='menuRows'><span class='checkmark'></span></label>" +
+        "<label class='container' id='colwidth'><i class='fas fa-cog'></i></label>" +
+        "<label class='container toggledetails'><i class='fas fa-info-circle'></i></label>" +
+        "<a class='arrow-down-close toggledetails'></div>" );
     $("body").append("<div id ='board'></div>");
-    $("body").append("<div id='toggledetails' class='hidden'>Details</div>");
     $("body").append("<div id='infobox' class='hidden'>" +
         "<textarea id='blockname' class='title' maxlength='50'></textarea>" +
         "<div id='blockdetails' contenteditable='true'></div>" +
         "<div><label class='container' id='savedetails'>Save</label><label class='container' id='canceldetails'>Cancel</label></div>" +
         "</div > ");
+
+  //  $(document).on("click", ".arrow-down-close", function () {
+   //    $(this).toggleClass('open');
+       // document.getElementsByTagName('body')[0].classList.toggle('open');
+ //   });
 
     var n = localStorage.getItem('board');
     var htmlstring = atob(n)
@@ -91,9 +97,6 @@ $(function () {
         appendNewcolumn("0");
         toggleGroups();
      //   toggleRows();
-
-
-
     }
 
     //Toggle groups
@@ -128,6 +131,32 @@ $(function () {
                     attr == "threecolumns.css" ? "fourcolumns.css" : "singlecolumn.css"))
         });
     });
+
+    //// scroll header size
+
+    function resizeHeaderOnScroll() {
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+       // const distanceY = window.pageYOffset || document.documentElement.scrollTop,
+       //     shrinkOn = 100,
+            headerEl = $('.groupline');
+
+       // if (distanceY > shrinkOn) {
+            headerEl.addClass("smaller");
+            $('.columnheader').addClass("smaller");
+            $('.columntext').addClass("smaller");
+            $('.grouptext').addClass("smaller");
+        } else if (document.body.scrollTop == 0 || document.documentElement.scrollTop == 0) {
+            headerEl.removeClass("smaller");
+            $('.columnheader').removeClass("smaller");
+            $('.columntext').removeClass("smaller");
+            $('.grouptext').removeClass("smaller");
+        }
+    }
+
+    window.addEventListener('scroll', resizeHeaderOnScroll);
+
+
+    ///////
   
     //upload file
     openFile = function (event) {
@@ -144,17 +173,12 @@ $(function () {
         };
         reader.readAsText(input.files[0]);
     };
-
-
-    
+       
     $(document).on("click", "#new", function () { //open new map from html template
         newboard();
         console.log("new map loaded");
     });
 
-    //////////  SAVE BOARD /////////////////
-
-    //Save map each time it is updated
     $(document).on("focusout", ".textbox", function () {
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
@@ -163,6 +187,8 @@ $(function () {
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
     });
 
+    //////////  SAVE BOARD /////////////////
+
     function saveToLocalStorage() {
         var html = $('#board').clone();
         var htmlString = html.html();
@@ -170,22 +196,11 @@ $(function () {
        
         localStorage.board = datauri;
 
-       
-        //createBoardJSON();
-     //   board["items"] = itemsObj;
-     //   board["rows"] = rowsObj;
-     //   board["columns"] = columnsObj;
-      //  board["groups"] = groupsObj;
-       // board["titles"] = blocktitlearray;
-      //  board["details"] = blockdetailsarray;
         var boarddata = JSON.stringify(board);
         localStorage.setItem("boarddata", boarddata);
         console.log("board saved");
         console.log(JSON.parse(boarddata));
         console.log(boarddata);
-        //Save downloadable file
-        //var downloadfile = "data: application/octet-stream;charset=utf-16le;base64," + datauri;
-        //$("#downloadmap").attr("href", downloadfile);
   
     };
 
@@ -377,7 +392,7 @@ $(function () {
                     });
 
                 }
-
+                saveToLocalStorage();
             }
         });
     }
@@ -387,6 +402,9 @@ $(function () {
             cursor: "move",
             handle: ".iteration",
             cancel: ".epic, .newrelease, .iterationtext",
+            stop: function (event, ui){
+                saveToLocalStorage();
+            },
         });
     }
     function makeActivitiesSortable() {
@@ -440,6 +458,9 @@ $(function () {
                    // removeEpics(event, ui);    
                    // moveEpics(event, ui, true);
                 };               
+            },
+            stop: function (event, ui){
+                saveToLocalStorage();
             },
         });
     }
@@ -560,7 +581,7 @@ $(function () {
   //         */
             stop: function (event, ui) {
 
-                var newepic = boxhtml("epic")
+                var newepic = boxhtml("epic");
                 var stopindex = ui.item.index();
                 var targetgroupindex = (ui.item.parents(".groupcontainer").index());
                 var targetgroup = targetgroupindex + 1;
@@ -598,6 +619,9 @@ $(function () {
                         });
                     }
                 }
+
+                saveToLocalStorage();
+                
             }
         });
     }
@@ -613,27 +637,33 @@ $(function () {
 
     $(document).on("click", ".textbox", function (event) {
         console.log("textbox clicked");
+        // Set block selected style
         $(".textbox").parent().removeClass('blockselected');
         $(this).parent().addClass('blockselected')
         textbox = $(this).parent().attr("id");
+      
+        // Display infobox if hidden
+        $("#infobox").removeClass("hidden");
+        $('.arrow-down-close').addClass('open');
+        $('#board').addClass("displayinfo");
+        $("#infobox").focus();
+        // Update infobox data
         var bgcolour = $(this).parent().css("background-color");
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
-
         $("#blockname").css("background-color", bgcolour);
         $("#blockname").val(currentText);
         console.log("Click on " + blockid);
         $("#blockdetails").html("");
-     
         var detailsText = blockdetailsarray[blockid];
         $("#blockdetails").html(detailsText);
         event.stopPropagation();
     });
-    $(document).on("dblclick", ".textbox", function (event) {
-        $("#infobox").removeClass("hidden");
-        $("#toggledetails").removeClass("hidden");
-        $("#infobox").focus();
-    });
+   // $(document).on("dblclick", ".textbox", function (event) {
+ //       $("#infobox").removeClass("hidden");
+ //       $("#toggledetails").removeClass("hidden");
+  //      $("#infobox").focus();
+  //  });
     $(document).on("click", ".story", function (event) {
           event.stopPropagation();
     });
@@ -644,7 +674,9 @@ $(function () {
         if (event.shiftKey && event.ctrlKey && event.which == 13) {
          //   hiddenblockdetails = $("#blockdetails").hasClass("hidden");
             $("#infobox").removeClass("hidden");
-            $("#toggledetails").removeClass("hidden");
+            //$("#toggledetails").removeClass("hidden");
+            $('.arrow-down-close').addClass('open');
+            $('#board').addClass("displayinfo");
             $('#blockdetails').focus();
             hiddenblockdetails = $("#infobox").hasClass("hidden");
            // $("#toggledetails").prop('checked',true);
@@ -752,7 +784,6 @@ $(function () {
 
         });
 
-    //    hideaddColumn();
     };
 
     //////////// column MANAGEMENT /////////////////
@@ -762,23 +793,6 @@ $(function () {
     var editablecolumn
     var newcolumnText
     var newcolumn
-
-    //Hide addColumn
-    function hideaddColumn() {
-
-        //hide the add story button when stories exist
-        $(".columnheader").each(function (index) {
-          //  if ($(this).is(':empty')) {
-          //      $(this).parent().children('.addColumn').show();
-          
-          //  } else {
-
-          //      $(this).parent().children('.addColumn').hide();
-         //   }
-
-        });
-
-    }
 
     //column text return functions
     $(document).on("keydown", ".columntext", function (event) {
@@ -1158,28 +1172,16 @@ $(function () {
         $(blockid).find(".textbox").text(currentText);
       //  updateBlockTitle(textbox, currentText);
     });
-/*
-    $(document).on("keyup", ".grouptext", function (event) {
-        var currentText = $(this).text();
-        var groupnumber = $(this).parent().parent().index();
 
-    });
-
-    $(document).on("keyup", ".columntext", function (event) {
-        var currentText = $(this).text();
-        var groupnumber = $($(this).parent().parent().parent().parent()).length;
-        var groupindex = groupnumber - 1;
-
-    });
-
-*/
     $(document).on("click", "#savedetails", function (event) {
         var detailsText = $("#blockdetails").html();
         updateBlockDetails(textbox, detailsText); 
     });
-    $(document).on("click", "#toggledetails", function (event) {
+    $(document).on("click", ".toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");
-        $("#toggledetails").toggleClass("hidden");
+      //  $("#toggledetails").toggleClass("hidden");
+        $('.arrow-down-close').toggleClass('open');
+        $('#board').toggleClass("displayinfo");
         hiddenblockdetails = $("#infobox").hasClass("hidden");
         event.stopPropagation();
     });
@@ -1197,11 +1199,11 @@ $(function () {
         }
     });
 
-    $(document).on("focusout", "#infobox", function (event) {
-        if ($("#toggledetails").prop('checked') === false && $(event.target).closest('#infobox').length == 0) {
-            $("#infobox").toggleClass("hidden");
-        }
-    });
+//    $(document).on("focusout", "#infobox", function (event) {
+   //     if ($("#toggledetails").prop('checked') === false && $(event.target).closest('#infobox').length == 0) {
+    //        $("#infobox").toggleClass("hidden");
+   //     }
+  //  });
    
  });
  

@@ -1,16 +1,18 @@
 ﻿body {
 }
 .blockselected {
-    box-shadow: 3px 3px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.8),
 }
 .group {
     width: 100%;
-    height: 25px;
+    height: inherit;
     text-align: left;
     background-color: #B7B8B6;
     float: left;
     padding-left: 10px;
     margin: 2px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 5px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 2px;
     /*
     padding-left: 10px;
     padding-right: 0px;
@@ -24,7 +26,7 @@
 .grouptext {
     width: 136px;
     max-width: 136px;
-    height: 25px;
+    height: inherit;
     text-align: left;
     background-color: transparent;
     color:white;
@@ -36,27 +38,30 @@
 .column {
     display: inline-block;
     width: 136px;
-    height: 76px;
+    height: inherit;
     max-height: 76px;
     text-align: left;
     background-color: #4CB5F5;
     padding-left: 10px;
     margin: 2px;
     vertical-align: top;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 2px;
 }
 
 .columntext {
     width: 136px;
     max-width: 136px;
-    height: 76px;
+    height: inherit;
     max-height: 76px;
     text-align: left;
     background-color: transparent;
-    color:white;
+    color: white;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
     overflow: hidden;
+   
 }
 .iteration {
     float: left;
@@ -65,9 +70,10 @@
     text-align: left;
     background-color: #34675C;
     color: white;
-    margin:2px;
+    margin: 2px;
     vertical-align: top;
-  
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 2px;
 }
 .iterationtext {
     width: 90px;
@@ -89,8 +95,13 @@
     text-align: left;
     background-color: #B3C100;
     padding-left: 10px;
-    margin: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
+    margin-top: 4px;
+    margin-bottom: 4px;
     vertical-align: top;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 2px;
 }
 
 .storytext {
