@@ -131,7 +131,7 @@ $(function () {
                     attr == "threecolumns.css" ? "fourcolumns.css" : "singlecolumn.css"))
         });
     });
-
+    /*
     //// scroll header size
 
     function resizeHeaderOnScroll() {
@@ -157,6 +157,7 @@ $(function () {
 
 
     ///////
+    */
   
     //upload file
     openFile = function (event) {

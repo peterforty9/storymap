@@ -10,6 +10,8 @@ and open the template in the editor.
 
 :root {
     --first-column-width: 100px;
+    --column-header-height: 44px;
+    --group-header-height: 22px;
 }
 
 
@@ -298,15 +300,15 @@ i {
 }
 
 #groupsheading {
-   
     display: flex;
     flex-direction: row;
- 
+    height: var(--group-header-height);
+    width: var(--first-column-width);
 }
 
 .groupsheadingtext {
     width: var(--first-column-width);
-    height: 25px;
+    height: inherit;
     text-align: right;
     background-color: transparent;
     color: #B7B8B6;
@@ -320,8 +322,8 @@ i {
 .groupline {
     display: flex;
     flex-direction: row;
-    height: 80px;
-    margin:2px;
+    height: var(--group-header-height);
+    margin: 2px;
 }
 .groupline.smaller {
     display: flex;
@@ -343,13 +345,12 @@ i {
 
 
 .columnheader {
-   
     list-style-type: none;
     margin: 0;
     padding: 0;
     float: left;
     min-width: 20px;
-    height: 80px;
+    height: var(--column-header-height);
 }
 .columnheader.smaller {
    
@@ -364,7 +365,7 @@ i {
         height:inherit;
     }
 .columnheaderheading {
-    height: inherit;
+    height: var(--column-header-height);
     width: var(--first-column-width);
     text-align: left;
     float: right;

@@ -24,8 +24,7 @@
 }
 
 .grouptext {
-    width: 136px;
-    max-width: 136px;
+    width: inherit;
     height: inherit;
     text-align: left;
     background-color: transparent;
@@ -50,10 +49,8 @@
 }
 
 .columntext {
-    width: 136px;
-    max-width: 136px;
+    width: inherit;
     height: inherit;
-    max-height: 76px;
     text-align: left;
     background-color: transparent;
     color: white;
