@@ -168,7 +168,7 @@ i {
     top:0px;
 }
 
-    #board.displayinfo {
+    #board .displayinfo {
         margin-right: 300px; /* Same as the width of the sidebar */
     }
 
