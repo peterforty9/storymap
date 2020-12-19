@@ -944,6 +944,13 @@ $(function () {
         appendNewcolumn(groupindex);
      //   $(this).hide();
     });
+    //Create new column when addColumn clicked
+    $(document).on("click", ".addGroup", function () {
+        var groupindex = $(this).parents('.groupcontainer').index();
+        insertGroup(groupindex);
+        //   $(this).hide();
+    });
+
 
     ///////////// STORY MANAGEMENT /////////////////
 

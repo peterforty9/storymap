@@ -285,7 +285,7 @@ $("body").on("DOMNodeInserted", "#storymap", makeSortable);
             var title = $(this).text();
             var details = $(this).next().attr("value");
 
-            item = {}
+            item = {};
             item["boxid"] = id;
             item["title"] = title;
             item["details"] = details;
