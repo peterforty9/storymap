@@ -6,30 +6,20 @@ rowsObj = [];
 itemsObj = [];
 blocktitlearray = {};
 blockdetailsarray = {};
-
-$(function () {
-
-    $(document).getElementById(files).addEventListener('change', handleFileSelect, false);
-
-});
+//Mongodb app bWoH5fByzkXQkAj7
+$(function () {$(document).getElementById(files).addEventListener('change', handleFileSelect, false);});
 
 $(function () {
     var textbox;
     var hiddenblockdetails;
-
-    ///////////  TOP MENU ///////////
-
-    //// Generate GUID
-    function S4() {
-        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    }
+    // Generate GUID
+    function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); } 
     function guid() {
         var id = (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
         return id;
     }
-
-
-    //generate page
+    
+    //Generate page structure
 
     $("body").prepend("<div class='ui-menu'>" +
         "<label class='container' id=new><i class='fas fa-table'></i></label>" +
@@ -63,9 +53,7 @@ $(function () {
     console.log("Local storage board loaded");
     console.log(board);
     makeSortable();
-
-    // Generate new board
-    function newboard() {
+    function newboard() {  // Generate new board
         
         $("#board").empty();
 
@@ -98,7 +86,6 @@ $(function () {
         toggleGroups();
      //   toggleRows();
     }
-
     //Toggle groups
     $(document).on("click", "#menuGroups", function () {
       //  toggleGroups();
@@ -131,33 +118,6 @@ $(function () {
                     attr == "threecolumns.css" ? "fourcolumns.css" : "singlecolumn.css"))
         });
     });
-    /*
-    //// scroll header size
-
-    function resizeHeaderOnScroll() {
-        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-       // const distanceY = window.pageYOffset || document.documentElement.scrollTop,
-       //     shrinkOn = 100,
-            headerEl = $('.groupline');
-
-       // if (distanceY > shrinkOn) {
-            headerEl.addClass("smaller");
-            $('.columnheader').addClass("smaller");
-            $('.columntext').addClass("smaller");
-            $('.grouptext').addClass("smaller");
-        } else if (document.body.scrollTop == 0 || document.documentElement.scrollTop == 0) {
-            headerEl.removeClass("smaller");
-            $('.columnheader').removeClass("smaller");
-            $('.columntext').removeClass("smaller");
-            $('.grouptext').removeClass("smaller");
-        }
-    }
-
-    window.addEventListener('scroll', resizeHeaderOnScroll);
-
-
-    ///////
-    */
   
     //upload file
     openFile = function (event) {
@@ -173,13 +133,11 @@ $(function () {
 
         };
         reader.readAsText(input.files[0]);
-    };
-       
+    }; 
     $(document).on("click", "#new", function () { //open new map from html template
         newboard();
         console.log("new map loaded");
     });
-
     $(document).on("focusout", ".textbox", function () {
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
@@ -187,10 +145,7 @@ $(function () {
 
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
     });
-
-    //////////  SAVE BOARD /////////////////
-
-    function saveToLocalStorage() {
+    function saveToLocalStorage() { //  SAVE BOARD 
         var html = $('#board').clone();
         var htmlString = html.html();
         var datauri = btoa(htmlString);
@@ -204,10 +159,7 @@ $(function () {
         console.log(boarddata);
   
     };
-
-  
-    /// Update block title
-    function updateBlockTitle(blockid, title) { 
+    function updateBlockTitle(blockid, title) {  // Update block title
 
         blocktitlearray[blockid] = title;
         board["titles"] = blocktitlearray;
@@ -215,7 +167,6 @@ $(function () {
        // console.log(blocktitlearray);
         saveToLocalStorage();
     }
-    /// Update block details
     function updateBlockDetails(blockid, text) {
         blockdetailsarray[blockid] = text;
         board["details"] = blockdetailsarray;
@@ -223,9 +174,6 @@ $(function () {
       //  console.log(blockdetailsarray);
         saveToLocalStorage();
     }
-   
-    //Create json objects /////
-
     function createBoardJSON(){
         updateGroupsObj();
         updateColumnsObj();
@@ -316,8 +264,7 @@ $(function () {
        // console.log("board");
         //console.log(board);
     };
-   
-    //Generate object html
+      //Generate object html
     function boxhtml(boxtype, textboxid) {
         var htmlData = "";
         if (textboxid == null) { textboxid = guid() };
@@ -374,7 +321,7 @@ $(function () {
                 }
             },
             */
-            stop: function (event, ui) {
+            update: function (event, ui) {
                 updateGroupsObj();  // Update group array
                // var targetgroup = (ui.item.index()) + 1;
                 var startgroupindex = ui.item.data('originIndex');
@@ -410,37 +357,52 @@ $(function () {
     }
     function makeActivitiesSortable() {
         $(".columnheader").sortable({
+       
 
             connectWith: ".columnheader",
             cursor: "move",
             cancel: ".columntext",
-       
 
             start: function (event, ui) {
                 // clone = $(ui.item[0].outerHTML).clone();
-               // columnstartindex = ui.item.index();
+                // columnstartindex = ui.item.index();
                 //columnstartplaceholderindex = ui.placeholder.index();
                 ui.item.data('originIndex', ui.item.index());
                 ui.item.data('originGroup', ui.item.parents(".groupcontainer").index());
                 ui.item.data('changeFromGroup', ui.item.parents(".groupcontainer").index());
                 ui.item.data('changeFromIndex', ui.item.index());
-              
+                ui.item.data('originblocktype', "activity");
+                var hs = hasStories(ui.item.data('originGroup'), ui.item.data('originIndex'));
+                console.log(hs);
+                if (hs === true) {
+                    ui.item.data('hasStories', true);
+                } else {
+                    ui.item.data('hasStories', false);
+                }
+
                 //columnstartgroupindex = ui.item.parents(".groupcontainer").index();
                 ui.placeholder.width('150px');
+
             },
-            // /*          
-            change: function (event, ui) {
-                console.log("Change executed");
-                var stayedincolumnheader = ui.placeholder.parents().hasClass("columnheader");
-                if (stayedincolumnheader == true) { 
-                    moveEpics(event, ui);   
-                } else { //if column moved to item
-                   // removeEpics(event, ui);
-                };  
-               
+            sort: function (event, ui) {
+               // unhideEpics(event, ui);
+               // totalcolumncount();
+               // moveEpics(event, ui);
+                console.log("Changed order");
+                // saveToLocalStorage();
+
             },
-        
-              
+            /* remove: function (event, ui) {
+                 if (ui.placeholder.parents().hasClass("columnheader") === false) {
+ 
+                     console.log("Activity removed");
+ 
+                     removeEpics(event, ui);
+                     console.log("Changed to story");
+                     saveToLocalStorage();
+                 };
+             },     
+           */
             placeholder: {
                 element: function (clone, ui) {
                     //   return $('<li class="selected">' + clone[0].innerHTML + '</li>');
@@ -450,24 +412,48 @@ $(function () {
                     return;
                 }
             },
-                  
-            beforeStop: function (event, ui) {                
-                var stayedincolumnheader = ui.item.parents().hasClass("columnheader");                
+
+            over: function (event, ui) {
+                console.log("Moved over");
+                unhideEpics(event, ui);
+            },
+            out: function (event, ui) {
+                console.log("Moved out");   
+            },
+            beforeStop: function (event, ui) {
+               
+            },
+            remove: function (event, ui) {
+                console.log("Removed");   
+            },
+        
+            ///*      
+            change: function (event, ui) {                
+                var stayedincolumnheader = ui.placeholder.parents().hasClass("columnheader"); 
+                var columnhasstories = ui.item.data('hasStories');
                 if (stayedincolumnheader == true) { //move epics in line with column movement
-                  //  moveEpics(event,ui);              
+                    moveEpics(event,ui);              
                 } else { //if column moved to item
                    // removeEpics(event, ui);    
                    // moveEpics(event, ui, true);
+                    if (columnhasstories === "true") {
+                       // $(".columnheader").sortable("cancel");
+                       // console.log("Has stories - action cancelled");
+                      ///  $(".columnheader").sortable("cancel");
+                      ///  console.log("Has stories - action cancelled");
+                    };
+
                 };               
             },
-            stop: function (event, ui){
+           // */
+            update: function (event, ui) {
                 saveToLocalStorage();
             },
+            
         });
     }
-
     function moveEpics(event, ui, cancel) {
-      //  var columntargetindex = ui.placeholder.index();
+        //var columntargetindex = ui.placeholder.index();
       
         var actcount;
         var lastcolumn = false;
@@ -479,12 +465,15 @@ $(function () {
         if (cancel === true) {
             var currentIndex = originIndex;
             var currentGroup = originGroup;
+            console.log("cancel===true");
         } else {
             var currentIndex = ui.placeholder.index();
             var currentGroup = ui.placeholder.parents(".groupcontainer").index();
+            console.log("cancel != true");
         };
         if ((originGroup === currentGroup) && (currentIndex > originIndex)) {
             currentIndex -= 1;
+            console.log("currentIndex > originIndex");
         };
         var targetepic = currentIndex + 1;
         if (originGroup === currentGroup) {
@@ -555,21 +544,70 @@ $(function () {
 
         }
     };
+    function hideEpics(event, ui) {
+        var originGroup = ui.item.data('originGroup');
+        var originIndex = ui.item.data('originIndex');
+      
+        $(".rowgroups").each(function (index) {
+            $(this).find(".grouprelease:eq(" + originGroup + ") .epic:eq(" + originIndex + ")").hide();
+        });
+       
+        console.log("Epics hidden");     
+    };
+    function unhideEpics(event, ui) {
+        var originGroup = ui.item.data('originGroup');
+        var originIndex = ui.item.data('originIndex');
+
+        $(".rowgroups").each(function (index) {
+            if ($(this).find(".grouprelease:eq(" + originGroup + ") .epic:eq(" + originIndex + ")").is(":visible")) {
+                ;
+            } else {
+                $(this).find(".grouprelease:eq(" + originGroup + ") .epic:eq(" + originIndex + ")").toggle();
+            }
+
+
+           // $(this).find(".grouprelease:eq(" + originGroup + ") .epic:eq(" + originIndex + ")").show();
+        });
+
+        console.log("Epics unhidden");
+    };
+    function hasStories(originGroup, originIndex) {
+        var stories = false
+       
+        $(".rowgroups").each(function (index) {
+            var startepic = $(this).find(".grouprelease:eq(" + originGroup + ") .epic:eq(" + originIndex + ")");
+            if (startepic.find(".stories").is(':empty')) {
+              
+            }
+            else {
+                console.log("Has stories");
+                stories = true;
+            };
+            console.log("Stories checked");
+                        
+        });
+        return stories;
+        //Only allow to convert a column to a story if it nas no stories
+               
+    };
     function makeEpicsSortable() {
         $(".stories").sortable({
        //     placeholder: "ui-sortable-placeholder",
             cursor: "move",
             cancel: ".storytext",
             connectWith: ".stories, .columnheader",
+           // containment: ".stories",
           
             start: function (event, ui) {
              //   ui.placeholder.html("<li class='selected'></li>");
              //   clone = $(ui.item[0].outerHTML).clone();
-               
+                ui.item.data('originblocktype', "story");
                     ui.placeholder.width(ui.item.width());
                 
             },
-
+            over: function(event,ui) {
+                hideEpics(event,ui);
+            },
  //    /*       
             placeholder: {
                 element: function () {
@@ -580,7 +618,7 @@ $(function () {
                 }
             },
   //         */
-            stop: function (event, ui) {
+            remove: function (event, ui) {
 
                 var newepic = boxhtml("epic");
                 var stopindex = ui.item.index();
@@ -690,6 +728,11 @@ $(function () {
         var columncount = $('.groupcontainer:eq(' + groupindex + ') .column').length;
         console.log("Column count: " + columncount);
         return columncount
+    }
+    function totalcolumncount(groupindex) {
+        var totalcolumns = $('#grouparraycontainer .column').length;
+        console.log("Total column count: " + totalcolumns);
+        return totalcolumns
     }
     ///////////// GROUP MANAGEMENT //////////////////
 
