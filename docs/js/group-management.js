@@ -7,7 +7,7 @@ itemsObj = [];
 blocktitlearray = {};
 blockdetailsarray = {};
 //Mongodb app bWoH5fByzkXQkAj7
-$(function () {$(document).getElementById(files).addEventListener('change', handleFileSelect, false);});
+//$(function () {$(document).getElementById(files).addEventListener('change', handleFileSelect, false);});
 
 $(function () {
     var textbox;
