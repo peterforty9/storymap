@@ -1,31 +1,18 @@
 ﻿
-board = {"columns": [], "groups": [], "items": [], "rows": [], "titles": {}, "details": {}};
-groupsObj = [];
-columnsObj = [];
-rowsObj = [];
-itemsObj = [];
-blocktitlearray = {};
-blockdetailsarray = {};
+
 //Mongodb app bWoH5fByzkXQkAj7
 //$(function () {$(document).getElementById(files).addEventListener('change', handleFileSelect, false);});
 
 $(function () {
-    var textbox;
-    var hiddenblockdetails;
-    // Generate GUID
-    function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); } 
-    function guid() {
-        var id = (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
-        return id;
-    }
     
-    //Generate page structure
+    ///// GENERATE PAGE ////
 
     $("body").prepend("<div class='ui-menu'>" +
         "<label class='container' id=new><i class='fas fa-table'></i></label>" +
-   //     "<label class='container'>Groups<input type='checkbox' id='menuGroups'><span class='checkmark'></span></label>" +
-   //     "<label class='container'>Rows<input type='checkbox' id='menuRows'><span class='checkmark'></span></label>" +
+        "<label class='container' id=loadarray title='load'><i class='fas fa-file-upload'></i></label>" +
+        "<label class='container' id=savearray><i class='fas fa-save'></i></label>" +
         "<label class='container' id='colwidth'><i class='fas fa-cog'></i></label>" +
+        "<label class='container' id='deleteboard'><i class='fas fa-trash-alt'></i></label>" +
         "<label class='container toggledetails'><i class='fas fa-info-circle'></i></label>" +
         "<a class='arrow-down-close toggledetails'></div>" );
     $("body").append("<div id ='board'></div>");
@@ -35,35 +22,148 @@ $(function () {
         "<div><label class='container' id='savedetails'>Save</label><label class='container' id='canceldetails'>Cancel</label></div>" +
         "</div > ");
 
-  //  $(document).on("click", ".arrow-down-close", function () {
-   //    $(this).toggleClass('open');
-       // document.getElementsByTagName('body')[0].classList.toggle('open');
- //   });
+    //// GLOBAL VARIABLES /////
 
-    var n = localStorage.getItem('board');
-    var htmlstring = atob(n)
-    $('#board').html(htmlstring);
+    var n, htmlstring, filename, loadfilename, newboardform,
+        dialog, textbox, hiddenblockdetails, board, blocktitlearray,
+        groupsObj, columnsObj, rowsObj, itemsObj;
+//blockdetailsarray = {};;
+    function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
+    function guid() {
+        var id = (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+        return id;
+    }; // Generate GUID
+
+    //// PAGE LOAD MANAGEMENT /////
+       
+    n = localStorage.getItem('board');
+    htmlstring = atob(n);
+    $('#board').html(htmlstring); //Update board from locally saved HTML
 
     var boarddata = localStorage.getItem("boarddata");
     if (boarddata) {
         board = JSON.parse(boarddata);
-    }
-    blockdetailsarray = board["details"];
-    blocktitlesarray = board["titles"];
+    };// If there is a localStorage boarddate array, retrieve it
+
+    var boardlistobject = new Object();
+    var localboardlistobject = localStorage.getItem("boardlist");
+    if (localboardlistobject) {
+        boardlistobject = JSON.parse(localboardlistobject);
+        updateboardlistoptions();
+         };// If there is a localStorage boardlist array, retrieve it
+    function updateboardlistoptions() {
+        //board load options
+        $('#loadfilename').empty();//empty board options
+        $.each(boardlistobject, function (key, value) {
+            $('#loadfilename')
+                .append($("<option></option>")
+                    .attr("value", key)
+                    .text(key));
+        });//Update board load options
+    };
+   
+    blockdetailsarray = board["details"]; //Retrieve block notes
+    blocktitlesarray = board["titles"]; //Retrieve block titles
+
     console.log("Local storage board loaded");
     console.log(board);
-    makeSortable();
+    makeSortable(); //Runs to add sortable fields to the uploaded HTML
+
+    //// MENU MANAGEMENT /////
+
+    $("#dialog-confirm").dialog({
+        autoOpen: false,
+        resizable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+            "Continue": function () {
+                newboard();
+                console.log("new map loaded");
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    }); // Confirm New board creation 
+    $("#delete-confirm").dialog({
+        autoOpen: false,
+        resizable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+            "Continue": function () {
+                delete boardlistobject[loadfilename];
+                var boardlist = JSON.stringify(boardlistobject);
+                localStorage.setItem("boardlist", boardlist);
+                updateboardlistoptions();
+                newboard();
+                console.log("map deleted");
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    }); // Confirm delete board
+    dialog = $("#save-confirm").dialog({
+        autoOpen: false,
+        resizable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+            "Continue": function () {
+                filename = $("#filename");
+                updateboardlist(filename.val());
+                updateboardlistoptions();
+               // createBoardJSON(filename.val());
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    });// Confirm Save board
+    dialog = $("#load-confirm").dialog({
+        autoOpen: false,
+        resizable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+            "Continue": function () {
+                loadfilename = $("#loadfilename").val();
+                board = boardlistobject[loadfilename];
+                htmlfromarray();
+                //updateboardlist(loadfilename.val());
+                // createBoardJSON(filename.val());
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    });// Confirm Load board
+    newboardform = dialog.find("form").on("submit", function (event) {
+        event.preventDefault();
+        filename = $("#filename");
+        createBoardJSON(filename.val());
+    });
     function newboard() {  // Generate new board
         
-        $("#board").empty();
+        $("#board").empty(); //Clear current board html
 
-        board = { "columns": [], "groups": [], "items": [], "rows": [], "titles": {}, "details": {} };
+        board = { "name": "", "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {} };
         groupsObj = [];
-        columnsObj = [];
+        columnsObj = {};
         rowsObj = [];
-        itemsObj = [];
+        itemsObj = {};
         blocktitlearray = {};
-        blockdetailsarray = {};2 
+        blockdetailsarray = {};
 
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
@@ -79,14 +179,136 @@ $(function () {
         $("#board").append(rowheading);
         $("#board").append(rows);
         $("#board").append(addrow);
-
         insertGroup("-1");
         addNewRelease();
         appendNewcolumn("0");
         toggleGroups();
      //   toggleRows();
-    }
-    //Toggle groups
+    };
+    function htmlfromarray() {  // Generate board html from locally stored array
+
+        $("#board").empty();
+
+        //count groups
+        numgroups = board["groups"].length;
+        numrows = board["rows"].length;
+
+        var boardheader = "<div id='boardheader'></div>";
+        var groups = "<div id='headingcontainer'>" +
+            "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
+            "<div class='columnheaderheading' id='columnheader1'><div class='columnheaderheadingtext textbox'>Activities</div></div>" +
+            "</div><div id='grouparraycontainer'>";
+        //add groups from array
+        var i;
+        for (i = 0; i < board["groups"].length; ++i) {     
+
+            var j;
+            var cols = "";
+            var gid = board["groups"][i];
+           
+            for (j = 0; j < board["columns"][gid].length; ++j) {
+                var tit = board["titles"][board["columns"][gid][j]];
+               cols += boxhtml("column", board["columns"][gid][j],tit);                
+            };
+            var grouptitle = board["items"].rows[0].groups[i].title;
+           groups += boxhtml("group", board["groups"][i],grouptitle,cols);                                 
+        };
+        groups += "</div > ";
+        //
+
+        var rowheading = "<div id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
+
+        var rows = "<div id='rows'>"
+        //iterate rows
+
+        var rowscount = board["rows"].length;
+        console.log("Row count: " + rowscount);
+        var crownum = 0
+        do {
+            //add row
+            var i = 0;
+            var k = 0;
+            var m;
+
+            var crowid = board["rows"][crownum];
+            if (board["items"].rows[crownum].title) {
+                var rowtitle = board["items"].rows[crownum].title
+            } else {
+                rowtitle = ""
+            };
+           
+            var groupcount = board["groups"].length;
+            var iteration = boxhtml("iteration", crowid,rowtitle)
+            var newrelease = "<div class='row'><div class='rowheader'>" + iteration + "</div><div class='rowgroups'>";
+            var newgroupstart = "<div class='grouprelease'><div class='cell-flex-container'>";
+            var newgroupend = "</div></div>";
+
+            do {
+                m = k;
+                newrelease = newrelease + newgroupstart;
+                // column count for group m in the array
+                var gid = board["groups"][k];
+                var columncount = board["columns"][gid].length;
+                console.log("group " + k + " has " + columncount + " columnheader");
+
+                if (columncount > 0) {
+                    do {
+
+                        //create stories
+                        var storiescount = Object.keys(board["items"].rows[crownum].groups[k].columns[i]["stories"]).length;
+                        console.log("Story count: " + storiescount);
+                        var si = 0;
+                        var storieshtml = "";
+                        if (storiescount > 0) {
+                            do {
+                                var storyid = board["items"].rows[crownum].groups[k].columns[i].stories[si].id;
+                                var storytitle = board["items"].rows[crownum].groups[k].columns[i].stories[si].title;
+                                var storyblock = boxhtml("story", storyid, storytitle);
+                                var storieshtml = storieshtml + storyblock;
+                                si++;
+                            }
+                            while (si < storiescount)
+                        };
+
+                        var epic = boxhtml("epic", null, null, storieshtml);
+                        newrelease = newrelease + epic;
+
+                        i++;
+                    }
+                    while (i < columncount);
+
+                };
+                i = 0;
+                newrelease = newrelease + newgroupend;
+                k++;
+            }
+            while (k < groupcount);
+            newrelease = newrelease + "</div></div>";
+
+            //update html string
+
+            rows += newrelease;
+            crownum++;
+            
+            //Update rows array
+            // updateRowsObj();
+        } while (crownum < rowscount);
+
+        rows += "</div > ";
+        
+        var addrow = "<div class='newrelease'><div class='addrelease cell'>Add release</div></div>";
+        $("#board").prepend(boardheader);
+        $("#boardheader").prepend(groups);
+        $("#board").append(rowheading);
+        $("#board").append(rows);
+        $("#board").append(addrow);
+       // insertGroup("-1");
+       
+        //
+        //addNewRelease();
+       // appendNewcolumn("0");
+        toggleGroups();
+    };//Toggle groups
     $(document).on("click", "#menuGroups", function () {
       //  toggleGroups();
         document.getElementById("menuGroups").checked ? $(".group").show() : $(".group").hide()
@@ -95,21 +317,17 @@ $(function () {
     function toggleGroups() {
         $("#group").toggle();
     }
-    //Toggle rows
     $(document).on("click", "#menuRows", function () {
       //  toggleRows();
         document.getElementById("menuRows").checked ? $(".rowsheadingtext").show() : $(".rowsheadingtext").hide();
         document.getElementById("menuRows").checked ? $(".iteration").show() : $(".iteration").hide();
         document.getElementById("menuRows").checked ? $(".addrelease").show() : $(".addrelease").hide();
-    });
+    });//Toggle rows
     function toggleRows() {
         $(".rowsheadingtext").toggle();
         $(".iteration").toggle();
         $(".addrelease").toggle();
-    }
-
-    // Update number of column columns
-  
+    };
     $(document).on("click", "#colwidth", function () {
 
         $("head link#columns").attr("href", function (i, attr) {
@@ -117,9 +335,7 @@ $(function () {
                 attr == "twocolumns.css" ? "threecolumns.css" : (
                     attr == "threecolumns.css" ? "fourcolumns.css" : "singlecolumn.css"))
         });
-    });
-  
-    //upload file
+    }); // Update number of column columns
     openFile = function (event) {
 
         var input = event.target;
@@ -133,10 +349,25 @@ $(function () {
 
         };
         reader.readAsText(input.files[0]);
-    }; 
+    }; //upload file
     $(document).on("click", "#new", function () { //open new map from html template
-        newboard();
-        console.log("new map loaded");
+        $("#dialog-confirm").dialog("open");
+       // newboard();
+       // console.log("new map loaded");
+    });
+    $(document).on("click", "#deleteboard", function () { //open new map from html template
+        $("#delete-confirm").dialog("open");
+        // newboard();
+        // console.log("new map loaded");
+    });
+    $(document).on("click", "#loadarray", function () { //open new map from array
+        $("#load-confirm").dialog("open");
+        //htmlfromarray();
+        console.log("array map loaded");
+    });
+    $(document).on("click", "#savearray", function () { //open new map from array
+        $("#save-confirm").dialog("open");
+        
     });
     $(document).on("focusout", ".textbox", function () {
         var currentText = $(this).text();
@@ -145,41 +376,60 @@ $(function () {
 
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
     });
+    $(document).on("focusout", "#blockname", function () {
+        var currentText = $(this).text();
+        var blockid = $(this).parent().attr("id");
+        updateBlockTitle(blockid, currentText);
+
+        if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
+    });
+
+    //JSON OBJECTS//
+
     function saveToLocalStorage() { //  SAVE BOARD 
         var html = $('#board').clone();
         var htmlString = html.html();
         var datauri = btoa(htmlString);
-       
         localStorage.board = datauri;
 
         var boarddata = JSON.stringify(board);
         localStorage.setItem("boarddata", boarddata);
         console.log("board saved");
-        console.log(JSON.parse(boarddata));
-        console.log(boarddata);
-  
-    };
+        //console.log(JSON.parse(boarddata));
+        //console.log(boarddata);       
+     };
     function updateBlockTitle(blockid, title) {  // Update block title
-
+        //update attributes
+        if (title){
+        $("#"+ blockid).attr({ 'title': title });
         blocktitlearray[blockid] = title;
         board["titles"] = blocktitlearray;
         console.log("Titles:");
-       // console.log(blocktitlearray);
-        saveToLocalStorage();
-    }
+            updateItemsObj();
+        };
+
+    };
     function updateBlockDetails(blockid, text) {
         blockdetailsarray[blockid] = text;
         board["details"] = blockdetailsarray;
         console.log("Details:");
       //  console.log(blockdetailsarray);
         saveToLocalStorage();
-    }
-    function createBoardJSON(){
+    };
+    function updateboardlist(filename) {       
+        createBoardJSON(filename);
+        boardlistobject[filename] = board;
+        var boardlist = JSON.stringify(boardlistobject);
+        localStorage.setItem("boardlist", boardlist);
+    };
+    function createBoardJSON(boardname) {
+        //board["name"] = boardname;
         updateGroupsObj();
         updateColumnsObj();
         updateRowsObj;
         updateItemsObj();
-    }
+       // saveToLocalStorage();
+    };
     function updateGroupsObj() {
         groupsObj = [];
         $(".group").each(function () {
@@ -190,11 +440,9 @@ $(function () {
         console.log(groupsObj);
   
         board["groups"] = groupsObj;
-      
-        saveToLocalStorage();
-    }
+    };
     function updateColumnsObj() {
-        columnsObj = []
+        columnsObj = {}
         $(".columnheader").each(function () {
             columngroupObj = [];
             var groupId = $(this).parent().parent().find(".group").attr("id");
@@ -202,17 +450,14 @@ $(function () {
                 var columnid = $(this).attr("id");
                 columngroupObj.push(columnid);
              });
-            item = {}
-            item[groupId] = columngroupObj;
-            columnsObj.push(item);
+           
+            columnsObj[groupId] = columngroupObj;
         });
         console.log("Columns updated:");
         console.log(columnsObj);
 
         board["columns"] = columnsObj;
   
-        saveToLocalStorage();
-      
     };
     function updateRowsObj() {
         rowsObj = [];
@@ -226,34 +471,78 @@ $(function () {
 
         board["rows"] = rowsObj;
   
-        saveToLocalStorage();
-       
-     }
+    };
     function updateItemsObj() {
-        itemsObj = [];
+        itemsObj = {};
+        rowsObj = {};
+
+        var w = 0;
         $(".row").each(function () {
             var iteration = ($(this).find(".iteration"));
-            var rowid = $(iteration).attr("id");
-            epicObj = [];
+            var rowId = $(iteration).attr("id");
+            var rowTitle = $(iteration).attr("title");
+            rowDetails = {};
+            groupObj = {};
+            
+            var z = 0;
             ($(this).find(".grouprelease")).each(function () {
+                epicObj = {};
+                colObj = {};
+                groupDetails = {};
+                
                 var groupIndex = $(this).index();
+                var groupId = $(".groupcontainer:eq(" + groupIndex + ")").find(".group").attr("id");
+                var grouptitle = $(".groupcontainer:eq(" + groupIndex + ")").find(".group").attr("title");
+                var y = 0;
                 ($(this).find(".epic")).each(function () {
                     var columnindex = $(this).index();
-                    storyObj = [];
+                    colDetails = {};
+                    storyObj = {};
+                    var x = 0;
                     var columnId = $(".groupcontainer:eq(" + groupIndex + ")").find(".columnheader li:eq(" + columnindex + ") .column").attr("id");
                     ($(this).find(".story")).each(function () {
-                        var itemid = $(this).attr("id");
-                        storyObj.push(itemid);
+                        storyDetails = {};
+                        var itemId = $(this).attr("id");
+                        var title = $(this).attr("title");
+                        //storyObj.push(itemid);
+                        storyDetails["id"] = itemId;
+                        storyDetails["title"] = title;
+                       // storyObj["stories"] = epicObj;
+                        storyObj["" + x + ""] = storyDetails;
+                        x++;
                     });
-                    item = {}
-                    item[columnId] = storyObj;
-                    epicObj.push(item);
+                    //item = {}
+                    //item[columnId] = storyObj;
+                    //epicObj.push(item);
+                    colDetails["id"] = columnId;
+                    colDetails["title"] = "";
+                    colDetails["stories"] = storyObj;
+                    colObj["" + y + ""] = colDetails;
+                    y++;
+
                 });
+                groupDetails["id"] = groupId;
+                groupDetails["title"] = grouptitle;
+                groupDetails["columns"] = colObj;
+                groupObj["" + z + ""] = groupDetails;
+                z++;
             });
-            item = {}
-            item[rowid] = epicObj;
-            itemsObj.push(item);
+            //item = {}
+            //item[rowid] = epicObj;
+            //itemsObj.push(item);
+            //itemsObj["id"] = rowId;
+           // itemsObj["groups"] = groupObj;
+
+            rowDetails["id"] = rowId;
+            rowDetails["title"] = rowTitle;
+            rowDetails["groups"] = groupObj;
+            rowsObj["" + w + ""] = rowDetails;
+            w++;
         });
+        itemsObj["id"] = "id";
+        itemsObj["title"] = "";
+        itemsObj["rows"] = rowsObj;
+        
         console.log("Items updated:");
         console.log(itemsObj);
 
@@ -264,30 +553,33 @@ $(function () {
        // console.log("board");
         //console.log(board);
     };
-      //Generate object html
-    function boxhtml(boxtype, textboxid) {
+    function boxhtml(boxtype, textboxid, title, childitems) {
         var htmlData = "";
         if (textboxid == null) { textboxid = guid() };
+        if (title == null) { title = "" };
+        if (childitems == null) { childitems = "" };
         if (boxtype == "group" || boxtype == "column" || boxtype == "story" || boxtype == "iteration") {
-            htmlData = "<div class='" + boxtype + "' id='" + textboxid + "'><div class='" + boxtype + "text textbox' contenteditable='true'></div></div>";
+            htmlData = "<div class='" + boxtype + "' id='" + textboxid + "' title='" + title + "'><div class='" + boxtype + "text textbox' contenteditable='true'>" + title +
+                "</div ></div > ";
             if (boxtype == "group") {
                 htmlData = "<div class='groupcontainer'><div class='groupline'>" + htmlData + "<i class='far fa-plus-square addGroup'></i></div>" +
-                    "<div class='groupcolumns'><ul class='columnheader'></ul><i class='far fa-plus-square addColumn'></i></div></div>";
+                    "<div class='groupcolumns'><ul class='columnheader'>" + childitems +
+                    "</ul > <i class='far fa-plus-square addColumn'></i></div ></div > ";
             } else if (boxtype == "column" || boxtype == "story") {
                 htmlData = "<li>" + htmlData + "</li>";
                 console.log(boxtype + " created (li)");
             } else { };
         } else if (boxtype == "epic") {
-            htmlData = "<div class='epic'><ul class='stories'></ul></div>";
+            htmlData = "<div class='epic'><ul class='stories'>" + childitems +
+                "</ul ></div > ";
         } else { };
         console.log(boxtype + " created");
         return htmlData;
-    }
+    };  //Generate object html
 
-    ////////// BLOCK MOVEMENT ////////////////
-
-    //Listen out for newly created blocks and make sortable
-    $("body").on("DOMNodeInserted", "#board", makeSortable);
+    ////////// BLOCK MOVEMENT MANAGEMENT ////////////////
+        
+    $("body").on("DOMNodeInserted", "#board", makeSortable);//Listen out for newly created blocks and make sortable
 
     function makeSortable() {
         makeGroupsSortable();
@@ -592,23 +884,16 @@ $(function () {
     };
     function makeEpicsSortable() {
         $(".stories").sortable({
-       //     placeholder: "ui-sortable-placeholder",
             cursor: "move",
             cancel: ".storytext",
             connectWith: ".stories, .columnheader",
-           // containment: ".stories",
-          
             start: function (event, ui) {
-             //   ui.placeholder.html("<li class='selected'></li>");
-             //   clone = $(ui.item[0].outerHTML).clone();
-                ui.item.data('originblocktype', "story");
+                    ui.item.data('originblocktype', "story");
                     ui.placeholder.width(ui.item.width());
-                
             },
             over: function(event,ui) {
                 hideEpics(event,ui);
             },
- //    /*       
             placeholder: {
                 element: function () {
                     return $('<li class="selected"></li>');
@@ -617,9 +902,7 @@ $(function () {
                     return;
                 }
             },
-  //         */
             remove: function (event, ui) {
-
                 var newepic = boxhtml("epic");
                 var stopindex = ui.item.index();
                 var targetgroupindex = (ui.item.parents(".groupcontainer").index());
@@ -663,7 +946,7 @@ $(function () {
                 
             }
         });
-    }
+    };
     function makeeditable() { 
             $(".stories").sortable({ cancel: "" });
             $(".columnheader").sortable({ cancel: "" });
@@ -673,7 +956,6 @@ $(function () {
             console.log("make editable");
 
     };
-
     $(document).on("click", ".textbox", function (event) {
         console.log("textbox clicked");
         // Set block selected style
@@ -698,50 +980,36 @@ $(function () {
         $("#blockdetails").html(detailsText);
         event.stopPropagation();
     });
-   // $(document).on("dblclick", ".textbox", function (event) {
- //       $("#infobox").removeClass("hidden");
- //       $("#toggledetails").removeClass("hidden");
-  //      $("#infobox").focus();
-  //  });
     $(document).on("click", ".story", function (event) {
           event.stopPropagation();
     });
-   // $(document).on("click", "#quick", function (event) {
-    //    makeSortable()
-   // });
     $(document).on("keydown", ".textbox", function (event) {
         if (event.shiftKey && event.ctrlKey && event.which == 13) {
-         //   hiddenblockdetails = $("#blockdetails").hasClass("hidden");
             $("#infobox").removeClass("hidden");
-            //$("#toggledetails").removeClass("hidden");
             $('.arrow-down-close').addClass('open');
             $('#board').addClass("displayinfo");
             $('#blockdetails').focus();
             hiddenblockdetails = $("#infobox").hasClass("hidden");
-           // $("#toggledetails").prop('checked',true);
             event.stopPropagation();
-
         }
     });  //Edit textbox details
-
     function groupcolumncount(groupindex) {       
         var columncount = $('.groupcontainer:eq(' + groupindex + ') .column').length;
         console.log("Column count: " + columncount);
         return columncount
-    }
+    };
     function totalcolumncount(groupindex) {
         var totalcolumns = $('#grouparraycontainer .column').length;
         console.log("Total column count: " + totalcolumns);
         return totalcolumns
-    }
+    };
+
     ///////////// GROUP MANAGEMENT //////////////////
 
-    //Insert new group from group
     $(document).on("keydown", ".grouptext", function (event) {
         console.log("Group return key");
         var group = $(this).parents('.groupcontainer');
         var groupstartindex = $(this).parents('.groupcontainer').index();
-        //var groupnumber = groupstartindex + 1;
         var columnlist = $('.groupcontainer:eq(' + groupstartindex + ') .columnheader');
 
         if (event.which == 13 && event.ctrlKey && (event.shiftKey == false)) {
@@ -767,9 +1035,7 @@ $(function () {
 
             } else { insertGroup(groupstartindex) };
         }
-    });
-
-     //Insert new group
+    });  //Insert new group from group
     function insertGroup(groupindex) {
         //var groupindex = groupnumber - 1
         var grouptextid = guid();
@@ -802,9 +1068,7 @@ $(function () {
                
         var block = document.getElementById(grouptextid);
         $(block).find(".textbox").focus();
-    }
-
-    //Append new column
+    }; //Insert new group
     function appendNewcolumn(groupindex) {
         var columntextid = guid();
         var columnhtml = boxhtml("column", columntextid);
@@ -828,17 +1092,16 @@ $(function () {
 
         });
 
-    };
+    };//Append new column
 
-    //////////// column MANAGEMENT /////////////////
+    //////////// COLUMN MANAGEMENT /////////////////
 
     var storedcolumn
     var columnHtml
     var editablecolumn
     var newcolumnText
     var newcolumn
-
-    //column text return functions
+       
     $(document).on("keydown", ".columntext", function (event) {
         console.log("column return key");
         var column = $(this).parents("li");
@@ -863,8 +1126,7 @@ $(function () {
                 insertNewcolumn(columnindex, groupindex)
             };
         };
-    });
-
+    }); //column text return functions
     function insertNewcolumn(columnindex, groupindex) {
         var columntextid = guid();
        // var groupindex = groupnumber - 1;
@@ -891,10 +1153,7 @@ $(function () {
         console.log("InsertNewcolumn"); 
     };
     function appendNewStory(column, groupindex, rowindex) {
-
         var storytextid = guid();
-     //   var groupindex = groupnumber - 1;
-      //  var column = columnnumber - 1;
         var htmlData = boxhtml("story", storytextid);
         if (rowindex == null) rowindex = 0; 
         var stories = $(".rowgroups").eq(rowindex).find('.grouprelease:eq(' + groupindex + ') .epic:eq(' + column + ') .stories');
@@ -914,15 +1173,13 @@ $(function () {
         //update arrays
         updateItemsObj();
     };
-    //Delete empty column when focus lost
     $(document).on("focusout", ".columntext", function () {
         var columnli = $(this).parents("li");
         if (columnempty(columnli)) {
             removecolumn(columnli)
         }
 
-    });
-    //Check column li has no text or underlying stories
+    }); //Delete empty column when focus lost
     function columnempty(columnline) {
         var columnstartindex = columnline.index();
         //var groupstartindex = columnline.parent().parent().index();
@@ -946,8 +1203,7 @@ $(function () {
         });
         if (columnempty && storycount === 0) { return true }
         console.log('column text empty?: ' + columnempty + 'storycount: ' + storycount);
-    }
-    //Check Epic has no stories
+    }; //Check column li has no text or underlying stories
     function epicEmpty(rowindex, groupindex, columnnumber) {
         var empty = false
        // groupnumber = groupnumber
@@ -958,8 +1214,7 @@ $(function () {
         if (columncount == 0 || $(".row").eq(rowindex).find('.grouprelease:eq(' + groupindex + ') .epic:eq(' + columnindex + ') .stories').is(':empty')) empty = true;
         console.log(empty);
         return empty;
-    };
-    //Remove column li and underlying epics
+    }; //Check Epic has no stories
     function removecolumn(columnli) {
         var columnindex = columnli.index();
        // var groupindex = columnli.parents().index();
@@ -980,21 +1235,18 @@ $(function () {
             $(this).find('.grouprelease:eq(' + groupindex + ') .epic:eq(' + columnindex + ')').remove();
             console.log("epic removed, " + groupindex + ", " + columnindex)
         });
-    };
-    //Create new column when addColumn clicked
+    };//Remove column li and underlying epics
     $(document).on("click", ".addColumn", function () {
         var groupindex = $(this).parents('.groupcontainer').index();
         appendNewcolumn(groupindex);
      //   $(this).hide();
-    });
-    //Create new column when addColumn clicked
+    });//Create new column when addColumn clicked
     $(document).on("click", ".addGroup", function () {
         var groupindex = $(this).parents('.groupcontainer').index();
         insertGroup(groupindex);
         //   $(this).hide();
-    });
-
-
+    });//Create new column when addColumn clicked
+    
     ///////////// STORY MANAGEMENT /////////////////
 
     var storedStory
@@ -1002,8 +1254,7 @@ $(function () {
     var editableStory
     var newStory
     var newStoryText
-
-    //Create new story when addStory clicked
+        
     $(document).on("click", ".epic", function () {
         var storytextid = guid();
         var htmlData = boxhtml("story", storytextid);
@@ -1018,9 +1269,7 @@ $(function () {
         var block = document.getElementById(storytextid);
         $(block).find(".textbox").focus();
     //    $(this).hide();
-    });
-
-    //Create new story when enter key pressed
+    });//Create new story when addStory clicked
     $(document).on("keydown", ".storytext", function (event) {
         var columnindex = $(this).parents(".epic").index();
         var groupindex = $(this).parents(".grouprelease").index();
@@ -1052,13 +1301,10 @@ $(function () {
             event.stopPropagation();
         };
 
-    });
-
-    //Remove empty story
+    });//Create new story when enter key pressed
     $(document).on("focusout", ".storytext", function () {
         if ($(this).is(':empty')) { deletestory($(this)) }
-    });
-    //Delete story
+    });//Remove empty story
     function deletestory(thisObj) {
         var stories = thisObj.parent().parent().parent();
         var laststory = $(stories).length;
@@ -1070,8 +1316,7 @@ $(function () {
         };
         //update array
         updateItemsObj();
-    }
-    //Hide add story
+    }; //Delete story
     function hideaddstory() {
 
         //hide the add story button when stories exist
@@ -1089,12 +1334,10 @@ $(function () {
     }
 
     /////////// RELEASE MANAGEMENT ////////////////
-
-    //Add new release   
+          
     $(document).on("click", ".addrelease", function () {
         addNewRelease();
-    });
-
+    });//Add new release 
     function addNewRelease(iterationtextid) {
 
         var i = 0;
@@ -1111,7 +1354,7 @@ $(function () {
         do {
             m = k;
             newrelease = newrelease + newgroupstart;
-
+            // column count for group m in the DOM
             var columncount = groupcolumncount(m);
             console.log("group " + k + " has " + columncount + " columnheader");
             if (columncount > 0) {
@@ -1128,14 +1371,13 @@ $(function () {
         while (k < groupcount);
         newrelease = newrelease + newgroupend + "</div></div>";
 
+        //update DOM
         $(newrelease).appendTo($("#rows"));
 
         //Update rows array
         updateRowsObj();
 
-    }
-
-    //Create new row when enter key pressed
+    }; //Add new release 
     $(document).on("keydown", ".iterationtext", function (event) {
         var rowindex = $(this).parent().parent().parent().index();
         console.log("on keydown row index:" + rowindex);
@@ -1154,8 +1396,7 @@ $(function () {
             };
             event.stopPropagation();
         };
-    });
-
+    });//Create new row when enter key pressed
     function emptyIteration(rowindex) {
         var storycount = 0
         var columnnumber = 1;
@@ -1192,7 +1433,8 @@ $(function () {
        
     };
 
-    //Display description in description panel
+    //////// NOTES PANEL MANAGEMENT ///////////
+
     $(document).on("focus", ".textbox", function (event) {
         $("#blockdetails").html("");
         var currentText = $(this).text();
@@ -1209,7 +1451,7 @@ $(function () {
         $("#blockdetails").html(detailsText);
         $("#blockname").css('background-color', bgcolor); //make title colour the same as the block type
                 
-    });
+    });//Display description in description panel
     $(document).on("keyup", ".textbox", function (event) {
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
@@ -1223,10 +1465,14 @@ $(function () {
         $(blockid).find(".textbox").text(currentText);
       //  updateBlockTitle(textbox, currentText);
     });
-
+    $(document).on("focusout", "#blockname", function (event) {
+        var currentText = $(this).val();
+        updateBlockTitle(textbox, currentText);
+    });
     $(document).on("click", "#savedetails", function (event) {
         var detailsText = $("#blockdetails").html();
         updateBlockDetails(textbox, detailsText); 
+
     });
     $(document).on("click", ".toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");
@@ -1236,12 +1482,11 @@ $(function () {
         hiddenblockdetails = $("#infobox").hasClass("hidden");
         event.stopPropagation();
     });
-
     $(document).on("keydown", "#blockdetails", function (event) {
 
         if (event.shiftKey && event.ctrlKey && event.which == 13) { //back to home block
             var detailsText = $(this).html();
-            updateBlockDetails(textbox, detailsText);
+           // updateBlockDetails(textbox, detailsText);
             var block = document.getElementById(textbox);
             $(block).find(".textbox").attr('contenteditable', 'true');
             $(block).find(".textbox").focus();
@@ -1249,12 +1494,6 @@ $(function () {
             
         }
     });
-
-//    $(document).on("focusout", "#infobox", function (event) {
-   //     if ($("#toggledetails").prop('checked') === false && $(event.target).closest('#infobox').length == 0) {
-    //        $("#infobox").toggleClass("hidden");
-   //     }
-  //  });
    
  });
  

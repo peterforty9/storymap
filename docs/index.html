@@ -17,14 +17,40 @@
     <link rel="stylesheet" type="text/css" href="newcss.css">
     <link rel="stylesheet" type="text/css" href="defaulttheme.css">
     <link id="columns" rel="stylesheet" type="text/css" href="singlecolumn.css">
-
-
-
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
 </head>
 
 <body>
-   
-
+    <div id="dialog-confirm" title="Start new map?">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    </div>
+    <div id="delete-confirm" title="Delete map?">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    </div>
+    <div id="save-confirm" title="Save board?">
+        <form>
+            <fieldset>
+                <label for="filename">Filename</label>
+                <input type="text" name="filename" id="filename" value="" class="text ui-widget-content ui-corner-all">
+                <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+        </form>
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    </div>
+    <div id="load-confirm" title="Load board?">
+        <form>
+            <fieldset>
+                <label for="loadfilename">Filename</label>
+                <select id="loadfilename"></select>
+                <!--<input type="text" name="loadfilename" id="loadfilename" value="" class="text ui-widget-content ui-corner-all">-->
+                <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+        </form>
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    </div>
 
 </body>
 
