@@ -6,7 +6,7 @@
 $(function () {
     
     ///// GENERATE PAGE ////
-
+/*
     $("body").prepend("<div class='ui-menu'>" +
         "<label class='container' id=new><i class='fas fa-table'></i></label>" +
         "<label class='container' id=loadarray title='load'><i class='fas fa-file-upload'></i></label>" +
@@ -21,7 +21,7 @@ $(function () {
         "<div id='blockdetails' contenteditable='true'></div>" +
         "<div><label class='container' id='savedetails'>Save</label><label class='container' id='canceldetails'>Cancel</label></div>" +
         "</div > ");
-
+*/
     //// GLOBAL VARIABLES /////
 
     var n, htmlstring, filename, loadfilename, newboardform,
@@ -1480,11 +1480,12 @@ $(function () {
     $(document).on("focusout", "#blockname", function (event) {
         var currentText = $(this).val();
         updateBlockTitle(textbox, currentText);
+        saveToLocalStorage;
     });
-    $(document).on("click", "#savedetails", function (event) {
-        var detailsText = $("#blockdetails").html();
+    $(document).on("focusout", "#blockdetails", function (event) {
+        var detailsText = $(this).html();
         updateBlockDetails(textbox, detailsText); 
-
+        saveToLocalStorage;
     });
     $(document).on("click", ".toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");

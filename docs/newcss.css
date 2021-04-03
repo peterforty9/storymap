@@ -14,8 +14,6 @@ and open the template in the editor.
     --group-header-height: 22px;
 }
 
-
-
 body {
     background-color: white;
     font-family: Arial, Helvetica, sans-serif;
@@ -23,154 +21,84 @@ body {
     vertical-align: top;
     display: inline-block;
 }
+.page{
+display:flex;
+flex-direction:column;
+height:100%;
+width:100%;
+}
 i {
     color:gray;
     height:inherit;
 }
 /* The menu item container */
 .container {
-    display: inline-block;
     position: relative;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-bottom: 12px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-bottom: 5px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 18px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-    /* Hide the browser's default checkbox */
-    .container input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        height: 0;
-        width: 0;
-    }
-
-/* Create a custom checkbox */
-.checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 18px;
-    width: 18px;
-    background-color: #eee;
-}
-
-/* On mouse-over, add a grey background color */
-.container:hover input ~ .checkmark {
-    background-color: #ccc;
-}
-
-/* When the checkbox is checked, add a blue background */
-.container input:checked ~ .checkmark {
-    background-color: #2196F3;
-}
-
-/* Create the checkmark/indicator (hidden when not checked) */
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
-
-/* Show the checkmark when checked */
-.container input:checked ~ .checkmark:after {
-    display: block;
-}
-
-/* Style the checkmark/indicator */
-.container .checkmark:after {
-    left: 4px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-}
 
 .ui-menu {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 22px;
+
     background-color: whitesmoke;
-    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    position:absolute; top:0px; left:0px; height:30px; right:0px;overflow:hidden;
 }
 .ui-menu-item {
     background-color: #34675C;
     color: white;
     display: inline-block;
-    float: right;
+   /* float: right;*/
+   
 }
-
-
-.arrow-down-close {
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-}
-    .arrow-down-close:before, .arrow-down-close:after {
-        content: '';
-        display: inline-block;
-        height: 9px;
-        width: 2px;
-        background-color: black;
-        border-radius: 1px;
-        position: relative;
-        transition: 200ms ease-in-out transform;
-    }
-
-    .arrow-down-close:before {
-        transform: rotate(-45deg);
-        left: 2px;
-        top: 3px
-       
-    }
-
-    .arrow-down-close:after {
-        transform: rotate(45deg);
-        left: 0px;
-        top: -3px
-    }
-
-    .arrow-down-close.open:before {
-    transform: translateY(-6px) rotate(-45deg);
-}
-
-    .arrow-down-close.open:after {
-        transform: translateY(6px) rotate(45deg);
-    }
-
 
 #board {
     /* display: table;*/
     display: flex;
     flex-direction: column;
-    margin-top: 0px;
-    margin-bottom: 10px;
-    margin-right: 10px;
-    margin-left: 10px;
     width: 100%;
- /*   border-collapse: separate;
+
+    position: absolute;
+    top: 30px;
+    bottom: 100px;
+    left: 0px;
+    right: 0px;
+    overflow: auto;
+    
+    /*   border-collapse: separate;
     border-spacing: 6px; */
-    -moz-transform: scale(1.0, 1.0);
+    /*   -moz-transform: scale(1.0, 1.0);
     zoom: 1.0;
     zoom: 100%;
     position:absolute;
-    top:0px;
+    top:0px;*/
+}
+#infobox {
+    display: flex;
+    flex-direction: column;
+    background-color: whitesmoke;
+
+    position: absolute;
+    bottom: 0px;
+    height: 100px;
+    left: 0px;
+    right: 0px;
+    overflow: hidden;
 }
 
-    #board .displayinfo {
-        margin-right: 300px; /* Same as the width of the sidebar */
+    #infobox.hidden {
+        max-width: 30px;
     }
+
 
 #boardheader {
     display: flex;
@@ -208,40 +136,18 @@ i {
     width: var(--first-column-width);
     margin-right: 2px;
 }
-#infobox {
-    position: fixed;
-    right: 0;
-    top: 20px;
-    max-width: 300px;
-    width: 300px;
-    height: 100%;
-    z-index: 1; /* Stay on top */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: whitesmoke;
-    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2), 0 8px 10px 0 rgba(0, 0, 0, 0.19);
-    border-radius: 2px;
-    transition-property: all;
-    transition-duration: .8s;
-    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
-}
-
-    #infobox.hidden {
-        max-width:0;
-    }
 
 
 #blockname {
-    height: 40px;
+    height: 25px;
     width: 100%;
     font-family: Arial, Helvetica, sans-serif;
     background-color: white;
+    resize:none;
 }
 #blockdetails {
     overflow-y: auto;
     width: 100%;
-    height: 500px;
     background-color: whitesmoke;
     color: gray;
     padding: 5px;
