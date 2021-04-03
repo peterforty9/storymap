@@ -137,8 +137,8 @@ $(function () {
         buttons: {
             "Continue": function () {
                 loadfilename = $("#loadfilename").val();
-                board = boardlistobject[loadfilename];
-                htmlfromarray();
+                loadJSONobjects(loadfilename);
+                htmlfromarray(loadfilename);
                 //updateboardlist(loadfilename.val());
                 // createBoardJSON(filename.val());
                 $(this).dialog("close");
@@ -185,8 +185,9 @@ $(function () {
         toggleGroups();
      //   toggleRows();
     };
-    function htmlfromarray() {  // Generate board html from locally stored array
+    function htmlfromarray(filename) {  // Generate board html from locally stored array
 
+        board = boardlistobject[filename];
         $("#board").empty();
 
         //count groups
@@ -302,12 +303,11 @@ $(function () {
         $("#board").append(rowheading);
         $("#board").append(rows);
         $("#board").append(addrow);
-       // insertGroup("-1");
-       
-        //
-        //addNewRelease();
-       // appendNewcolumn("0");
+
+        //UPDATE ARRAYS
+        
         toggleGroups();
+        saveToLocalStorage();
     };//Toggle groups
     $(document).on("click", "#menuGroups", function () {
       //  toggleGroups();
@@ -385,7 +385,15 @@ $(function () {
     });
 
     //JSON OBJECTS//
-
+    function loadJSONobjects(filename) {
+        board = boardlistobject[filename];
+        groupsObj = board["groups"];
+        columnsObj = board["columns"];
+        rowsObj = board["rows"];
+        itemsObj = board["items"];
+        blocktitlearray = board["titles"];
+        blockdetailsarray = board["details"];
+    };
     function saveToLocalStorage() { //  SAVE BOARD 
         var html = $('#board').clone();
         var htmlString = html.html();
@@ -394,6 +402,10 @@ $(function () {
 
         var boarddata = JSON.stringify(board);
         localStorage.setItem("boarddata", boarddata);
+
+        var boardlist = JSON.stringify(boardlistobject);
+        localStorage.setItem("boardlist", boardlist);
+
         console.log("board saved");
         //console.log(JSON.parse(boarddata));
         //console.log(boarddata);       
