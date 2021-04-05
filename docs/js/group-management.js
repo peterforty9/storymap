@@ -5,28 +5,12 @@
 
 $(function () {
     
-    ///// GENERATE PAGE ////
-/*
-    $("body").prepend("<div class='ui-menu'>" +
-        "<label class='container' id=new><i class='fas fa-table'></i></label>" +
-        "<label class='container' id=loadarray title='load'><i class='fas fa-file-upload'></i></label>" +
-        "<label class='container' id=savearray><i class='fas fa-save'></i></label>" +
-        "<label class='container' id='colwidth'><i class='fas fa-cog'></i></label>" +
-        "<label class='container' id='deleteboard'><i class='fas fa-trash-alt'></i></label>" +
-        "<label class='container toggledetails'><i class='fas fa-info-circle'></i></label>" +
-        "<a class='arrow-down-close toggledetails'></div>" );
-    $("body").append("<div id ='board'></div>");
-    $("body").append("<div id='infobox' class='hidden'>" +
-        "<textarea id='blockname' class='title' maxlength='50'></textarea>" +
-        "<div id='blockdetails' contenteditable='true'></div>" +
-        "<div><label class='container' id='savedetails'>Save</label><label class='container' id='canceldetails'>Cancel</label></div>" +
-        "</div > ");
-*/
-    //// GLOBAL VARIABLES /////
+     //// GLOBAL VARIABLES /////
 
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, columnsObj, rowsObj, itemsObj;
+    var boardlistobject = [];
 //blockdetailsarray = {};;
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
     function guid() {
@@ -35,39 +19,34 @@ $(function () {
     }; // Generate GUID
 
     //// PAGE LOAD MANAGEMENT /////
-       
-    n = localStorage.getItem('board');
-    htmlstring = atob(n);
-    $('#board').html(htmlstring); //Update board from locally saved HTML
+  
+    var currentBoard = localStorage.getItem("currentboard");
+ 
+        loadfilename = currentBoard;
+    if (loadfilename) {
+        loadJSONobjects(loadfilename);
+        htmlfromarray(loadfilename);
+    };
 
-    var boarddata = localStorage.getItem("boarddata");
-    if (boarddata) {
-        board = JSON.parse(boarddata);
-    };// If there is a localStorage boarddate array, retrieve it
-
-    var boardlistobject = new Object();
-    var localboardlistobject = localStorage.getItem("boardlist");
+       var localboardlistobject = localStorage.getItem("boardlist");
     if (localboardlistobject) {
         boardlistobject = JSON.parse(localboardlistobject);
-        updateboardlistoptions();
          };// If there is a localStorage boardlist array, retrieve it
+    
     function updateboardlistoptions() {
         //board load options
         $('#loadfilename').empty();//empty board options
-        $.each(boardlistobject, function (key, value) {
+        $.each(boardlistobject, function (i, value) {
             $('#loadfilename')
                 .append($("<option></option>")
-                    .attr("value", key)
-                    .text(key));
+                    .attr("value", value)
+                    .text(value));
         });//Update board load options
     };
-   
-    blockdetailsarray = board["details"]; //Retrieve block notes
-    blocktitlesarray = board["titles"]; //Retrieve block titles
 
-    console.log("Local storage board loaded");
-    console.log(board);
     makeSortable(); //Runs to add sortable fields to the uploaded HTML
+
+    // If there is a localStorage boarddate array, retrieve it
 
     //// MENU MANAGEMENT /////
 
@@ -96,11 +75,18 @@ $(function () {
         modal: true,
         buttons: {
             "Continue": function () {
-                delete boardlistobject[loadfilename];
+                var index = boardlistobject.indexOf(loadfilename);
+                boardlistobject.splice(index, 1);
+                //delete boardlistobject[loadfilename];
                 var boardlist = JSON.stringify(boardlistobject);
                 localStorage.setItem("boardlist", boardlist);
-                updateboardlistoptions();
-                newboard();
+                localStorage.removeItem(loadfilename);
+                loadfilename = "";
+                localStorage.setItem("currentboard", "");
+                $("#board").empty();
+
+               // updateboardlistoptions();
+                //newboard();
                 console.log("map deleted");
                 $(this).dialog("close");
             },
@@ -117,9 +103,10 @@ $(function () {
         modal: true,
         buttons: {
             "Continue": function () {
-                filename = $("#filename");
-                updateboardlist(filename.val());
-                updateboardlistoptions();
+                filename = $("#filename").val();
+                newboard(filename);
+                //board["name"] = filename;
+               
                // createBoardJSON(filename.val());
                 $(this).dialog("close");
             },
@@ -139,6 +126,7 @@ $(function () {
                 loadfilename = $("#loadfilename").val();
                 loadJSONobjects(loadfilename);
                 htmlfromarray(loadfilename);
+                localStorage.setItem("currentboard", loadfilename);
                 //updateboardlist(loadfilename.val());
                 // createBoardJSON(filename.val());
                 $(this).dialog("close");
@@ -153,17 +141,20 @@ $(function () {
         filename = $("#filename");
         createBoardJSON(filename.val());
     });
-    function newboard() {  // Generate new board
+    function newboard(boardname) {  // Generate new board
         
         $("#board").empty(); //Clear current board html
 
-        board = { "name": "", "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {} };
+        board = { "name": boardname, "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {} };
         groupsObj = [];
         columnsObj = {};
         rowsObj = [];
         itemsObj = {};
         blocktitlearray = {};
         blockdetailsarray = {};
+
+        localStorage.setItem("currentboard", boardname);
+        loadfilename = boardname;
 
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
@@ -184,11 +175,24 @@ $(function () {
         appendNewcolumn("0");
         toggleGroups();
      //   toggleRows();
+        //Add board to boardlist
+        updateboardlist(boardname);
+        //updateboardlistoptions();
+        localStorage.setItem("currentboard", boardname);
+        var boarddata = JSON.stringify(board);
+        localStorage.setItem(boardname, boarddata);
     };
     function htmlfromarray(filename) {  // Generate board html from locally stored array
 
-        board = boardlistobject[filename];
         $("#board").empty();
+
+        //var boarddata = localStorage.getItem("boarddata");
+        var boarddata = localStorage.getItem(filename);
+        //if (boarddata) {
+            board = JSON.parse(boarddata);
+            // loadfilename = board["name"]
+            loadfilename = filename;
+       // };// If there is a localStorage boarddate array, retrieve it
 
         //count groups
         numgroups = board["groups"].length;
@@ -351,7 +355,9 @@ $(function () {
         reader.readAsText(input.files[0]);
     }; //upload file
     $(document).on("click", "#new", function () { //open new map from html template
-        $("#dialog-confirm").dialog("open");
+        $("#save-confirm").dialog("open");
+        //newboard();
+       // $("#dialog-confirm").dialog("open");
        // newboard();
        // console.log("new map loaded");
     });
@@ -361,9 +367,10 @@ $(function () {
         // console.log("new map loaded");
     });
     $(document).on("click", "#loadarray", function () { //open new map from array
+        updateboardlistoptions();
         $("#load-confirm").dialog("open");
         //htmlfromarray();
-        console.log("array map loaded");
+       // console.log("array map loaded");
     });
     $(document).on("click", "#savearray", function () { //open new map from array
         $("#save-confirm").dialog("open");
@@ -385,8 +392,12 @@ $(function () {
     });
 
     //JSON OBJECTS//
-    function loadJSONobjects(filename) {
-        board = boardlistobject[filename];
+function loadJSONobjects(filename) {
+    var boarddata = localStorage.getItem(filename);
+    if (boarddata) {
+        board = JSON.parse(boarddata);
+        //board = boardlistobject[filename];
+        // filename = board["name"];
         groupsObj = board["groups"];
         columnsObj = board["columns"];
         rowsObj = board["rows"];
@@ -394,21 +405,13 @@ $(function () {
         blocktitlearray = board["titles"];
         blockdetailsarray = board["details"];
     };
+    };
     function saveToLocalStorage() { //  SAVE BOARD 
-        var html = $('#board').clone();
-        var htmlString = html.html();
-        var datauri = btoa(htmlString);
-        localStorage.board = datauri;
-
-        var boarddata = JSON.stringify(board);
-        localStorage.setItem("boarddata", boarddata);
-
-        var boardlist = JSON.stringify(boardlistobject);
-        localStorage.setItem("boardlist", boardlist);
-
+     
+        var boardobject = JSON.stringify(board);
+        localStorage.setItem(loadfilename, boardobject);
         console.log("board saved");
-        //console.log(JSON.parse(boarddata));
-        //console.log(boarddata);       
+         
      };
     function updateBlockTitle(blockid, title) {  // Update block title
         //update attributes
@@ -429,13 +432,17 @@ $(function () {
         saveToLocalStorage();
     };
     function updateboardlist(filename) {       
-        createBoardJSON(filename);
-        boardlistobject[filename] = board;
+       // createBoardJSON(filename);
+       // boardlistobject[filename] = board;
+        boardlistobject.push(filename);
+
         var boardlist = JSON.stringify(boardlistobject);
         localStorage.setItem("boardlist", boardlist);
+        localStorage.setItem(filename, boardlist);
+     
     };
     function createBoardJSON(boardname) {
-        //board["name"] = boardname;
+        board["name"] = boardname;
         updateGroupsObj();
         updateColumnsObj();
         updateRowsObj;
