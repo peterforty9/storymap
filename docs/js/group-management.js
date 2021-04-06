@@ -9,7 +9,7 @@ $(function () {
 
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
-        groupsObj, columnsObj, rowsObj, itemsObj;
+        groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock;
     var boardlistobject = [];
 //blockdetailsarray = {};;
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
@@ -405,6 +405,14 @@ $(function () {
 
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
     });
+
+    $(document).on("click", "#deleteblock", function () {
+        var blockid = document.getElementById(textbox);
+        if ($(blockid).hasClass("story")) {
+        deletestory($(blockid).find(".textbox"));
+    }
+    });
+   
 
     //JSON OBJECTS//
     function loadJSONobjects(filename) {
@@ -1472,7 +1480,9 @@ $(function () {
     $(document).on("focus", ".textbox", function (event) {
         $("#blockdetails").html("");
         var currentText = $(this).text();
+       
         var blockid = $(this).parent().attr("id");
+        selectedBlock = blockid;
         $("#blockname").val(currentText);
         console.log("Focus on " + blockid);
 
@@ -1481,6 +1491,7 @@ $(function () {
         $(".textbox").parent().removeClass('blockselected');
         $(this).parent().addClass('blockselected')
         textbox = $(this).parent().attr("id");
+
         var bgcolor = $(this).parent().css('background-color');
         $("#blockdetails").html(detailsText);
         $("#blockname").css('background-color', bgcolor); //make title colour the same as the block type

@@ -446,3 +446,8 @@ textarea {
     padding: 5px;
     height:15px;
 }
+#deleteblock {
+    position: absolute;
+    right: 0;
+    bottom: 70px;
+}
