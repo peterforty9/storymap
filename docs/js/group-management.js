@@ -281,7 +281,8 @@ $(function () {
                             if (storiescount > 0) {
                                 do {
                                     var storyid = board["items"].rows[crownum].groups[k].columns[i].stories[si].id;
-                                    var storytitle = board["items"].rows[crownum].groups[k].columns[i].stories[si].title;
+                                    //var storytitle = board["items"].rows[crownum].groups[k].columns[i].stories[si].title;
+                                    var storytitle = board["titles"][storyid];
                                     var storyblock = boxhtml("story", storyid, storytitle);
                                     var storieshtml = storieshtml + storyblock;
                                     si++;
