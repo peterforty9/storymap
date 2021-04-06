@@ -104,11 +104,16 @@ $(function () {
         buttons: {
             "Continue": function () {
                 filename = $("#filename").val();
-                newboard(filename);
-                //board["name"] = filename;
-               
-               // createBoardJSON(filename.val());
-                $(this).dialog("close");
+                var fileexists = boardlistobject.indexOf(filename);
+                if (fileexists >= 0) {
+
+                } else {
+                    newboard(filename);
+                    //board["name"] = filename;
+
+                    // createBoardJSON(filename.val());
+                    $(this).dialog("close");
+                };
             },
             Cancel: function () {
                 $(this).dialog("close");
@@ -215,7 +220,8 @@ $(function () {
                 var tit = board["titles"][board["columns"][gid][j]];
                cols += boxhtml("column", board["columns"][gid][j],tit);                
             };
-            var grouptitle = board["items"].rows[0].groups[i].title;
+            //var grouptitle = board["items"].rows[0].groups[i].title;
+            var grouptitle = board["titles"][board["columns"][gid]];
            groups += boxhtml("group", board["groups"][i],grouptitle,cols);                                 
         };
         groups += "</div > ";
@@ -236,8 +242,15 @@ $(function () {
             var m;
 
             var crowid = board["rows"][crownum];
-            if (board["items"].rows[crownum].title) {
+
+      /*      if (board["items"].rows[crownum].title) {
                 var rowtitle = board["items"].rows[crownum].title
+            } else {
+                rowtitle = ""
+            };
+*/
+            if (board["titles"][crowid]) {
+                rowtitle = board["titles"][crowid];
             } else {
                 rowtitle = ""
             };
@@ -260,20 +273,22 @@ $(function () {
                     do {
 
                         //create stories
-                        var storiescount = Object.keys(board["items"].rows[crownum].groups[k].columns[i]["stories"]).length;
-                        console.log("Story count: " + storiescount);
-                        var si = 0;
-                        var storieshtml = "";
-                        if (storiescount > 0) {
-                            do {
-                                var storyid = board["items"].rows[crownum].groups[k].columns[i].stories[si].id;
-                                var storytitle = board["items"].rows[crownum].groups[k].columns[i].stories[si].title;
-                                var storyblock = boxhtml("story", storyid, storytitle);
-                                var storieshtml = storieshtml + storyblock;
-                                si++;
-                            }
-                            while (si < storiescount)
-                        };
+                        if (Object.keys(board["items"]).length > 0) {
+                            var storiescount = Object.keys(board["items"].rows[crownum].groups[k].columns[i]["stories"]).length;
+                            console.log("Story count: " + storiescount);
+                            var si = 0;
+                            var storieshtml = "";
+                            if (storiescount > 0) {
+                                do {
+                                    var storyid = board["items"].rows[crownum].groups[k].columns[i].stories[si].id;
+                                    var storytitle = board["items"].rows[crownum].groups[k].columns[i].stories[si].title;
+                                    var storyblock = boxhtml("story", storyid, storytitle);
+                                    var storieshtml = storieshtml + storyblock;
+                                    si++;
+                                }
+                                while (si < storiescount)
+                            };
+                        } else { var storieshtml = "" };
 
                         var epic = boxhtml("epic", null, null, storieshtml);
                         newrelease = newrelease + epic;
@@ -374,7 +389,6 @@ $(function () {
     });
     $(document).on("click", "#savearray", function () { //open new map from array
         $("#save-confirm").dialog("open");
-        
     });
     $(document).on("focusout", ".textbox", function () {
         var currentText = $(this).text();
@@ -392,7 +406,7 @@ $(function () {
     });
 
     //JSON OBJECTS//
-function loadJSONobjects(filename) {
+    function loadJSONobjects(filename) {
     var boarddata = localStorage.getItem(filename);
     if (boarddata) {
         board = JSON.parse(boarddata);
