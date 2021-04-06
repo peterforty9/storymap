@@ -405,6 +405,14 @@ $(function () {
 
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
     });
+    $(document).on("click", ".toggledetails", function (event) {
+        $("#infobox").toggleClass("hidden");
+        //  $("#toggledetails").toggleClass("hidden");
+        $('.arrow-down-close').toggleClass('open');
+        $('#board').toggleClass("displayinfo");
+        hiddenblockdetails = $("#infobox").hasClass("hidden");
+        event.stopPropagation();
+    });
 
     $(document).on("click", "#deleteblock", function () {
         var blockid = document.getElementById(textbox);
@@ -1520,14 +1528,7 @@ $(function () {
         updateBlockDetails(textbox, detailsText); 
         saveToLocalStorage;
     });
-    $(document).on("click", ".toggledetails", function (event) {
-        $("#infobox").toggleClass("hidden");
-      //  $("#toggledetails").toggleClass("hidden");
-        $('.arrow-down-close').toggleClass('open');
-        $('#board').toggleClass("displayinfo");
-        hiddenblockdetails = $("#infobox").hasClass("hidden");
-        event.stopPropagation();
-    });
+   
     $(document).on("keydown", "#blockdetails", function (event) {
 
         if (event.shiftKey && event.ctrlKey && event.which == 13) { //back to home block

@@ -34,11 +34,11 @@ i {
 /* The menu item container */
 .container {
     position: relative;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
     margin-bottom: 5px;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 20px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -46,19 +46,21 @@ i {
 }
 
 
-.ui-menu {
+.menu {
 
     background-color: whitesmoke;
     display: flex;
-    flex-direction: row;
-    position:absolute; top:0px; left:0px; height:30px; right:0px;overflow:hidden;
+   /* flex-direction: row; */
+    position:absolute; 
+    bottom:0px; left:0px; height:30px; right:0px;
+    overflow:hidden;
+    justify-content:flex-end;
 }
 .ui-menu-item {
     background-color: #34675C;
     color: white;
     display: inline-block;
-   /* float: right;*/
-   
+     
 }
 
 #board {
@@ -88,7 +90,7 @@ i {
     background-color: whitesmoke;
 
     position: absolute;
-    bottom: 0px;
+    bottom: 30px;
     height: 100px;
     left: 0px;
     right: 0px;
@@ -96,7 +98,7 @@ i {
 }
 
     #infobox.hidden {
-        max-width: 30px;
+        height: 95%;
     }
 
 
@@ -449,5 +451,5 @@ textarea {
 #deleteblock {
     position: absolute;
     right: 0;
-    bottom: 70px;
+    bottom: 95%;
 }

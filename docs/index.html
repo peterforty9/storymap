@@ -23,19 +23,21 @@
 
 <body>
     <div class="page">
-        <div class='ui-menu'>
+
+        <div id='board'></div>
+        <div id='infobox'>
+            <textarea id='blockname' class='title' maxlength='50' style="overflow:hidden"></textarea>
+
+            <label class='container' id='deleteblock'><i class='fas fa-trash-alt'></i></label>
+            <div id='blockdetails' contenteditable='true'></div>
+        </div>
+        <div class='menu'>
             <label class='container' id=new><i class='fas fa-table'></i></label>
             <label class='container' id=loadarray title='load'><i class='fas fa-file-upload'></i></label>
             <label class='container' id=savearray><i class='fas fa-save'></i></label>
             <label class='container' id='colwidth'><i class='fas fa-cog'></i></label>
             <label class='container' id='deleteboard'><i class='fas fa-trash-alt'></i></label>
             <label class='container toggledetails'><i class='fas fa-info-circle'></i></label>
-        </div>
-        <div id='board'></div>
-        <div id='infobox'>
-            <textarea id='blockname' class='title' maxlength='50' style="overflow:hidden"></textarea>
-            <label class='container' id='deleteblock'><i class='fas fa-trash-alt' ></i></label>
-            <div id='blockdetails' contenteditable='true'></div>
         </div>
     </div>
         <div id="dialog-confirm" title="Start new map?">
