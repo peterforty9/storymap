@@ -217,11 +217,11 @@ $(function () {
             var gid = board["groups"][i];
            
             for (j = 0; j < board["columns"][gid].length; ++j) {
-                var tit = board["titles"][board["columns"][gid][j]];
+                var tit = board["titles"][board["columns"][gid][j]]; //column title from title array
                cols += boxhtml("column", board["columns"][gid][j],tit);                
             };
             //var grouptitle = board["items"].rows[0].groups[i].title;
-            var grouptitle = board["titles"][board["columns"][gid]];
+            var grouptitle = board["titles"][gid]; //group titles from titles array
            groups += boxhtml("group", board["groups"][i],grouptitle,cols);                                 
         };
         groups += "</div > ";
@@ -250,7 +250,7 @@ $(function () {
             };
 */
             if (board["titles"][crowid]) {
-                rowtitle = board["titles"][crowid];
+                rowtitle = board["titles"][crowid]; //row title from titles array
             } else {
                 rowtitle = ""
             };
