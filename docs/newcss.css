@@ -9,7 +9,7 @@ and open the template in the editor.
 */
 
 :root {
-    --first-column-width: 100px;
+    --first-column-width: 0;
     --column-header-height: 44px;
     --group-header-height: 22px;
 }
@@ -67,13 +67,13 @@ i {
     /* display: table;*/
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width:100%;
 
     position: absolute;
     top: 10px;
     bottom: 133px;
 
-    overflow: scroll;
+    overflow:auto;
     padding-bottom:5px;
     
     /*   border-collapse: separate;
@@ -96,6 +96,7 @@ i {
     right: 0px;
     overflow: hidden;
     border-top: 3px solid grey;
+    width:100%;
 }
 
     #infobox.hidden {
@@ -129,15 +130,39 @@ i {
     flex-direction: row;
     height:inherit;
 }
+
+#rows {
+    /*  display: table-row-group;*/
+    display: flex;
+    flex-direction: column;
+    top: 75px;
+    width: 100%;
+ /*  overflow-y: auto;
+    overflow-x: ;*/
+}
+
+.row {
+    /* display: table-row;*/
+    display: flex;
+    flex-direction: column;
+    margin: 2px;
+    width: 100%;
+    flex-grow:1;
+}
+
 .rowgroups {
     display: flex;
     flex-direction: row;
+    width:100%;
 }
 .rowheader {
     display: flex;
+    flex-direction: row;
     height: inherit;
-    width: var(--first-column-width);
+    width: 100%;
     margin-right: 2px;
+    position: sticky;
+    top: 75px;
 }
 
 #infobox-navbar {
@@ -198,13 +223,6 @@ j {
 }
 
 
-.row {
-    /* display: table-row;*/
-    display: flex;
-    flex-direction: row;
-    margin:2px;   
-}
-
 .releaserow {
    
 }
@@ -233,11 +251,7 @@ j {
     flex-direction: column;
 }
 
-#rows {
-    /*  display: table-row-group;*/
-    display: flex;
-    flex-direction: column;
-}
+
 
 #groups {
     /* display: table-row;*/
@@ -457,7 +471,7 @@ textarea {
     height: 20px;
 }
 .addrelease {
-    display:flex
+    display:flex;
     text-align: center;
     justify-content:center;
     width: 100%;

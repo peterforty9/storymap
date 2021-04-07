@@ -61,29 +61,29 @@
    
 }
 .iteration {
-    float: left;
-    width: 100px;
-    height: 100%;
-    text-align: left;
-    background-color: #34675C;
-    color: white;
+    display: flex;
+    text-align: center;
+    /*background-color: #34675C;*/
+    background-color: white;
+    color: #34675C;
     margin: 2px;
-    vertical-align: top;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+    /*box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);*/
     border-radius: 2px;
+    position: sticky;
+    left: 0;
 }
 .iterationtext {
     width: 90px;
     height: 100%;
     text-align: left;
     background-color: transparent;
-    color: white;
+    color: #34675C;
     float: left;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
     overflow: hidden;
-    padding:5px;
+    padding: 5px;
 }
 .story {
     float: left;

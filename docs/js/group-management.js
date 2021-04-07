@@ -170,7 +170,8 @@ $(function () {
                         "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
                         "<div class='columnheaderheading' id='columnheader1'><div class='columnheaderheadingtext textbox'>Activities</div></div>" +
                         "</div><div id='grouparraycontainer'></div>";
-        var rowheading = "<div id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
+        var rowheading = "";
+            //"<div id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
 
         var rows = "<div id='rows'></div>";
         var addrow = "<div class='newrelease'><div class='addrelease cell'>Add release</div></div>";
@@ -231,7 +232,7 @@ $(function () {
         groups += "</div > ";
         //
 
-        var rowheading = "<div id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
+        var rowheading = "";//"<div id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
 
         var rows = "<div id='rows'>"
         //iterate rows
