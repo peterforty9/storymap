@@ -154,7 +154,6 @@ i {
    
 }
 .rowheader {
-   display: table-column;
     position: sticky;
     top: 75px;
 }
