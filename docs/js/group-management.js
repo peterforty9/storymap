@@ -1023,10 +1023,17 @@ $(function () {
         $('#board').addClass("displayinfo");
         $("#infobox").focus();
         // Update infobox data
-        var bgcolour = $(this).parent().css("background-color");
+        
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
+
+        var bgcolour = $(this).parent().css("background-color");
         $("#infobox-navbar").css("background-color", bgcolour);
+
+        var tcolour = $(this).parent().css("color");
+        $("#infobox-navbar").css("background-color", tcolour);
+
+
         $("#blockname").val(currentText);
         console.log("Click on " + blockid);
         $("#blockdetails").html("");
@@ -1506,7 +1513,10 @@ $(function () {
 
         var bgcolor = $(this).parent().css('background-color');
         $("#blockdetails").html(detailsText);
-        $("#infobox-navbar").css('background-color', bgcolor); //make title colour the same as the block type
+        $("#infobox-navbar").css('background-color', bgcolor); //make title bgcolour the same as the block type
+
+        var tcolor = $(this).parent().css('color');
+        $("#infobox-navbar").css('color', tcolor); //make title colour the same as the block type
                 
     });//Display description in description panel
     $(document).on("keyup", ".textbox", function (event) {

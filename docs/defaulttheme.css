@@ -73,7 +73,7 @@
     left: 0;
 }
 .iterationtext {
-    width: 90px;
+    width: auto;
     height: 100%;
     text-align: left;
     background-color: transparent;
