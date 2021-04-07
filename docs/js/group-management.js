@@ -50,7 +50,7 @@ $(function () {
 
     //// MENU MANAGEMENT /////
 
-    $("#dialog-confirm").dialog({
+    $("#deleteblock-confirm").dialog({
         autoOpen: false,
         resizable: false,
         height: "auto",
@@ -58,10 +58,14 @@ $(function () {
         modal: true,
         buttons: {
             "Continue": function () {
-                newboard();
-                console.log("new map loaded");
-                $(this).dialog("close");
-            },
+                // newboard();
+                var blockid = document.getElementById(textbox);
+                if ($(blockid).hasClass("story")) {
+                    deletestory($(blockid).find(".textbox"));
+                    console.log("block deleted");
+                    $(this).dialog("close");
+                };
+        },
             Cancel: function () {
                 $(this).dialog("close");
             }
@@ -405,8 +409,9 @@ $(function () {
 
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
     });
-    $(document).on("click", ".toggledetails", function (event) {
+    $(document).on("click", "#toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");
+        $(".blocksubmenu-item").toggleClass("hidden");
         //  $("#toggledetails").toggleClass("hidden");
         $('.arrow-down-close').toggleClass('open');
         $('#board').toggleClass("displayinfo");
@@ -415,10 +420,8 @@ $(function () {
     });
 
     $(document).on("click", "#deleteblock", function () {
-        var blockid = document.getElementById(textbox);
-        if ($(blockid).hasClass("story")) {
-        deletestory($(blockid).find(".textbox"));
-    }
+        $("#deleteblock-confirm").dialog("open");
+          
     });
    
 
@@ -1022,7 +1025,7 @@ $(function () {
         var bgcolour = $(this).parent().css("background-color");
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
-        $("#blockname").css("background-color", bgcolour);
+        $("#infobox-navbar").css("background-color", bgcolour);
         $("#blockname").val(currentText);
         console.log("Click on " + blockid);
         $("#blockdetails").html("");
@@ -1502,7 +1505,7 @@ $(function () {
 
         var bgcolor = $(this).parent().css('background-color');
         $("#blockdetails").html(detailsText);
-        $("#blockname").css('background-color', bgcolor); //make title colour the same as the block type
+        $("#infobox-navbar").css('background-color', bgcolor); //make title colour the same as the block type
                 
     });//Display description in description panel
     $(document).on("keyup", ".textbox", function (event) {

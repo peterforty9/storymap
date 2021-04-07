@@ -26,9 +26,13 @@
 
         <div id='board'></div>
         <div id='infobox'>
-            <textarea id='blockname' class='title' maxlength='50' style="overflow:hidden"></textarea>
-
-            <label class='container' id='deleteblock'><i class='fas fa-trash-alt'></i></label>
+            <div id='infobox-navbar'>
+                <textarea id='blockname' class='title' maxlength='50' style="overflow:hidden"></textarea>
+                <div id="blockmenu">
+                    <label class='blockmenu-item blocksubmenu-item' id='deleteblock'><j class='fas fa-trash-alt'></j></label>
+                    <label class='blockmenu-item' id='toggledetails'><j class='fas fa-angle-double-up'></j></label>
+                </div>
+            </div>
             <div id='blockdetails' contenteditable='true'></div>
         </div>
         <div class='menu'>
@@ -37,10 +41,10 @@
             <label class='container' id=savearray><i class='fas fa-save'></i></label>
             <label class='container' id='colwidth'><i class='fas fa-cog'></i></label>
             <label class='container' id='deleteboard'><i class='fas fa-trash-alt'></i></label>
-            <label class='container toggledetails'><i class='fas fa-info-circle'></i></label>
+          
         </div>
     </div>
-        <div id="dialog-confirm" title="Start new map?">
+        <div id="deleteblock-confirm" title="Delete block?">
             <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
         </div>
         <div id="delete-confirm" title="Delete map?">
