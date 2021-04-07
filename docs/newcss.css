@@ -115,7 +115,7 @@ i {
     display: flex;
     flex-direction: column;
     width: var(--first-column-width);
-    margin: 2px;
+    margin: 0;
 }
 .groupcontainer {
     display: flex;
@@ -229,7 +229,7 @@ j {
 .cell-flex-container {
     display: flex;
     height: 100%;
-    margin-right: 20px;
+    margin-right: 0;
     margin-bottom: 10px;
     background-color: white;
 }
@@ -466,11 +466,12 @@ textarea {
 }
 .addrelease {
     display:flex;
-    text-align: center;
-    justify-content:center;
-    width: 100%;
+    text-align: left;
+    justify-content:flex-start;
     color: gray;
     cursor: pointer;
+    left: 5px;
+    position:sticky;
 }
 
 .groupblock {

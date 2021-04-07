@@ -616,9 +616,9 @@ $(function () {
             htmlData = "<div class='" + boxtype + "' id='" + textboxid + "' title='" + title + "'><div class='" + boxtype + "text textbox' contenteditable='true'>" + title +
                 "</div ></div > ";
             if (boxtype == "group") {
-                htmlData = "<div class='groupcontainer'><div class='groupline'>" + htmlData + "<i class='far fa-plus-square addGroup'></i></div>" +
+                htmlData = "<div class='groupcontainer'><div class='groupline'>" + htmlData + "</div>" +
                     "<div class='groupcolumns'><ul class='columnheader'>" + childitems +
-                    "</ul > <i class='far fa-plus-square addColumn'></i></div ></div > ";
+                    "</ul ></div ></div > ";
             } else if (boxtype == "column" || boxtype == "story") {
                 htmlData = "<li>" + htmlData + "</li>";
                 console.log(boxtype + " created (li)");
@@ -1302,9 +1302,18 @@ $(function () {
         appendNewcolumn(groupindex);
      //   $(this).hide();
     });//Create new column when addColumn clicked
-    $(document).on("click", ".addGroup", function () {
-        var groupindex = $(this).parents('.groupcontainer').index();
-        insertGroup(groupindex);
+    $(document).on("click", "#addblock", function () {
+      //  var groupindex = $(this).parents('.groupcontainer').index();
+       
+        var blockid = document.getElementById(textbox);
+        if ($(blockid).hasClass("group")) {
+            var groupindex = $(blockid).parents('.groupcontainer').index();
+            insertGroup(groupindex);
+        } else if ($(blockid).hasClass("column")) {
+            var groupindex = $(blockid).parents('.groupcontainer').index();
+            appendNewcolumn(groupindex);
+        }
+        
         //   $(this).hide();
     });//Create new column when addColumn clicked
     
