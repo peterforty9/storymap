@@ -132,35 +132,29 @@ i {
 }
 
 #rows {
-    /*  display: table-row-group;*/
+    /*  display: table-row-group;
     display: flex;
-    flex-direction: column;
+    flex-direction: column;*/
     top: 75px;
-    width: 100%;
- /*  overflow-y: auto;
+    /*  overflow-y: auto;
     overflow-x: ;*/
 }
 
 .row {
-    /* display: table-row;*/
-    display: flex;
-    flex-direction: column;
+    display: table-row;
+    /*   display: flex;
+    flex-direction: column;*/
     margin: 2px;
-    width: 100%;
-    flex-grow:1;
+    flex-grow: 1;
 }
 
 .rowgroups {
     display: flex;
     flex-direction: row;
-    width:100%;
+   
 }
 .rowheader {
-    display: flex;
-    flex-direction: row;
-    height: inherit;
-    width: 100%;
-    margin-right: 2px;
+   
     position: sticky;
     top: 75px;
 }
@@ -446,7 +440,8 @@ textarea {
     width: 150px;
     min-height: 25px;
     text-align: left;
-    background-color: transparent;
+    background-color: inherit;
+    color: inherit;
     box-sizing: border-box;
     border:0;
     float: left;

@@ -61,8 +61,6 @@
    
 }
 .iteration {
-    display: flex;
-    text-align: center;
     /*background-color: #34675C;*/
     background-color: white;
     color: #34675C;
@@ -78,7 +76,6 @@
     text-align: left;
     background-color: transparent;
     color: #34675C;
-    float: left;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
