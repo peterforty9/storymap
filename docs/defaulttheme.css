@@ -24,15 +24,17 @@
 }
 
 .grouptext {
-    width: inherit;
+    max-width: 400px;
     height: inherit;
     text-align: left;
     background-color: transparent;
-    color:white;
+    color: white;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
     overflow: hidden;
+    position: sticky;
+    left: 5px;
 }
 .column {
     display: inline-block;
@@ -62,18 +64,15 @@
 }
 .iteration {
     /*background-color: #34675C;*/
-    width: 100px;
-    height:30px;
     background-color: white;
     color: #34675C;
     margin: 2px;
     /*box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);*/
     border-radius: 2px;
-    position: sticky;
-    left: 5px;
+
 }
 .iterationtext {
-    width: auto;
+    width: 400px;
     height: 100%;
     text-align: left;
     background-color: transparent;
@@ -83,6 +82,8 @@
     white-space: normal;
     overflow: hidden;
     padding: 5px;
+    position: sticky;
+    left: 5px;
 }
 .story {
     float: left;

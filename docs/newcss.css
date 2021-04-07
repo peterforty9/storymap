@@ -132,8 +132,8 @@ i {
 }
 
 #rows {
-    /*  display: table-row-group;
-    display: flex;
+    display: table-row-group;
+    /*   display: flex;
     flex-direction: column;*/
     top: 75px;
     /*  overflow-y: auto;
