@@ -609,6 +609,8 @@ $(function () {
     };
     function boxhtml(boxtype, textboxid, title, childitems) {
         var htmlData = "";
+        var groupcount
+        var groupnum
         if (textboxid == null) { textboxid = guid() };
         if (title == null) { title = "" };
         if (childitems == null) { childitems = "" };
@@ -1297,11 +1299,12 @@ $(function () {
             console.log("epic removed, " + groupindex + ", " + columnindex)
         });
     };//Remove column li and underlying epics
-    $(document).on("click", ".addColumn", function () {
+    $(document).on("click", ".groupcolumns", function () {
         var groupindex = $(this).parents('.groupcontainer').index();
         appendNewcolumn(groupindex);
      //   $(this).hide();
-    });//Create new column when addColumn clicked
+    });//Create new column when groupcolumns clicked
+
     $(document).on("click", "#addblock", function () {
       //  var groupindex = $(this).parents('.groupcontainer').index();
        

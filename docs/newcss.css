@@ -120,6 +120,7 @@ i {
 .groupcontainer {
     display: flex;
     flex-direction: column;
+    min-width: 136px;
 }
 #grouparraycontainer {
     display: flex;
