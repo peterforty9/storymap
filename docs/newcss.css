@@ -110,6 +110,7 @@ i {
     background-color: white;
     position: sticky;
     top: 0px;
+    padding-bottom:5px;
 }
 #headingcontainer {
     display: flex;
@@ -399,7 +400,6 @@ j {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background-color: #f2f2f2;
     margin:2px;
 }
     .epic ul {

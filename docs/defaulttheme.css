@@ -2,13 +2,12 @@
 }
 .blockselected {
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.8);
-    color:midnightblue;
+ 
 }
 .group {
     width: 100%;
     height: inherit;
     text-align: left;
-    background-color: #B7B8B6;
     float: left;
     padding-left: 10px;
     margin: 2px;
@@ -28,8 +27,6 @@
     max-width: 400px;
     height: inherit;
     text-align: left;
-    background-color: transparent;
-    color: white;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
@@ -43,7 +40,6 @@
     height: inherit;
     max-height: 76px;
     text-align: left;
-    background-color: #4CB5F5;
     padding-left: 10px;
     margin: 2px;
     vertical-align: top;
@@ -55,8 +51,6 @@
     width: inherit;
     height: inherit;
     text-align: left;
-    background-color: transparent;
-    color: white;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
@@ -65,8 +59,6 @@
 }
 .iteration {
     /*background-color: #34675C;*/
-    background-color: white;
-    color: #34675C;
     margin: 2px;
     /*box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);*/
     border-radius: 2px;
@@ -76,8 +68,6 @@
     width: 400px;
     height: 100%;
     text-align: left;
-    background-color: transparent;
-    color: #34675C;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
@@ -91,7 +81,6 @@
     width: 136px;
     height: 76px;
     text-align: left;
-    background-color: #B3C100;
     padding-left: 10px;
     margin-left: 2px;
     margin-right: 2px;
@@ -108,14 +97,9 @@
     height: 76px;
     max-height: 76px;
     text-align: left;
-    background-color: transparent;
-    color: white;
     float: left;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
     overflow: hidden;
-}
-.title {
-color:white;
 }

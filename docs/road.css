@@ -1,0 +1,40 @@
+﻿.epic {
+    background-color: #E5E4E5
+}
+.blockselected {
+    color:midnightblue;
+}
+.group {
+    background-color: #40393E;
+}
+
+.grouptext {
+    background-color: transparent;
+    color: white;
+}
+.column {
+    background-color: #CA9C95;
+}
+
+.columntext {   
+    background-color: transparent;
+    color: white;
+}
+.iteration {
+    background-color: #874741;
+}
+.iterationtext {
+    background-color: transparent;
+    color: white;
+}
+.story {
+    background-color: #897C87;
+}
+
+.storytext {
+    background-color: transparent;
+    color: white;
+}
+.title {
+color:white;
+}

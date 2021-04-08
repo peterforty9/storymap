@@ -1015,8 +1015,8 @@ $(function () {
     $(document).on("click", ".textbox", function (event) {
         console.log("textbox clicked");
         // Set block selected style
-        $(".textbox").parent().removeClass('blockselected');
-        $(this).parent().addClass('blockselected')
+        //$(".textbox").parent().removeClass('blockselected');
+        //$(this).parent().addClass('blockselected')
         textbox = $(this).parent().attr("id");
       
         // Display infobox if hidden
@@ -1032,8 +1032,8 @@ $(function () {
         var bgcolour = $(this).parent().css("background-color");
         $("#infobox-navbar").css("background-color", bgcolour);
 
-        var tcolour = $(this).parent().css("color");
-        $("#infobox-navbar").css("background-color", tcolour);
+        var tcolour = $(this).css("color");
+        $("#infobox-navbar").css("color", tcolour);
 
 
         $("#blockname").val(currentText);
