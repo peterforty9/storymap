@@ -205,8 +205,8 @@ $(function () {
        // };// If there is a localStorage boarddate array, retrieve it
 
         //count groups
-        numgroups = board["groups"].length;
-        numrows = board["rows"].length;
+       // numgroups = board["groups"].length;
+       // numrows = board["rows"].length;
 
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
@@ -276,16 +276,19 @@ $(function () {
 
                 if (columncount > 0) {
                     do {
-
+                        var columnId = board["columns"][gid][i];
+                        console.log("Column ID: " + columnId);
                         //create stories
-                        if (Object.keys(board["items"]).length > 0) {
-                            var storiescount = Object.keys(board["items"].rows[crownum].groups[k].columns[i]["stories"]).length;
+                        if (board["items"][crowid][columnId] != undefined) {
+                           // var storiescount = Object.keys(board["items"].rows[crownum].groups[k].columns[i]["stories"]).length;
+
+                            var storiescount = board["items"][crowid][columnId].length;
                             console.log("Story count: " + storiescount);
                             var si = 0;
                             var storieshtml = "";
                             if (storiescount > 0) {
                                 do {
-                                    var storyid = board["items"].rows[crownum].groups[k].columns[i].stories[si].id;
+                                    var storyid = board["items"][crowid][columnId][si];
                                     //var storytitle = board["items"].rows[crownum].groups[k].columns[i].stories[si].title;
                                     var storytitle = board["titles"][storyid];
                                     var storyblock = boxhtml("story", storyid, storytitle);
@@ -419,12 +422,35 @@ $(function () {
         hiddenblockdetails = $("#infobox").hasClass("hidden");
         event.stopPropagation();
     });
-
     $(document).on("click", "#deleteblock", function () {
         $("#deleteblock-confirm").dialog("open");
           
     });
-   
+    $(document).on("click", "#moveright", function () {
+        var blockid = document.getElementById(textbox);
+        var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
+        console.log("group: " + gid);
+        if ($(blockid).hasClass("column")) {
+            var cols = columnsObj[gid];
+            var i = cols.indexOf(textbox);
+            console.log("index of column: " + i);
+            if (columnsObj[gid].length > (i + 1)) {
+                console.log("array before: " + cols);
+                var j = cols.splice(i, 1).toString();
+                console.log("column spliced: " + j);
+                var k = i + 1;
+                cols.splice(k, 0, j);
+                console.log("array after: " + cols);
+                columnsObj[gid] = cols;
+                board["columns"] = columnsObj;
+                saveToLocalStorage();
+                htmlfromarray(loadfilename);
+               // location.reload();
+            }
+            
+        };
+
+    });
 
     //JSON OBJECTS//
     function loadJSONobjects(filename) {
@@ -536,13 +562,14 @@ $(function () {
             var rowId = $(iteration).attr("id");
             var rowTitle = $(iteration).attr("title");
             rowDetails = {};
-            groupObj = {};
+            //groupObj = {};
+            colObj = {};
             
             var z = 0;
             ($(this).find(".grouprelease")).each(function () {
                 epicObj = {};
-                colObj = {};
-                groupDetails = {};
+              //  colObj = {};
+               // groupDetails = {};
                 
                 var groupIndex = $(this).index();
                 var groupId = $(".groupcontainer:eq(" + groupIndex + ")").find(".group").attr("id");
@@ -551,7 +578,7 @@ $(function () {
                 ($(this).find(".epic")).each(function () {
                     var columnindex = $(this).index();
                     colDetails = {};
-                    storyObj = {};
+                    storyObj = [];
                     var x = 0;
                     var columnId = $(".groupcontainer:eq(" + groupIndex + ")").find(".columnheader li:eq(" + columnindex + ") .column").attr("id");
                     ($(this).find(".story")).each(function () {
@@ -559,26 +586,27 @@ $(function () {
                         var itemId = $(this).attr("id");
                         var title = $(this).attr("title");
                         //storyObj.push(itemid);
-                        storyDetails["id"] = itemId;
-                        storyDetails["title"] = title;
+                       // storyDetails["id"] = itemId;
+                      //  storyDetails["title"] = title;
                        // storyObj["stories"] = epicObj;
-                        storyObj["" + x + ""] = storyDetails;
+                       // storyObj["" + itemid + ""] = storyDetails;
+                        storyObj.push(itemId);
                         x++;
                     });
                     //item = {}
                     //item[columnId] = storyObj;
                     //epicObj.push(item);
-                    colDetails["id"] = columnId;
-                    colDetails["title"] = "";
-                    colDetails["stories"] = storyObj;
-                    colObj["" + y + ""] = colDetails;
+                 //   colDetails["id"] = columnId;
+                 //   colDetails["title"] = "";
+                  //  colDetails["stories"] = storyObj;
+                    colObj["" + columnId + ""] = storyObj //colDetails;
                     y++;
 
                 });
-                groupDetails["id"] = groupId;
-                groupDetails["title"] = grouptitle;
-                groupDetails["columns"] = colObj;
-                groupObj["" + z + ""] = groupDetails;
+               // groupDetails["id"] = groupId;
+              //  groupDetails["title"] = grouptitle;
+              //  groupDetails["columns"] = colObj;
+              //  groupObj["" + z + ""] = groupDetails;
                 z++;
             });
             //item = {}
@@ -587,15 +615,16 @@ $(function () {
             //itemsObj["id"] = rowId;
            // itemsObj["groups"] = groupObj;
 
-            rowDetails["id"] = rowId;
-            rowDetails["title"] = rowTitle;
-            rowDetails["groups"] = groupObj;
-            rowsObj["" + w + ""] = rowDetails;
+           // rowDetails["id"] = rowId;
+          //  rowDetails["title"] = rowTitle;
+          //  rowDetails["groups"] = groupObj;
+          //  rowsObj["" + rowId + ""] = rowDetails;
+            itemsObj[rowId] = colObj;
             w++;
         });
-        itemsObj["id"] = "id";
-        itemsObj["title"] = "";
-        itemsObj["rows"] = rowsObj;
+      //  itemsObj["id"] = "id";
+      //  itemsObj["title"] = "";
+      //  itemsObj["rows"] = rowsObj;
         
         console.log("Items updated:");
         console.log(itemsObj);
