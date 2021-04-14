@@ -451,6 +451,30 @@ $(function () {
         };
 
     });
+    $(document).on("click", "#moveleft", function () {
+        var blockid = document.getElementById(textbox);
+        var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
+        console.log("group: " + gid);
+        if ($(blockid).hasClass("column")) {
+            var cols = columnsObj[gid];
+            var i = cols.indexOf(textbox);
+            console.log("index of column: " + i);
+            if (i > 0) {
+                console.log("array before: " + cols);
+                var j = cols.splice(i, 1).toString();
+                console.log("column spliced: " + j);
+                var k = i - 1;
+                cols.splice(k, 0, j);
+                console.log("array after: " + cols);
+                columnsObj[gid] = cols;
+                board["columns"] = columnsObj;
+                saveToLocalStorage();
+                htmlfromarray(loadfilename);
+                // location.reload();
+            }
+
+        };
+    });
 
     //JSON OBJECTS//
     function loadJSONobjects(filename) {
