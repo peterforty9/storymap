@@ -4,14 +4,14 @@
 //$(function () {$(document).getElementById(files).addEventListener('change', handleFileSelect, false);});
 
 $(function () {
-    
-     //// GLOBAL VARIABLES /////
+
+    //// GLOBAL VARIABLES /////
 
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock;
     var boardlistobject = [];
-//blockdetailsarray = {};;
+    //blockdetailsarray = {};;
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
     function guid() {
         var id = (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
@@ -19,20 +19,20 @@ $(function () {
     }; // Generate GUID
 
     //// PAGE LOAD MANAGEMENT /////
-  
+
     var currentBoard = localStorage.getItem("currentboard");
- 
-        loadfilename = currentBoard;
+
+    loadfilename = currentBoard;
     if (loadfilename) {
         loadJSONobjects(loadfilename);
         htmlfromarray(loadfilename);
     };
 
-       var localboardlistobject = localStorage.getItem("boardlist");
+    var localboardlistobject = localStorage.getItem("boardlist");
     if (localboardlistobject) {
         boardlistobject = JSON.parse(localboardlistobject);
-         };// If there is a localStorage boardlist array, retrieve it
-    
+    };// If there is a localStorage boardlist array, retrieve it
+
     function updateboardlistoptions() {
         //board load options
         $('#loadfilename').empty();//empty board options
@@ -65,7 +65,7 @@ $(function () {
                     console.log("block deleted");
                     $(this).dialog("close");
                 };
-        },
+            },
             Cancel: function () {
                 $(this).dialog("close");
             }
@@ -89,7 +89,7 @@ $(function () {
                 localStorage.setItem("currentboard", "");
                 $("#board").empty();
 
-               // updateboardlistoptions();
+                // updateboardlistoptions();
                 //newboard();
                 console.log("map deleted");
                 $(this).dialog("close");
@@ -151,7 +151,7 @@ $(function () {
         createBoardJSON(filename.val());
     });
     function newboard(boardname) {  // Generate new board
-        
+
         $("#board").empty(); //Clear current board html
 
         board = { "name": boardname, "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {} };
@@ -167,11 +167,11 @@ $(function () {
 
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
-                        "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
-                        "<div class='columnheaderheading' id='columnheader1'><div class='columnheaderheadingtext textbox'>Activities</div></div>" +
-                        "</div><div id='grouparraycontainer'></div>";
+            "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
+            "<div class='columnheaderheading' id='columnheader1'><div class='columnheaderheadingtext textbox'>Activities</div></div>" +
+            "</div><div id='grouparraycontainer'></div>";
         var rowheading = "";
-            //"<div id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
+        //"<div id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
 
         var rows = "<div id='rows'></div>";
         var addrow = "<div class='newrelease'><div class='addrelease cell'>Add release</div></div>";
@@ -184,7 +184,7 @@ $(function () {
         addNewRelease();
         appendNewcolumn("0");
         toggleGroups();
-     //   toggleRows();
+        //   toggleRows();
         //Add board to boardlist
         updateboardlist(boardname);
         //updateboardlistoptions();
@@ -199,14 +199,14 @@ $(function () {
         //var boarddata = localStorage.getItem("boarddata");
         var boarddata = localStorage.getItem(filename);
         //if (boarddata) {
-            board = JSON.parse(boarddata);
-            // loadfilename = board["name"]
-            loadfilename = filename;
-       // };// If there is a localStorage boarddate array, retrieve it
+        board = JSON.parse(boarddata);
+        // loadfilename = board["name"]
+        loadfilename = filename;
+        // };// If there is a localStorage boarddate array, retrieve it
 
         //count groups
-       // numgroups = board["groups"].length;
-       // numrows = board["rows"].length;
+        // numgroups = board["groups"].length;
+        // numrows = board["rows"].length;
 
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
@@ -215,19 +215,19 @@ $(function () {
             "</div><div id='grouparraycontainer'>";
         //add groups from array
         var i;
-        for (i = 0; i < board["groups"].length; ++i) {     
+        for (i = 0; i < board["groups"].length; ++i) {
 
             var j;
             var cols = "";
             var gid = board["groups"][i];
-           
+
             for (j = 0; j < board["columns"][gid].length; ++j) {
                 var tit = board["titles"][board["columns"][gid][j]]; //column title from title array
-               cols += boxhtml("column", board["columns"][gid][j],tit);                
+                cols += boxhtml("column", board["columns"][gid][j], tit);
             };
             //var grouptitle = board["items"].rows[0].groups[i].title;
             var grouptitle = board["titles"][gid]; //group titles from titles array
-           groups += boxhtml("group", board["groups"][i],grouptitle,cols);                                 
+            groups += boxhtml("group", board["groups"][i], grouptitle, cols);
         };
         groups += "</div > ";
         //
@@ -248,20 +248,20 @@ $(function () {
 
             var crowid = board["rows"][crownum];
 
-      /*      if (board["items"].rows[crownum].title) {
-                var rowtitle = board["items"].rows[crownum].title
-            } else {
-                rowtitle = ""
-            };
-*/
+            /*      if (board["items"].rows[crownum].title) {
+                      var rowtitle = board["items"].rows[crownum].title
+                  } else {
+                      rowtitle = ""
+                  };
+      */
             if (board["titles"][crowid]) {
                 rowtitle = board["titles"][crowid]; //row title from titles array
             } else {
                 rowtitle = ""
             };
-           
+
             var groupcount = board["groups"].length;
-            var iteration = boxhtml("iteration", crowid,rowtitle)
+            var iteration = boxhtml("iteration", crowid, rowtitle)
             var newrelease = "<div class='row'><div class='rowheader'>" + iteration + "</div><div class='rowgroups'>";
             var newgroupstart = "<div class='grouprelease'><div class='cell-flex-container'>";
             var newgroupend = "</div></div>";
@@ -280,7 +280,7 @@ $(function () {
                         console.log("Column ID: " + columnId);
                         //create stories
                         if (board["items"][crowid][columnId] != undefined) {
-                           // var storiescount = Object.keys(board["items"].rows[crownum].groups[k].columns[i]["stories"]).length;
+                            // var storiescount = Object.keys(board["items"].rows[crownum].groups[k].columns[i]["stories"]).length;
 
                             var storiescount = board["items"][crowid][columnId].length;
                             console.log("Story count: " + storiescount);
@@ -318,13 +318,13 @@ $(function () {
 
             rows += newrelease;
             crownum++;
-            
+
             //Update rows array
             // updateRowsObj();
         } while (crownum < rowscount);
 
         rows += "</div > ";
-        
+
         var addrow = "<div class='newrelease'><div class='addrelease cell'>Add release</div></div>";
         $("#board").prepend(boardheader);
         $("#boardheader").prepend(groups);
@@ -333,20 +333,20 @@ $(function () {
         $("#board").append(addrow);
 
         //UPDATE ARRAYS
-        
+
         toggleGroups();
         saveToLocalStorage();
     };//Toggle groups
     $(document).on("click", "#menuGroups", function () {
-      //  toggleGroups();
+        //  toggleGroups();
         document.getElementById("menuGroups").checked ? $(".group").show() : $(".group").hide()
-        
+
     });
     function toggleGroups() {
         $("#group").toggle();
     }
     $(document).on("click", "#menuRows", function () {
-      //  toggleRows();
+        //  toggleRows();
         document.getElementById("menuRows").checked ? $(".rowsheadingtext").show() : $(".rowsheadingtext").hide();
         document.getElementById("menuRows").checked ? $(".iteration").show() : $(".iteration").hide();
         document.getElementById("menuRows").checked ? $(".addrelease").show() : $(".addrelease").hide();
@@ -381,9 +381,9 @@ $(function () {
     $(document).on("click", "#new", function () { //open new map from html template
         $("#save-confirm").dialog("open");
         //newboard();
-       // $("#dialog-confirm").dialog("open");
-       // newboard();
-       // console.log("new map loaded");
+        // $("#dialog-confirm").dialog("open");
+        // newboard();
+        // console.log("new map loaded");
     });
     $(document).on("click", "#deleteboard", function () { //open new map from html template
         $("#delete-confirm").dialog("open");
@@ -394,7 +394,7 @@ $(function () {
         updateboardlistoptions();
         $("#load-confirm").dialog("open");
         //htmlfromarray();
-       // console.log("array map loaded");
+        // console.log("array map loaded");
     });
     $(document).on("click", "#savearray", function () { //open new map from array
         $("#save-confirm").dialog("open");
@@ -424,7 +424,7 @@ $(function () {
     });
     $(document).on("click", "#deleteblock", function () {
         $("#deleteblock-confirm").dialog("open");
-          
+
     });
     $(document).on("click", "#moveright", function () {
         var blockid = document.getElementById(textbox);
@@ -445,12 +445,70 @@ $(function () {
                 board["columns"] = columnsObj;
                 saveToLocalStorage();
                 htmlfromarray(loadfilename);
-               // location.reload();
+                // location.reload();
             }
-            
         };
-
     });
+    $(document).on("click", "#movedown", function () {
+        var blockid = document.getElementById(textbox);
+        var rowscount = rowsObj.length;
+        var rowid = $(blockid).parents(".row").find(".iteration").attr("id");
+        var rowindex = rowsObj.indexOf(rowid);
+        console.log("row: " + rowindex);
+        if (rowindex < rowscount) {
+            var rowdownid = rowsObj[rowindex + 1]
+            console.log("row: " + rowdownid);
+            if ($(blockid).hasClass("story")) {
+                var gindex = $(blockid).parents(".grouprelease").index();
+                var gid = groupsObj[gindex];
+                console.log("group index: " + gindex);
+                var colindex = $(blockid).parents(".epic").index();
+                var colid = columnsObj[gid][colindex];
+                var stories = itemsObj[rowid][colid];
+                var i = stories.indexOf(textbox);
+                console.log("index of story: " + i);
+                
+                //    console.log("array before: " + cols);
+                    var j = stories.splice(i, 1).toString();
+                    console.log("story spliced: " + j);
+                // carry on from here to splice a story to the correct epic
+                var trowid = rowsObj[rowindex+1];
+                var tstories = itemsObj[trowid][colid];
+                    tstories.splice(0, 0, j);
+                  //  console.log("array after: " + cols);
+                    //columnsObj[gid] = tstories;
+                    board["items"] = itemsObj;
+                    saveToLocalStorage();
+                    htmlfromarray(loadfilename);
+                    // location.reload();
+                
+            };
+        }
+    });
+    $(document).on("click", "#moveright", function () {
+        var blockid = document.getElementById(textbox);
+        var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
+        console.log("group: " + gid);
+        if ($(blockid).hasClass("column")) {
+            var cols = columnsObj[gid];
+            var i = cols.indexOf(textbox);
+            console.log("index of column: " + i);
+            if (columnsObj[gid].length > (i + 1)) {
+                console.log("array before: " + cols);
+                var j = cols.splice(i, 1).toString();
+                console.log("column spliced: " + j);
+                var k = i + 1;
+                cols.splice(k, 0, j);
+                console.log("array after: " + cols);
+                columnsObj[gid] = cols;
+                board["columns"] = columnsObj;
+                saveToLocalStorage();
+                htmlfromarray(loadfilename);
+                // location.reload();
+            }
+        }
+    });
+
     $(document).on("click", "#moveleft", function () {
         var blockid = document.getElementById(textbox);
         var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
