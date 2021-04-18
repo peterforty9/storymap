@@ -432,15 +432,31 @@ $(function () {
         var blockid = document.getElementById(textbox);
         var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
         console.log("group: " + gid);
-        if ($(blockid).hasClass("column")) {
+        var gind = groupsObj.indexOf(gid);
+        if ($(blockid).hasClass("column") ) {
             var cols = columnsObj[gid];
             var i = cols.indexOf(textbox);
             console.log("index of column: " + i);
-            if (columnsObj[gid].length > (i + 1)) {
-                console.log("array before: " + cols);
-                var j = cols.splice(i, 1).toString();
-                console.log("column spliced: " + j);
-                var k = i + 1;
+            console.log("array before: " + cols);
+            
+            if (columnsObj[gid].length > (i + 1) || (columnsObj[gid].length === (i + 1) && groupsObj[gind + 1])) {
+                if (columnsObj[gid].length > (i + 1)) {
+                    var j = cols.splice(i, 1).toString();
+                    console.log("column spliced: " + j);
+                    var k = i + 1;
+
+                } else if (columnsObj[gid].length === (i + 1) && groupsObj[gind + 1]) {
+                    var j = cols.splice(i, 1).toString();
+                    console.log("column spliced: " + j);
+                    var k = 0;
+                    columnsObj[gid] = cols;
+
+                    gid = groupsObj[gind + 1];
+                    cols = columnsObj[gid];
+                    //  cols.splice(k, 0, j);
+                    //   console.log("array after: " + cols);
+                    //   columnsObj[gid] = cols;
+                }
                 cols.splice(k, 0, j);
                 console.log("array after: " + cols);
                 columnsObj[gid] = cols;
@@ -448,7 +464,8 @@ $(function () {
                 saveToLocalStorage();
                 htmlfromarray(loadfilename);
                 // location.reload();
-            }
+            };
+
         };
     });
     $(document).on("click", "#movedown", function () {
@@ -459,7 +476,7 @@ $(function () {
         console.log("rowsobj: " + rowsObj);
         var rowindex = rowsObj.indexOf(rowid);
         console.log("row: " + rowindex);
-        if (rowindex < rowscount) {
+        if ((rowindex +1) < rowscount) {
             var rowdownid = rowsObj[rowindex + 1]
             console.log("row: " + rowdownid);
             if ($(blockid).hasClass("story")) {
@@ -578,51 +595,48 @@ $(function () {
             };
         }
     });
-    $(document).on("click", "#moveright", function () {
-        var blockid = document.getElementById(textbox);
-        var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
-        console.log("group: " + gid);
-        if ($(blockid).hasClass("column")) {
-            var cols = columnsObj[gid];
-            var i = cols.indexOf(textbox);
-            console.log("index of column: " + i);
-            if (columnsObj[gid].length > (i + 1)) {
-                console.log("array before: " + cols);
-                var j = cols.splice(i, 1).toString();
-                console.log("column spliced: " + j);
-                var k = i + 1;
-                cols.splice(k, 0, j);
-                console.log("array after: " + cols);
-                columnsObj[gid] = cols;
-                board["columns"] = columnsObj;
-                saveToLocalStorage();
-                htmlfromarray(loadfilename);
-                // location.reload();
-            }
-        }
-    });
-
+ 
     $(document).on("click", "#moveleft", function () {
         var blockid = document.getElementById(textbox);
         var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
         console.log("group: " + gid);
+        var gind = groupsObj.indexOf(gid);
         if ($(blockid).hasClass("column")) {
             var cols = columnsObj[gid];
             var i = cols.indexOf(textbox);
             console.log("index of column: " + i);
-            if (i > 0) {
-                console.log("array before: " + cols);
-                var j = cols.splice(i, 1).toString();
-                console.log("column spliced: " + j);
-                var k = i - 1;
-                cols.splice(k, 0, j);
+            console.log("array before: " + cols);
+
+            if (i > 0 || (i === 0 && groupsObj[gind - 1])) {
+                if (i > 0) {
+                    var j = cols.splice(i, 1).toString();
+                    console.log("column spliced: " + j);
+                    var k = i - 1;
+                    cols.splice(k, 0, j);
+
+                } else if (i === 0 && groupsObj[gind - 1]) {
+                    var j = cols.splice(i, 1).toString();
+                    console.log("column spliced: " + j);
+                               
+                    columnsObj[gid] = cols;
+
+                    gid = groupsObj[gind - 1];
+                    
+                    //var k = columnsObj[gid].length;
+                    cols = columnsObj[gid];
+                    //  cols.splice(k, 0, j);
+                    //   console.log("array after: " + cols);
+                    //   columnsObj[gid] = cols;
+                    cols.push(j);
+                }
+               
                 console.log("array after: " + cols);
                 columnsObj[gid] = cols;
                 board["columns"] = columnsObj;
                 saveToLocalStorage();
                 htmlfromarray(loadfilename);
                 // location.reload();
-            }
+            };
 
         };
     });
