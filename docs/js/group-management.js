@@ -20,6 +20,7 @@ $(function () {
 
     //// PAGE LOAD MANAGEMENT /////
 
+
     var currentBoard = localStorage.getItem("currentboard");
 
     loadfilename = currentBoard;
@@ -403,15 +404,16 @@ $(function () {
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
         updateBlockTitle(blockid, currentText);
-
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
+        saveToLocalStorage();
+       
     });
     $(document).on("focusout", "#blockname", function () {
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
         updateBlockTitle(blockid, currentText);
-
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
+        saveToLocalStorage();
     });
     $(document).on("click", "#toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");
@@ -453,6 +455,8 @@ $(function () {
         var blockid = document.getElementById(textbox);
         var rowscount = rowsObj.length;
         var rowid = $(blockid).parents(".row").find(".iteration").attr("id");
+        console.log("rowid: " + rowid);
+        console.log("rowsobj: " + rowsObj);
         var rowindex = rowsObj.indexOf(rowid);
         console.log("row: " + rowindex);
         if (rowindex < rowscount) {
@@ -477,14 +481,62 @@ $(function () {
                     tstories.splice(0, 0, j);
                   //  console.log("array after: " + cols);
                     //columnsObj[gid] = tstories;
-                    board["items"] = itemsObj;
+                board["items"] = itemsObj;
+
                     saveToLocalStorage();
-                    htmlfromarray(loadfilename);
+                htmlfromarray(loadfilename);
+
+                var blockid = document.getElementById(textbox);
+                blockid.scrollIntoView(false);
                     // location.reload();
                 
             };
         }
     });
+    $(document).on("click", "#moveup", function () {
+        var blockid = document.getElementById(textbox);
+        var rowscount = rowsObj.length;
+        var rowid = $(blockid).parents(".row").find(".iteration").attr("id");
+        console.log("rowid: " + rowid);
+        console.log("rowsobj: " + rowsObj);
+        var rowindex = rowsObj.indexOf(rowid);
+        console.log("row: " + rowindex);
+        if (rowindex > 0) {
+            var rowdownid = rowsObj[rowindex - 1]
+            console.log("row: " + rowdownid);
+            if ($(blockid).hasClass("story")) {
+                var gindex = $(blockid).parents(".grouprelease").index();
+                var gid = groupsObj[gindex];
+                console.log("group index: " + gindex);
+                var colindex = $(blockid).parents(".epic").index();
+                var colid = columnsObj[gid][colindex];
+                var stories = itemsObj[rowid][colid];
+                var i = stories.indexOf(textbox);
+                console.log("index of story: " + i);
+
+                //    console.log("array before: " + cols);
+                var j = stories.splice(i, 1).toString();
+                console.log("story spliced: " + j);
+                // carry on from here to splice a story to the correct epic
+                var trowid = rowsObj[rowindex - 1];
+                var tstories = itemsObj[trowid][colid];
+                tstories.push(j);
+               // tstories.splice(0, 0, j);
+                //  console.log("array after: " + cols);
+                //columnsObj[gid] = tstories;
+                board["items"] = itemsObj;
+
+                saveToLocalStorage();
+                htmlfromarray(loadfilename);
+
+                var blockid = document.getElementById(textbox);
+                blockid.scrollIntoView(true);
+                // location.reload();
+
+            };
+        }
+    });
+
     $(document).on("click", "#moveright", function () {
         var blockid = document.getElementById(textbox);
         var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
@@ -636,7 +688,7 @@ $(function () {
     };
     function updateItemsObj() {
         itemsObj = {};
-        rowsObj = {};
+      //  rowsObj = [];
 
         var w = 0;
         $(".row").each(function () {
@@ -1452,6 +1504,9 @@ $(function () {
 
         var block = document.getElementById(storytextid);
         $(block).find(".textbox").focus();
+        saveToLocalStorage();
+        event.stopPropagation();
+                
     //    $(this).hide();
     });//Create new story when addStory clicked
     $(document).on("keydown", ".storytext", function (event) {
