@@ -491,6 +491,29 @@ $(function () {
                     // location.reload();
                 
             };
+            if ($(blockid).hasClass("iteration")) {
+                var cols = rowsObj;
+                var i = cols.indexOf(textbox);
+                console.log("index of row: " + i);
+                if (rowsObj.length > (i + 1)) {
+                    console.log("array before: " + cols);
+                    var j = cols.splice(i, 1).toString();
+                    console.log("row spliced: " + j);
+                    var k = i + 1;
+                    cols.splice(k, 0, j);
+                    console.log("array after: " + cols);
+                    rowsObj = cols;
+                    board["rows"] = rowsObj;
+                    saveToLocalStorage();
+                    htmlfromarray(loadfilename);
+                    // location.reload();
+                }
+
+                var blockid = document.getElementById(textbox);
+                blockid.scrollIntoView(true);
+                // location.reload();
+
+            };
         }
     });
     $(document).on("click", "#moveup", function () {
@@ -534,9 +557,27 @@ $(function () {
                 // location.reload();
 
             };
+            if ($(blockid).hasClass("iteration")) {
+                var cols = rowsObj;
+                var i = cols.indexOf(textbox);
+                console.log("index of row: " + i);
+                if (i > 0) {
+                    console.log("array before: " + cols);
+                    var j = cols.splice(i, 1).toString();
+                    console.log("row spliced: " + j);
+                    var k = i - 1;
+                    cols.splice(k, 0, j);
+                    console.log("array after: " + cols);
+                    rowsObj = cols;
+                    board["rows"] = rowsObj;
+                    saveToLocalStorage();
+                    htmlfromarray(loadfilename);
+                    // location.reload();
+                }
+
+            };
         }
     });
-
     $(document).on("click", "#moveright", function () {
         var blockid = document.getElementById(textbox);
         var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
