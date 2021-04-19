@@ -535,15 +535,18 @@ $(function () {
     });
     $(document).on("click", "#moveup", function () {
         var blockid = document.getElementById(textbox);
+
+
+
         var rowscount = rowsObj.length;
         var rowid = $(blockid).parents(".row").find(".iteration").attr("id");
         console.log("rowid: " + rowid);
         console.log("rowsobj: " + rowsObj);
         var rowindex = rowsObj.indexOf(rowid);
         console.log("row: " + rowindex);
-        if (rowindex > 0) {
-            var rowdownid = rowsObj[rowindex - 1]
-            console.log("row: " + rowdownid);
+        
+          //  var rowdownid = rowsObj[rowindex - 1]
+           // console.log("row: " + rowdownid);
             if ($(blockid).hasClass("story")) {
                 var gindex = $(blockid).parents(".grouprelease").index();
                 var gid = groupsObj[gindex];
@@ -553,28 +556,32 @@ $(function () {
                 var stories = itemsObj[rowid][colid];
                 var i = stories.indexOf(textbox);
                 console.log("index of story: " + i);
+                if ((i === 0 && rowsObj[rowindex - 1]) || i > 0) {
+                    //    console.log("array before: " + cols);
+                    var j = stories.splice(i, 1).toString();
+                    console.log("story spliced: " + j);
+                    // carry on from here to splice a story to the correct epic
+                    if (i === 0) {
+                        var trowid = rowsObj[rowindex - 1];
+                        var tstories = itemsObj[trowid][colid];
+                        tstories.push(j);
+                    } else {
+                        stories.splice(i - 1, 0, j)
+                    };
+                    // tstories.splice(0, 0, j);
+                    //  console.log("array after: " + cols);
+                    //columnsObj[gid] = tstories;
+                    board["items"] = itemsObj;
 
-                //    console.log("array before: " + cols);
-                var j = stories.splice(i, 1).toString();
-                console.log("story spliced: " + j);
-                // carry on from here to splice a story to the correct epic
-                var trowid = rowsObj[rowindex - 1];
-                var tstories = itemsObj[trowid][colid];
-                tstories.push(j);
-               // tstories.splice(0, 0, j);
-                //  console.log("array after: " + cols);
-                //columnsObj[gid] = tstories;
-                board["items"] = itemsObj;
+                    saveToLocalStorage();
+                    htmlfromarray(loadfilename);
 
-                saveToLocalStorage();
-                htmlfromarray(loadfilename);
-
-                var blockid = document.getElementById(textbox);
-                blockid.scrollIntoView(true);
-                // location.reload();
-
+                    var blockid = document.getElementById(textbox);
+                    blockid.scrollIntoView(true);
+                    // location.reload();
+                }
             };
-            if ($(blockid).hasClass("iteration")) {
+            if ($(blockid).hasClass("iteration") && rowindex > 0) {
                 var cols = rowsObj;
                 var i = cols.indexOf(textbox);
                 console.log("index of row: " + i);
@@ -593,7 +600,7 @@ $(function () {
                 }
 
             };
-        }
+        
     });
  
     $(document).on("click", "#moveleft", function () {
