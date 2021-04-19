@@ -710,7 +710,8 @@ $(function () {
         itemsObj = board["items"];
         blocktitlearray = board["titles"];
         blockdetailsarray = board["details"];
-        typeItemsObj = board["itemtypes"];
+        if (board["itemtypes"]) { typeItemsObj = board["itemtypes"] } else {
+            typeItemsObj = {} };
     };
     };
     function saveToLocalStorage() { //  SAVE BOARD 
