@@ -9,8 +9,10 @@ $(function () {
 
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
-        groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock, sleft, stop;
+        groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock, sleft, stop,
+        typeItemsObj;
     var boardlistobject = [];
+    var boardtypes = ["Story","Bug"];
     //blockdetailsarray = {};;
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
     function guid() {
@@ -155,13 +157,14 @@ $(function () {
 
         $("#board").empty(); //Clear current board html
 
-        board = { "name": boardname, "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {} };
+        board = {"name": boardname, "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}};
         groupsObj = [];
         columnsObj = {};
         rowsObj = [];
         itemsObj = {};
         blocktitlearray = {};
         blockdetailsarray = {};
+        typeItemsObj = {};
 
         localStorage.setItem("currentboard", boardname);
         loadfilename = boardname;
@@ -621,7 +624,6 @@ $(function () {
         $("#board").scrollTop(stop);
         console.log("scroll: " + sleft + ", " + stop);  
     });
- 
     $(document).on("click", "#moveleft", function () {
         var blockid = document.getElementById(textbox);
 
@@ -674,6 +676,27 @@ $(function () {
         console.log("scroll: " + sleft + ", " + stop);
     });
 
+    //SUBSETS//
+
+    $('#typelist').on('change', function () {
+       
+        updateTypeItemsObj(textbox, this.value);
+
+    });
+    function updatesubsets() {
+        //board load options
+        $('#typelist').empty();//empty board options
+        $.each(boardtypes, function (i, value) {
+            $('#typelist')
+                .append($("<option></option>")
+                    .attr("value", value)
+                    .text(value));
+        });//Update board load options
+        console.log("Selected:" + typeItemsObj[textbox]);
+        $('#typelist').val(typeItemsObj[textbox]);
+    };
+
+
     //JSON OBJECTS//
     function loadJSONobjects(filename) {
     var boarddata = localStorage.getItem(filename);
@@ -687,6 +710,7 @@ $(function () {
         itemsObj = board["items"];
         blocktitlearray = board["titles"];
         blockdetailsarray = board["details"];
+        typeItemsObj = board["itemtypes"];
     };
     };
     function saveToLocalStorage() { //  SAVE BOARD 
@@ -857,6 +881,14 @@ $(function () {
         
        // console.log("board");
         //console.log(board);
+    };
+    function updateTypeItemsObj(blockid,type) {
+        typeItemsObj[blockid] = type;
+        board["itemtypes"] = typeItemsObj;
+        console.log("Type items:" + typeItemsObj);
+        //  console.log(blockdetailsarray);
+        saveToLocalStorage();
+       
     };
     function boxhtml(boxtype, textboxid, title, childitems) {
         var htmlData = "";
@@ -1286,6 +1318,7 @@ $(function () {
         var tcolour = $(this).css("color");
         $("#infobox-navbar").css("color", tcolour);
 
+        updatesubsets(); //Display status
 
         $("#blockname").val(currentText);
         console.log("Click on " + blockid);
@@ -1783,6 +1816,8 @@ $(function () {
 
         var tcolor = $(this).parent().css('color');
         $("#infobox-navbar").css('color', tcolor); //make title colour the same as the block type
+
+        updatesubsets(); //Display status
                 
     });//Display description in description panel
     $(document).on("keyup", ".textbox", function (event) {
