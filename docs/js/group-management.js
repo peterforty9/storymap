@@ -9,7 +9,7 @@ $(function () {
 
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
-        groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock;
+        groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock, sleft, stop;
     var boardlistobject = [];
     //blockdetailsarray = {};;
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
@@ -429,6 +429,8 @@ $(function () {
 
     });
     $(document).on("click", "#moveright", function () {
+        sleft = $("#board").scrollLeft();
+        stop = $("#board").scrollTop();
         var blockid = document.getElementById(textbox);
         var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
         console.log("group: " + gid);
@@ -467,9 +469,15 @@ $(function () {
             };
 
         };
+
+        $("#board").scrollLeft(sleft);
+        $("#board").scrollTop(stop);
     });
     $(document).on("click", "#movedown", function () {
         var blockid = document.getElementById(textbox);
+        sleft = $("#board").scrollLeft();
+        stop = $("#board").scrollTop();
+
         var rowscount = rowsObj.length;
         var rowid = $(blockid).parents(".row").find(".iteration").attr("id");
         console.log("rowid: " + rowid);
@@ -532,11 +540,15 @@ $(function () {
 
             };
         }
+        $("#board").scrollLeft(sleft);
+        $("#board").scrollTop(stop);
     });
     $(document).on("click", "#moveup", function () {
         var blockid = document.getElementById(textbox);
-
-
+        
+        sleft = $("#board").scrollLeft();
+        stop = $("#board").scrollTop();
+        console.log("scroll: " + sleft + ", " + stop);
 
         var rowscount = rowsObj.length;
         var rowid = $(blockid).parents(".row").find(".iteration").attr("id");
@@ -576,8 +588,9 @@ $(function () {
                     saveToLocalStorage();
                     htmlfromarray(loadfilename);
 
-                    var blockid = document.getElementById(textbox);
-                    blockid.scrollIntoView(true);
+                    blockid = document.getElementById(textbox);
+                    
+                    //blockid.scrollIntoView(true);
                     // location.reload();
                 }
             };
@@ -596,15 +609,25 @@ $(function () {
                     board["rows"] = rowsObj;
                     saveToLocalStorage();
                     htmlfromarray(loadfilename);
+
+                    blockid = document.getElementById(textbox);
+               
                     // location.reload();
+
                 }
 
             };
-        
+        $("#board").scrollLeft(sleft);
+        $("#board").scrollTop(stop);
+        console.log("scroll: " + sleft + ", " + stop);  
     });
  
     $(document).on("click", "#moveleft", function () {
         var blockid = document.getElementById(textbox);
+
+        sleft = $("#board").scrollLeft();
+        stop = $("#board").scrollTop();
+
         var gid = $(blockid).parents(".groupcontainer").find(".group").attr("id");
         console.log("group: " + gid);
         var gind = groupsObj.indexOf(gid);
@@ -646,6 +669,9 @@ $(function () {
             };
 
         };
+        $("#board").scrollLeft(sleft);
+        $("#board").scrollTop(stop);
+        console.log("scroll: " + sleft + ", " + stop);
     });
 
     //JSON OBJECTS//
