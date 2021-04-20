@@ -10,9 +10,10 @@ $(function () {
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock, sleft, stop,
-        typeItemsObj;
+        typeItemsObj, statusItemsObj;
     var boardlistobject = [];
-    var boardtypes = ["Story","Bug"];
+    var boarditemtypes = ["Story", "Bug"];
+    var boarditemstatus = ["To do","Prioritised","In progress","Done"];
     //blockdetailsarray = {};;
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
     function guid() {
@@ -165,6 +166,7 @@ $(function () {
         blocktitlearray = {};
         blockdetailsarray = {};
         typeItemsObj = {};
+        statusItemsObj = {};
 
         localStorage.setItem("currentboard", boardname);
         loadfilename = boardname;
@@ -297,6 +299,8 @@ $(function () {
                                     var storytitle = board["titles"][storyid];
                                     var storyblock = boxhtml("story", storyid, storytitle);
                                     var storieshtml = storieshtml + storyblock;
+                                   // var type = board["itemtypes"][storyid];
+                                   // var status = board["statustypes"][storyid];
                                     si++;
                                 }
                                 while (si < storiescount)
@@ -683,10 +687,15 @@ $(function () {
         updateTypeItemsObj(textbox, this.value);
 
     });
+    $('#statuslist').on('change', function () {
+
+        updateStatusItemsObj(textbox, this.value);
+
+    });
     function updatesubsets() {
         //board load options
         $('#typelist').empty();//empty board options
-        $.each(boardtypes, function (i, value) {
+        $.each(boarditemtypes, function (i, value) {
             $('#typelist')
                 .append($("<option></option>")
                     .attr("value", value)
@@ -694,6 +703,16 @@ $(function () {
         });//Update board load options
         console.log("Selected:" + typeItemsObj[textbox]);
         $('#typelist').val(typeItemsObj[textbox]);
+
+        $('#statuslist').empty();//empty board options
+        $.each(boarditemstatus, function (i, value) {
+            $('#statuslist')
+                .append($("<option></option>")
+                    .attr("value", value)
+                    .text(value));
+        });//Update board load options
+        console.log("Selected:" + statusItemsObj[textbox]);
+        $('#statuslist').val(statusItemsObj[textbox]);
     };
 
 
@@ -711,7 +730,11 @@ $(function () {
         blocktitlearray = board["titles"];
         blockdetailsarray = board["details"];
         if (board["itemtypes"]) { typeItemsObj = board["itemtypes"] } else {
-            typeItemsObj = {} };
+            typeItemsObj = {}
+        };
+        if (board["itemstatus"]) { statusItemsObj = board["itemstatus"] } else {
+            statusItemsObj = {}
+        };
     };
     };
     function saveToLocalStorage() { //  SAVE BOARD 
@@ -888,8 +911,14 @@ $(function () {
         board["itemtypes"] = typeItemsObj;
         console.log("Type items:" + typeItemsObj);
         //  console.log(blockdetailsarray);
+        saveToLocalStorage();       
+    };
+    function updateStatusItemsObj(blockid, status) {
+        statusItemsObj[blockid] = status;
+        board["itemstatus"] = statusItemsObj;
+        console.log("Status items:" + statusItemsObj);
+        //  console.log(blockdetailsarray);
         saveToLocalStorage();
-       
     };
     function boxhtml(boxtype, textboxid, title, childitems) {
         var htmlData = "";
@@ -916,7 +945,7 @@ $(function () {
         console.log(boxtype + " created");
         return htmlData;
     };  //Generate object html
-
+ 
     ////////// BLOCK MOVEMENT MANAGEMENT ////////////////
         
     $("body").on("DOMNodeInserted", "#board", makeSortable);//Listen out for newly created blocks and make sortable
