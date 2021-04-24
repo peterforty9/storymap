@@ -10,11 +10,11 @@ $(function () {
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock, sleft, stop,
-        typeItemsObj, statusItemsObj;
-    var boardlistobject = [];
-    var boarditemtypes = ["Story", "Bug"];
-    var boarditemstatus = ["To do","Prioritised","In progress","Done"];
-    //blockdetailsarray = {};;
+        typeItemsObj, statusItemsObj, subsetsObj;
+
+   
+    //Build status list from status board items
+  
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
     function guid() {
         var id = (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
@@ -22,8 +22,7 @@ $(function () {
     }; // Generate GUID
 
     //// PAGE LOAD MANAGEMENT /////
-
-
+    
     var currentBoard = localStorage.getItem("currentboard");
 
     loadfilename = currentBoard;
@@ -158,7 +157,7 @@ $(function () {
 
         $("#board").empty(); //Clear current board html
 
-        board = {"name": boardname, "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}};
+        board = { "name": boardname, "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}, "subsets": {}};
         groupsObj = [];
         columnsObj = {};
         rowsObj = [];
@@ -167,6 +166,7 @@ $(function () {
         blockdetailsarray = {};
         typeItemsObj = {};
         statusItemsObj = {};
+        subsetsObj = {};
 
         localStorage.setItem("currentboard", boardname);
         loadfilename = boardname;
@@ -680,42 +680,8 @@ $(function () {
         console.log("scroll: " + sleft + ", " + stop);
     });
 
-    //SUBSETS//
 
-    $('#typelist').on('change', function () {
-       
-        updateTypeItemsObj(textbox, this.value);
-
-    });
-    $('#statuslist').on('change', function () {
-
-        updateStatusItemsObj(textbox, this.value);
-
-    });
-    function updatesubsets() {
-        //board load options
-        $('#typelist').empty();//empty board options
-        $.each(boarditemtypes, function (i, value) {
-            $('#typelist')
-                .append($("<option></option>")
-                    .attr("value", value)
-                    .text(value));
-        });//Update board load options
-        console.log("Selected:" + typeItemsObj[textbox]);
-        $('#typelist').val(typeItemsObj[textbox]);
-
-        $('#statuslist').empty();//empty board options
-        $.each(boarditemstatus, function (i, value) {
-            $('#statuslist')
-                .append($("<option></option>")
-                    .attr("value", value)
-                    .text(value));
-        });//Update board load options
-        console.log("Selected:" + statusItemsObj[textbox]);
-        $('#statuslist').val(statusItemsObj[textbox]);
-    };
-
-
+ 
     //JSON OBJECTS//
     function loadJSONobjects(filename) {
     var boarddata = localStorage.getItem(filename);
@@ -729,14 +695,95 @@ $(function () {
         itemsObj = board["items"];
         blocktitlearray = board["titles"];
         blockdetailsarray = board["details"];
-        if (board["itemtypes"]) { typeItemsObj = board["itemtypes"] } else {
-            typeItemsObj = {}
-        };
-        if (board["itemstatus"]) { statusItemsObj = board["itemstatus"] } else {
-            statusItemsObj = {}
-        };
+        subsetsObj = board["subsets"];
+     /*   if (board["subsets"]) { subsetsObj = board["subsets"] } else {
+            subsetsObj = { "status": {}, "type": {} }
+        };*/
     };
     };
+
+    //SUBSETS//
+
+    var boardlistobject = [];
+    var subsetBoard = localStorage.getItem("boardoptions");
+    if (subsetBoard) {
+        var subsetlist = [];
+        var subsetBoardData = JSON.parse(subsetBoard);
+        var gro = subsetBoardData["groups"][0];
+        for (i = 0; i < subsetBoardData["columns"][gro].length; i++) {
+            var subsetvalues = [];
+            var row = subsetBoardData["rows"][0];
+
+            var col = subsetBoardData["columns"][gro][i];
+            var boarditemstatuskeys = subsetBoardData["items"][row][col];
+            var label = subsetBoardData["titles"][subsetBoardData["columns"][gro][i]];
+            //  $("label[for='subset" + i + "']").html(label);
+            console.log("row:" + row + ",col," + col + ", " + boarditemstatuskeys);
+
+            boarditemstatuskeys.forEach(setItemStatus)
+            function setItemStatus(item) {
+                subsetvalues.push(item);
+                console.log("set subset value:" + item + "," + subsetBoardData["titles"][item]);
+            };
+            subsetlist.push(subsetvalues);
+
+            if (subsetsObj[col]) { } else {
+                
+                subsetsObj[col] = {};
+            }; //create board object if it does not exist
+
+            //var listname = "subset" + i;
+            var listname = subsetBoardData["columns"][gro][i]
+            //  <label for="subset1">Type</label>
+            //     <select id="subset1"></select>
+            var subsetSelect = document.createElement('select');
+            subsetSelect.id = listname;
+            subsetSelect.name = label;
+
+            var subsetLabel = document.createElement('label');
+            subsetLabel.setAttribute("for", subsetSelect);
+            subsetLabel.innerHTML = label;
+
+            $("#subsetsfieldset").append(subsetLabel);
+            $("#subsetsfieldset").append(subsetSelect);
+
+            subsetSelect.onchange = subsetChange; //add onchange event
+
+            console.log(subsetLabel + "," + subsetSelect);
+
+            $("#" + listname).empty();//empty board options
+            $.each(subsetlist[i], function (j, value) {
+                var text = subsetBoardData["titles"][value];
+                $("#" + listname)
+                    .append($("<option></option>")
+                        .attr("value", value)
+                        .text(text));
+            });//Update subset list options
+
+        };
+    };// If there is a localStorage boardlist array, retrieve it
+    function subsetChange() {
+
+        console.log("Subset " + this.id + " changed to:" + this.value);
+        updatesubsetObj(textbox, this.value, this.id);
+        // updateTypeItemsObj(textbox, this.value);
+
+    };
+    function updatesubsets() {
+        //fetch block subsets
+        for (j = 0; j < subsetBoardData["columns"][gro].length; j++) {
+            //var listname = "subset" + j;
+            var listname = subsetBoardData["columns"][gro][j];
+            //var label = $("#" + listname).attr("name");
+            var label = $("#" + listname).attr("id");
+            console.log("LabelID of changed item:" + label);
+            if (subsetsObj[label]) {
+                $("#" + listname).val(subsetsObj[label][textbox]);
+            };
+        };
+
+    };
+
     function saveToLocalStorage() { //  SAVE BOARD 
      
         var boardobject = JSON.stringify(board);
@@ -905,6 +952,19 @@ $(function () {
         
        // console.log("board");
         //console.log(board);
+    };
+    function updatesubsetObj(blockid, value, label) {
+        console.log("update subset (id, value, label):" + blockid + ", " + value + "," + label);
+        if (subsetsObj[label]) {
+            subsetsObj[label][blockid] = value
+        } else {
+            subsetsObj[label] = {};
+            subsetsObj[label][blockid] = value;
+        };
+        board["subsets"] = subsetsObj;
+        console.log("subsets object saved:" + subsetsObj);
+        //  console.log(blockdetailsarray);
+        saveToLocalStorage();
     };
     function updateTypeItemsObj(blockid,type) {
         typeItemsObj[blockid] = type;
@@ -1348,7 +1408,9 @@ $(function () {
         var tcolour = $(this).css("color");
         $("#infobox-navbar").css("color", tcolour);
 
-        updatesubsets(); //Display status
+        if (subsetBoard) {
+            updatesubsets(); //Display status
+        }
 
         $("#blockname").val(currentText);
         console.log("Click on " + blockid);
@@ -1847,7 +1909,9 @@ $(function () {
         var tcolor = $(this).parent().css('color');
         $("#infobox-navbar").css('color', tcolor); //make title colour the same as the block type
 
-        updatesubsets(); //Display status
+        if (subsetBoard) {
+            updatesubsets(); //Display status
+        }
                 
     });//Display description in description panel
     $(document).on("keyup", ".textbox", function (event) {
