@@ -695,10 +695,10 @@ $(function () {
         itemsObj = board["items"];
         blocktitlearray = board["titles"];
         blockdetailsarray = board["details"];
-        subsetsObj = board["subsets"];
-     /*   if (board["subsets"]) { subsetsObj = board["subsets"] } else {
-            subsetsObj = { "status": {}, "type": {} }
-        };*/
+       // subsetsObj = board["subsets"];
+        if (board["subsets"]) { subsetsObj = board["subsets"] } else {
+            subsetsObj = {};
+        };
     };
     };
 
