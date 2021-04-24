@@ -704,7 +704,7 @@ $(function () {
 
     //SUBSETS//
 
-    var boardlistobject = [];
+    //var boardlistobject = [];
     var subsetBoard = localStorage.getItem("boardoptions");
     if (subsetBoard) {
         var subsetlist = [];
