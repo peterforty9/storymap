@@ -66,13 +66,18 @@ $(function () {
                     deletestory($(blockid).find(".textbox"));
                     console.log("block deleted");
                     $(this).dialog("close");
-                };
+                } else if ($(blockid).hasClass("column")) {
+                    var column = $(blockid).parents("li")
+                    if (columnempty(column)) {
+                        removecolumn(column);
+                        saveToLocalStorage()
+                    }}
             },
             Cancel: function () {
                 $(this).dialog("close");
             }
         }
-    }); // Confirm New board creation 
+    }); // Confirm delete block
     $("#delete-confirm").dialog({
         autoOpen: false,
         resizable: false,
