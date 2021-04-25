@@ -10,9 +10,8 @@ $(function () {
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock, sleft, stop,
-        typeItemsObj, statusItemsObj, subsetsObj;
-
-   
+        typeItemsObj, statusItemsObj, subsetsObj, settingsBoard;
+       
     //Build status list from status board items
   
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
@@ -148,6 +147,31 @@ $(function () {
             }
         }
     });// Confirm Load board
+    dialog = $("#boardSettings").dialog({
+        autoOpen: false,
+        resizable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+            "Continue": function () {
+                settingsBoard = $("#settingsBoard").val();
+                board["settings"] = settingsBoard;
+                saveToLocalStorage();
+                console.log("Settings board = " + settingsBoard);
+               // loadJSONobjects(loadfilename);
+               // htmlfromarray(loadfilename);
+               // localStorage.setItem("currentboard", loadfilename);
+                //updateboardlist(loadfilename.val());
+                // createBoardJSON(filename.val());
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    });// Confirm Load board
+
     newboardform = dialog.find("form").on("submit", function (event) {
         event.preventDefault();
         filename = $("#filename");
@@ -157,7 +181,7 @@ $(function () {
 
         $("#board").empty(); //Clear current board html
 
-        board = { "name": boardname, "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}, "subsets": {}};
+        board = { "name": boardname, "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}, "subsets": {}, "settings":""};
         groupsObj = [];
         columnsObj = {};
         rowsObj = [];
@@ -167,6 +191,7 @@ $(function () {
         typeItemsObj = {};
         statusItemsObj = {};
         subsetsObj = {};
+        settings = "";
 
         localStorage.setItem("currentboard", boardname);
         loadfilename = boardname;
@@ -350,6 +375,8 @@ $(function () {
         document.getElementById("menuGroups").checked ? $(".group").show() : $(".group").hide()
 
     });
+
+    //Board settings
     function toggleGroups() {
         $("#group").toggle();
     }
@@ -372,6 +399,25 @@ $(function () {
                     attr == "threecolumns.css" ? "fourcolumns.css" : "singlecolumn.css"))
         });
     }); // Update number of column columns
+    $(document).on("click", "#boardSettingsbutton", function () { //open new map from array
+        updateSettingsBoardList();
+        if (settingsBoard) {
+            $("#settingsBoard").val(settingsBoard);
+        } else { $("#settingsBoard").val(null) };
+        $("#boardSettings").dialog("open");
+        // console.log("array map loaded");
+    });
+    function updateSettingsBoardList() {
+        //board load options
+        $('#settingsBoard').empty();//empty board options
+        $.each(boardlistobject, function (i, value) {
+            $('#settingsBoard')
+                .append($("<option></option>")
+                    .attr("value", value)
+                    .text(value));
+        });//Update board load options
+    }
+
     openFile = function (event) {
 
         var input = event.target;
@@ -435,6 +481,7 @@ $(function () {
         $("#deleteblock-confirm").dialog("open");
 
     });
+    //Move board items
     $(document).on("click", "#moveright", function () {
         sleft = $("#board").scrollLeft();
         stop = $("#board").scrollTop();
@@ -679,8 +726,7 @@ $(function () {
         $("#board").scrollTop(stop);
         console.log("scroll: " + sleft + ", " + stop);
     });
-
-
+    
  
     //JSON OBJECTS//
     function loadJSONobjects(filename) {
@@ -695,17 +741,17 @@ $(function () {
         itemsObj = board["items"];
         blocktitlearray = board["titles"];
         blockdetailsarray = board["details"];
-       // subsetsObj = board["subsets"];
         if (board["subsets"]) { subsetsObj = board["subsets"] } else {
             subsetsObj = {};
         };
+        if (board["settings"]) { settingsBoard = board["settings"] };
     };
     };
 
     //SUBSETS//
 
     //var boardlistobject = [];
-    var subsetBoard = localStorage.getItem("boardoptions");
+    var subsetBoard = localStorage.getItem(settingsBoard);
     if (subsetBoard) {
         var subsetlist = [];
         var subsetBoardData = JSON.parse(subsetBoard);

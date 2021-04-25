@@ -43,10 +43,10 @@
             <div id="subsets" class="blocksubmenu-item">
                 <form>
                     <fieldset id="subsetsfieldset">
-                      <!--  <label for="subset1">Type</label>
-                        <select id="subset1"></select>
-                        <label for="subset0">State</label>
-                        <select id="subset0"></select> -->
+                        <!--  <label for="subset1">Type</label>
+                          <select id="subset1"></select>
+                          <label for="subset0">State</label>
+                          <select id="subset0"></select> -->
                     </fieldset>
                 </form>
             </div>
@@ -57,43 +57,54 @@
             <label class='container' id=new><i class='fas fa-table'></i></label>
             <label class='container' id=loadarray title='load'><i class='fas fa-file-upload'></i></label>
             <label class='container' id=savearray><i class='fas fa-save'></i></label>
-            <label class='container' id='colwidth'><i class='fas fa-cog'></i></label>
+            <label class='container' id='boardSettingsbutton'><i class='fas fa-cog'></i></label>
             <label class='container' id='deleteboard'><i class='fas fa-trash-alt'></i></label>
-          
+
         </div>
     </div>
-        <div id="deleteblock-confirm" title="Delete block?">
-            <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
-        </div>
-        <div id="delete-confirm" title="Delete map?">
-            <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
-        </div>
-        <div id="save-confirm" title="Save board?">
-            <form>
-                <fieldset>
-                    <label for="filename">Filename</label>
-                    <input type="text" name="filename" id="filename" value="" class="text ui-widget-content ui-corner-all">
+    <div id="deleteblock-confirm" title="Delete block?">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    </div>
+    <div id="delete-confirm" title="Delete map?">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    </div>
+    <div id="save-confirm" title="Save board?">
+        <form>
+            <fieldset>
+                <label for="filename">Filename</label>
+                <input type="text" name="filename" id="filename" value="" class="text ui-widget-content ui-corner-all">
 
-                    
-                    <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                    <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-                </fieldset>
-            </form>
-            <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
-        </div>
-        <div id="load-confirm" title="Load board?">
-            <form>
-                <fieldset>
-                    <label for="loadfilename">Filename</label>
-                    <select id="loadfilename"></select>
-                    <!--<input type="text" name="loadfilename" id="loadfilename" value="" class="text ui-widget-content ui-corner-all">-->
-                    <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                    <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-                </fieldset>
-            </form>
-            <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
-        </div>
-   
+                <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+        </form>
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    </div>
+    <div id="load-confirm" title="Load board?">
+        <form>
+            <fieldset>
+                <label for="loadfilename">Filename</label>
+                <select id="loadfilename"></select>
+                <!--<input type="text" name="loadfilename" id="loadfilename" value="" class="text ui-widget-content ui-corner-all">-->
+                <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+        </form>
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    </div>
+    <div id="boardSettings" title="Board settings">
+        <form>
+            <fieldset>
+                <label for="settingsBoard">Settings board</label>
+                <select id="settingsBoard"></select>
+                <!--<input type="text" name="loadfilename" id="loadfilename" value="" class="text ui-widget-content ui-corner-all">-->
+                <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+        </form>
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    </div>
+
 </body>
 
 
