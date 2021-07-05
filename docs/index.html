@@ -68,12 +68,18 @@
     <div id="delete-confirm" title="Delete map?">
         <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
     </div>
-    <div id="save-confirm" title="Save board?">
+    <div id="save-confirm" title="Create new board?">
         <form>
             <fieldset>
                 <label for="filename">Filename</label>
                 <input type="text" name="filename" id="filename" value="" class="text ui-widget-content ui-corner-all">
 
+                <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+            <fieldset>
+                <label for="settingsBoardNew">Settings board</label>
+                <select id="settingsBoardNew"></select>
                 <!-- Allow form submission with keyboard without duplicating the dialog button -->
                 <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
             </fieldset>

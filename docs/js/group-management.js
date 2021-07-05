@@ -119,11 +119,16 @@ $(function () {
                 if (fileexists >= 0) {
 
                 } else {
-                    newboard(filename);
+                    /// settings board
+                    settingsBoard = $("#settingsBoardNew").val();
+                   
+                    newboard(filename, settingsBoard);
                     //board["name"] = filename;
 
                     // createBoardJSON(filename.val());
                     $(this).dialog("close");
+
+                   
                 };
             },
             Cancel: function () {
@@ -182,11 +187,11 @@ $(function () {
         filename = $("#filename");
         createBoardJSON(filename.val());
     });
-    function newboard(boardname) {  // Generate new board
+    function newboard(boardname, settings) {  // Generate new board
 
         $("#board").empty(); //Clear current board html
 
-        board = { "name": boardname, "columns":[], "groupColumns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}, "subsets": {}, "settings":""};
+        board = { "name": boardname, "columns":[], "groupColumns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}, "subsets": {}, "settings": settings};
         groupsObj = [];
         groupColumnsObj = {};
         columnsArray = [];
@@ -418,8 +423,13 @@ $(function () {
     function updateSettingsBoardList() {
         //board load options
         $('#settingsBoard').empty();//empty board options
+        $('#settingsBoardNew').empty();//empty board options
         $.each(boardlistobject, function (i, value) {
             $('#settingsBoard')
+                .append($("<option></option>")
+                    .attr("value", value)
+                    .text(value));
+            $('#settingsBoardNew')
                 .append($("<option></option>")
                     .attr("value", value)
                     .text(value));
@@ -441,7 +451,10 @@ $(function () {
         reader.readAsText(input.files[0]);
     }; //upload file
     $(document).on("click", "#new", function () { //open new map from html template
+        updateSettingsBoardList();
+        $("#settingsBoardNew").val(null)
         $("#save-confirm").dialog("open");
+
         //newboard();
         // $("#dialog-confirm").dialog("open");
         // newboard();
@@ -835,6 +848,7 @@ $(function () {
 
     };
     function updatesubsets() {
+        console.log("Update subsets from " + subsetBoardData["name"]);
         //fetch block subsets
         for (j = 0; j < subsetBoardData["groupColumns"][gro].length; j++) {
             //var listname = "subset" + j;
