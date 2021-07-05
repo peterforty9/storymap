@@ -33,8 +33,7 @@ $(function () {
     var localboardlistobject = localStorage.getItem("boardlist");
     if (localboardlistobject) {
         boardlistobject = JSON.parse(localboardlistobject);
-    } else { boardlistobject = "[]"}
-    ;// If there is a localStorage boardlist array, retrieve it
+    } else { boardlistobject = []} ;// If there is a localStorage boardlist array, retrieve it
 
     function updateboardlistoptions() {
         //board load options
