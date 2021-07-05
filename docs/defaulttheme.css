@@ -1,7 +1,7 @@
 ﻿body {
 }
 .blockselected {
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.8);
+    box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.8);
  
 }
 .group {

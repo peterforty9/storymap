@@ -9,8 +9,8 @@ $(function () {
 
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
-        groupsObj, columnsObj, rowsObj, itemsObj, selectedBlock, sleft, stop,
-        typeItemsObj, statusItemsObj, subsetsObj, settingsBoard;
+        groupsObj, groupColumnsObj, groupColumnsArray, columnsArray, rowsObj, itemsObj, itemsArray, selectedBlock, sleft, stop,
+        typeItemsObj, statusItemsObj, subsetsObj, settingsBoard, relationshipArray, boardlistobject;
        
     //Build status list from status board items
   
@@ -33,7 +33,8 @@ $(function () {
     var localboardlistobject = localStorage.getItem("boardlist");
     if (localboardlistobject) {
         boardlistobject = JSON.parse(localboardlistobject);
-    };// If there is a localStorage boardlist array, retrieve it
+    } else { boardlistobject = "[]"}
+    ;// If there is a localStorage boardlist array, retrieve it
 
     function updateboardlistoptions() {
         //board load options
@@ -186,11 +187,14 @@ $(function () {
 
         $("#board").empty(); //Clear current board html
 
-        board = { "name": boardname, "columns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}, "subsets": {}, "settings":""};
+        board = { "name": boardname, "columns":[], "groupColumns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}, "subsets": {}, "settings":""};
         groupsObj = [];
-        columnsObj = {};
+        groupColumnsObj = {};
+        columnsArray = [];
+        groupColumnsArray = [];
         rowsObj = [];
         itemsObj = {};
+        itemsArray = [];
         blocktitlearray = {};
         blockdetailsarray = {};
         typeItemsObj = {};
@@ -257,9 +261,9 @@ $(function () {
             var cols = "";
             var gid = board["groups"][i];
 
-            for (j = 0; j < board["columns"][gid].length; ++j) {
-                var tit = board["titles"][board["columns"][gid][j]]; //column title from title array
-                cols += boxhtml("column", board["columns"][gid][j], tit);
+            for (j = 0; j < board["groupColumns"][gid].length; ++j) {
+                var tit = board["titles"][board["groupColumns"][gid][j]]; //column title from title array
+                cols += boxhtml("column", board["groupColumns"][gid][j], tit);
             };
             //var grouptitle = board["items"].rows[0].groups[i].title;
             var grouptitle = board["titles"][gid]; //group titles from titles array
@@ -307,12 +311,12 @@ $(function () {
                 newrelease = newrelease + newgroupstart;
                 // column count for group m in the array
                 var gid = board["groups"][k];
-                var columncount = board["columns"][gid].length;
+                var columncount = board["groupColumns"][gid].length;
                 console.log("group " + k + " has " + columncount + " columnheader");
 
                 if (columncount > 0) {
                     do {
-                        var columnId = board["columns"][gid][i];
+                        var columnId = board["groupColumns"][gid][i];
                         console.log("Column ID: " + columnId);
                         //create stories
                         if (board["items"][crowid][columnId] != undefined) {
@@ -495,40 +499,44 @@ $(function () {
         console.log("group: " + gid);
         var gind = groupsObj.indexOf(gid);
         if ($(blockid).hasClass("column") ) {
-            var cols = columnsObj[gid];
+            var cols = groupColumnsObj[gid];
             var i = cols.indexOf(textbox);
             console.log("index of column: " + i);
             console.log("array before: " + cols);
             
-            if (columnsObj[gid].length > (i + 1) || (columnsObj[gid].length === (i + 1) && groupsObj[gind + 1])) {
-                if (columnsObj[gid].length > (i + 1)) {
+            if (groupColumnsObj[gid].length > (i + 1) || (groupColumnsObj[gid].length === (i + 1) && groupsObj[gind + 1])) {
+                if (groupColumnsObj[gid].length > (i + 1)) {
                     var j = cols.splice(i, 1).toString();
                     console.log("column spliced: " + j);
                     var k = i + 1;
 
-                } else if (columnsObj[gid].length === (i + 1) && groupsObj[gind + 1]) {
+                } else if (groupColumnsObj[gid].length === (i + 1) && groupsObj[gind + 1]) {
                     var j = cols.splice(i, 1).toString();
                     console.log("column spliced: " + j);
                     var k = 0;
-                    columnsObj[gid] = cols;
+                    groupColumnsObj[gid] = cols;
 
                     gid = groupsObj[gind + 1];
-                    cols = columnsObj[gid];
+                    cols = groupColumnsObj[gid];
                     //  cols.splice(k, 0, j);
                     //   console.log("array after: " + cols);
                     //   columnsObj[gid] = cols;
                 }
                 cols.splice(k, 0, j);
                 console.log("array after: " + cols);
-                columnsObj[gid] = cols;
-                board["columns"] = columnsObj;
+                groupColumnsObj[gid] = cols;
+                board["groupColumns"] = groupColumnsObj;
+                columnsArray = Object.values(groupColumnsObj).flat();
+                board["columns"] = columnsArray;
+                groupColumnsArray = Object.values(groupColumnsObj);
+                board["groupColumnsArray"] = groupColumnsArray;
                 saveToLocalStorage();
                 htmlfromarray(loadfilename);
                 // location.reload();
             };
 
         };
-
+        
         $("#board").scrollLeft(sleft);
         $("#board").scrollTop(stop);
     });
@@ -551,7 +559,7 @@ $(function () {
                 var gid = groupsObj[gindex];
                 console.log("group index: " + gindex);
                 var colindex = $(blockid).parents(".epic").index();
-                var colid = columnsObj[gid][colindex];
+                var colid = groupColumnsObj[gid][colindex];
                 var stories = itemsObj[rowid][colid];
                 var i = stories.indexOf(textbox);
                 console.log("index of story: " + i);
@@ -623,7 +631,7 @@ $(function () {
                 var gid = groupsObj[gindex];
                 console.log("group index: " + gindex);
                 var colindex = $(blockid).parents(".epic").index();
-                var colid = columnsObj[gid][colindex];
+                var colid = groupColumnsObj[gid][colindex];
                 var stories = itemsObj[rowid][colid];
                 var i = stories.indexOf(textbox);
                 console.log("index of story: " + i);
@@ -690,7 +698,7 @@ $(function () {
         console.log("group: " + gid);
         var gind = groupsObj.indexOf(gid);
         if ($(blockid).hasClass("column")) {
-            var cols = columnsObj[gid];
+            var cols = groupColumnsObj[gid];
             var i = cols.indexOf(textbox);
             console.log("index of column: " + i);
             console.log("array before: " + cols);
@@ -706,12 +714,12 @@ $(function () {
                     var j = cols.splice(i, 1).toString();
                     console.log("column spliced: " + j);
                                
-                    columnsObj[gid] = cols;
+                    groupColumnsObj[gid] = cols;
 
                     gid = groupsObj[gind - 1];
                     
                     //var k = columnsObj[gid].length;
-                    cols = columnsObj[gid];
+                    cols = groupColumnsObj[gid];
                     //  cols.splice(k, 0, j);
                     //   console.log("array after: " + cols);
                     //   columnsObj[gid] = cols;
@@ -719,8 +727,15 @@ $(function () {
                 }
                
                 console.log("array after: " + cols);
-                columnsObj[gid] = cols;
-                board["columns"] = columnsObj;
+                groupColumnsObj[gid] = cols;
+                board["groupColumns"] = groupColumnsObj;
+
+                columnsArray = Object.values(groupColumnsObj).flat();
+                board["columns"] = columnsArray;
+
+                groupColumnsArray = Object.values(groupColumnsObj);
+                board["groupColumnsArray"] = groupColumnsArray;
+
                 saveToLocalStorage();
                 htmlfromarray(loadfilename);
                 // location.reload();
@@ -741,7 +756,7 @@ $(function () {
         //board = boardlistobject[filename];
         // filename = board["name"];
         groupsObj = board["groups"];
-        columnsObj = board["columns"];
+        groupColumnsObj = board["groupColumns"];
         rowsObj = board["rows"];
         itemsObj = board["items"];
         blocktitlearray = board["titles"];
@@ -761,13 +776,13 @@ $(function () {
         var subsetlist = [];
         var subsetBoardData = JSON.parse(subsetBoard);
         var gro = subsetBoardData["groups"][0];
-        for (i = 0; i < subsetBoardData["columns"][gro].length; i++) {
+        for (i = 0; i < subsetBoardData["groupColumns"][gro].length; i++) {
             var subsetvalues = [];
             var row = subsetBoardData["rows"][0];
 
-            var col = subsetBoardData["columns"][gro][i];
+            var col = subsetBoardData["groupColumns"][gro][i];
             var boarditemstatuskeys = subsetBoardData["items"][row][col];
-            var label = subsetBoardData["titles"][subsetBoardData["columns"][gro][i]];
+            var label = subsetBoardData["titles"][subsetBoardData["groupColumns"][gro][i]];
             //  $("label[for='subset" + i + "']").html(label);
             console.log("row:" + row + ",col," + col + ", " + boarditemstatuskeys);
 
@@ -784,7 +799,7 @@ $(function () {
             }; //create board object if it does not exist
 
             //var listname = "subset" + i;
-            var listname = subsetBoardData["columns"][gro][i]
+            var listname = subsetBoardData["groupColumns"][gro][i]
             //  <label for="subset1">Type</label>
             //     <select id="subset1"></select>
             var subsetSelect = document.createElement('select');
@@ -822,9 +837,9 @@ $(function () {
     };
     function updatesubsets() {
         //fetch block subsets
-        for (j = 0; j < subsetBoardData["columns"][gro].length; j++) {
+        for (j = 0; j < subsetBoardData["groupColumns"][gro].length; j++) {
             //var listname = "subset" + j;
-            var listname = subsetBoardData["columns"][gro][j];
+            var listname = subsetBoardData["groupColumns"][gro][j];
             //var label = $("#" + listname).attr("name");
             var label = $("#" + listname).attr("id");
             console.log("LabelID of changed item:" + label);
@@ -890,21 +905,27 @@ $(function () {
         board["groups"] = groupsObj;
     };
     function updateColumnsObj() {
-        columnsObj = {}
+        groupColumnsObj = {};
+        columnsArray = [];
+        
         $(".columnheader").each(function () {
             columngroupObj = [];
             var groupId = $(this).parent().parent().find(".group").attr("id");
             ($(this).find(".column")).each(function () {
                 var columnid = $(this).attr("id");
+               // relationshipArray[columnid] ???
                 columngroupObj.push(columnid);
+                columnsArray.push(columnid);
              });
            
-            columnsObj[groupId] = columngroupObj;
+            groupColumnsObj[groupId] = columngroupObj;
+            
+           
         });
         console.log("Columns updated:");
-        console.log(columnsObj);
+        console.log(groupColumnsObj);
 
-        board["columns"] = columnsObj;
+        board["groupColumns"] = groupColumnsObj;
   
     };
     function updateRowsObj() {
