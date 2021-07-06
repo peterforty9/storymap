@@ -1488,9 +1488,11 @@ $(function () {
         var blockid = $(this).parent().attr("id");
 
         var bgcolour = $(this).parent().css("background-color");
+        $("#infobox-title").css("background-color", bgcolour);
         $("#infobox-navbar").css("background-color", bgcolour);
 
         var tcolour = $(this).css("color");
+        $("#infobox-title").css("color", tcolour);
         $("#infobox-navbar").css("color", tcolour);
 
         if (subsetBoard) {

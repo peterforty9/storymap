@@ -54,7 +54,7 @@ i {
     position:absolute; 
     bottom:0px; left:0px; height:30px; right:0px;
     overflow:hidden;
-    justify-content:center;
+    justify-content:space-around;
 }
 .ui-menu-item {
     background-color: #34675C;
@@ -160,20 +160,34 @@ i {
     top: 75px;
 }
 
-#infobox-navbar {
-    display:flex;
-    flex-direction:row;
+#infobox-title {
+    display: flex;
+    flex-direction: row;
     height: 30px;
     width: 100%;
     font-family: Arial, Helvetica, sans-serif;
-    background-color: white;
+  
+    resize: none;
+}
+
+#infobox-navbar {
+    display:flex;
+    flex-direction:column;
+    height: 30px;
+    width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+   
     resize: none;
 }
 
 #blockmenu {
-    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: space-around;
+  /*  position: relative;
     right: 0px;
-    top: 5px;   
+    top: 5px;   */
 }
 .blocksubmenu-item {
   
@@ -186,8 +200,9 @@ i {
 .blockmenu-item {
         padding-left: 15px;
         padding-right: 15px;
+        padding-bottom: 10px;
         cursor: pointer;
-        font-size: 18px;
+        font-size: 22px;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
