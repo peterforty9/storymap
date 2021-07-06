@@ -21,11 +21,12 @@ body {
     vertical-align: top;
     display: inline-block;
 }
-.page{
-display:flex;
-flex-direction:column;
-height:100%;
-width:100%;
+.page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;   
 }
 i {
     color:gray;
@@ -47,19 +48,20 @@ i {
 
 
 .menu {
-
     background-color: whitesmoke;
     display: flex;
-   /* flex-direction: row; */
-    position:absolute; 
-    bottom:0px; left:0px; height:30px; right:0px;
-    overflow:hidden;
-    justify-content:space-around;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: space-around;
+    position: absolute; 
+    top:0px; left:0px; height:30px; right:0px;
+    overflow: hidden;
+   
 }
 .ui-menu-item {
     background-color: #34675C;
     color: white;
-    display: inline-block;
+   /* display: inline-block;*/
      
 }
 
@@ -70,8 +72,8 @@ i {
     width:100%;
 
     position: absolute;
-    top: 10px;
-    bottom: 133px;
+    top: 30px;
+    bottom: 100px;
 
     overflow:auto;
     padding-bottom:5px;
@@ -90,7 +92,7 @@ i {
     align-content: flex-start;
     background-color: whitesmoke;
     position: absolute;
-    bottom: 30px;
+    bottom: 0px;
     height: 100px;
     left: 0px;
     right: 0px;
@@ -166,18 +168,25 @@ i {
     height: 30px;
     width: 100%;
     font-family: Arial, Helvetica, sans-serif;
-  
     resize: none;
 }
 
 #infobox-navbar {
+    display:none;
+    /*
     display:flex;
     flex-direction:column;
     height: 30px;
     width: 100%;
     font-family: Arial, Helvetica, sans-serif;
-   
     resize: none;
+        */
+}
+#manageblock {
+    display:none;
+}
+#subsets{
+    display:none;
 }
 
 #blockmenu {
@@ -185,7 +194,11 @@ i {
     flex-direction: row;
     flex-grow: 1;
     justify-content: space-around;
-  /*  position: relative;
+    height: 30px;
+    width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    resize: none;
+    /*  position: relative;
     right: 0px;
     top: 5px;   */
 }
@@ -200,7 +213,7 @@ i {
 .blockmenu-item {
         padding-left: 15px;
         padding-right: 15px;
-        padding-bottom: 10px;
+        padding-bottom: 2px;
         cursor: pointer;
         font-size: 22px;
         -webkit-user-select: none;

@@ -491,12 +491,17 @@ $(function () {
     });
     $(document).on("click", "#toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");
-        $(".blocksubmenu-item").toggleClass("hidden");
+        $("#manageblock").toggle();
+        $("#blockmenu").toggle();
+        $("#subsets").toggle();
         //  $("#toggledetails").toggleClass("hidden");
         $('.arrow-down-close').toggleClass('open');
         $('#board').toggleClass("displayinfo");
         hiddenblockdetails = $("#infobox").hasClass("hidden");
         event.stopPropagation();
+    });
+    $(document).on("click", "#toggleBlockmenu", function (event) {
+        $("#infobox-navbar").toggle();
     });
     $(document).on("click", "#deleteblock", function () {
         $("#deleteblock-confirm").dialog("open");
