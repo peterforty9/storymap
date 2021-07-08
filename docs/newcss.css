@@ -29,7 +29,7 @@ body {
     overflow: hidden;   
 }
 i {
-    color:gray;
+    color:white;
     height:inherit;
 }
 /* The menu item container */
@@ -37,7 +37,7 @@ i {
     position: relative;
     padding-left: 15px;
     padding-right: 15px;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     cursor: pointer;
     font-size: 20px;
     -webkit-user-select: none;
@@ -47,22 +47,46 @@ i {
 }
 
 
-.menu {
-    background-color: whitesmoke;
+#menubar {
+    background-color: gray;
     display: flex;
     flex-direction: row;
     flex-grow: 1;
-    justify-content: space-around;
+    justify-content: space-between;
     position: absolute; 
     top:0px; left:0px; height:30px; right:0px;
     overflow: hidden;
+    padding: 8px 8px 2px 2px;
    
+}
+#menuright {
+    background-color: gray;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    overflow: hidden;
+    align-content: flex-end;
+}
+#boardMenu {
+    background-color: gray;
+    display: flex;
+    flex-direction: row;
+    justify-content:space-around;
+    overflow: hidden;
+    align-content:flex-end;
+    
 }
 .ui-menu-item {
     background-color: #34675C;
     color: white;
    /* display: inline-block;*/
      
+}
+#boardTitle{
+    background-color:gray;
+}
+#boardMenu{
+    display:none;
 }
 
 #board {
@@ -72,7 +96,7 @@ i {
     width:100%;
 
     position: absolute;
-    top: 30px;
+    top: 40px;
     bottom: 100px;
 
     overflow:auto;

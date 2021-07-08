@@ -24,12 +24,22 @@
 
 <body>
     <div class="page">
-        <div class='menu'>
-            <label class='container' id=new><i class='fas fa-table'></i></label>
-            <label class='container' id=loadarray title='load'><i class='fas fa-file-upload'></i></label>
-            <label class='container' id=savearray><i class='fas fa-save'></i></label>
-            <label class='container' id='boardSettingsbutton'><i class='fas fa-cog'></i></label>
-            <label class='container' id='deleteboard'><i class='fas fa-trash-alt'></i></label>
+        <div id='menubar'>
+            <div id='boardTitle'>
+                <label id='boardname' class='title' maxlength='50' style="overflow:hidden"></label>
+            </div>
+            <div id="menuright">
+                <div id="boardMenu">
+                    <label class='container' id=new><i class='fas fa-table'></i></label>
+                    <label class='container' id=loadarray title='load'><i class='fas fa-file-upload'></i></label>
+                    <label class='container' id=savearray><i class='fas fa-save'></i></label>
+                    <label class='container' id='boardSettingsbutton'><i class='fas fa-cog'></i></label>
+                    <label class='container' id='deleteboard'><i class='fas fa-trash-alt'></i></label>
+                </div>
+                <div>
+                    <label class='blockmenu-item' id='toggleBoardMenu'><j class='fas fa-bars'></j></label>
+                </div>
+            </div>
         </div>
         <div id='board'></div>
         <div id='infobox'>
@@ -39,7 +49,7 @@
                 <label class='blockmenu-item' id='toggledetails'><j class='fas fa-angle-double-up'></j></label>
             </div>
             <div id='infobox-navbar'>
-                <div id="blockmenu">               
+                <div id="blockmenu">
                     <label class='blockmenu-item' id='addblock'><j class='fas fa-plus-square addGroup'></j></label>
                     <label class='blockmenu-item' id='moveleft'><j class="far fa-caret-square-left"></j></label>
                     <label class='blockmenu-item' id='moveup' title="Move up"><j class="far fa-caret-square-up"></j></label>

@@ -209,6 +209,8 @@ $(function () {
         localStorage.setItem("currentboard", boardname);
         loadfilename = boardname;
 
+        $("#boardname").text(filename);
+
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
             "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
@@ -435,7 +437,7 @@ $(function () {
                     .text(value));
         });//Update board load options
     }
-
+       
     openFile = function (event) {
 
         var input = event.target;
@@ -450,6 +452,11 @@ $(function () {
         };
         reader.readAsText(input.files[0]);
     }; //upload file
+
+    $(document).on("click", "#toggleBoardMenu", function (event) {
+        $("#boardMenu").toggle();
+    });
+
     $(document).on("click", "#new", function () { //open new map from html template
         updateSettingsBoardList();
         $("#settingsBoardNew").val(null)
@@ -782,6 +789,8 @@ $(function () {
             subsetsObj = {};
         };
         if (board["settings"]) { settingsBoard = board["settings"] };
+
+        $("#boardname").text(filename);
     };
     };
 
