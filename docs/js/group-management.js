@@ -455,6 +455,7 @@ $(function () {
 
     $(document).on("click", "#toggleBoardMenu", function (event) {
         $("#boardMenu").toggle();
+        $("#boardname").toggle();
     });
 
     $(document).on("click", "#new", function () { //open new map from html template

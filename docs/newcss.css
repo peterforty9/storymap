@@ -44,6 +44,7 @@ i {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    flex-grow: 1;
 }
 
 
@@ -63,18 +64,24 @@ i {
     background-color: gray;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-end;
     overflow: hidden;
-    align-content: flex-end;
+    flex-grow: 1;
+  
+}
+#togglearea {
+    display: flex;
+  /*  flex-direction: row-reverse;
+    flex-grow: 1;
+    justify-content: flex-start;*/
 }
 #boardMenu {
-    background-color: gray;
+  
     display: flex;
     flex-direction: row;
-    justify-content:space-around;
+    justify-content: space-around;
     overflow: hidden;
-    align-content:flex-end;
-    
+  
 }
 .ui-menu-item {
     background-color: #34675C;
@@ -82,8 +89,9 @@ i {
    /* display: inline-block;*/
      
 }
-#boardTitle{
-    background-color:gray;
+#boardTitle {
+   
+   
 }
 #boardMenu{
     display:none;
@@ -250,6 +258,7 @@ i {
 j {
     color: white;
     height: inherit;
+  
 }
 #blockname {
     height: 25px;
