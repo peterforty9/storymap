@@ -10,7 +10,8 @@ $(function () {
     var n, htmlstring, filename, loadfilename, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, groupColumnsObj, groupColumnsArray, columnsArray, rowsObj, itemsObj, itemsArray, selectedBlock, sleft, stop,
-        typeItemsObj, statusItemsObj, subsetsObj, settingsBoard, relationshipArray, boardlistobject;
+        typeItemsObj, statusItemsObj, subsetsObj, settingsBoard, relationshipArray, boardlistobject, boardTypeBoard,
+        boardTypeObject;
        
     //Build status list from status board items
   
@@ -31,9 +32,19 @@ $(function () {
     };
 
     var localboardlistobject = localStorage.getItem("boardlist");
+    var localboardtypeobject = localStorage.getItem("BoardTypes");
     if (localboardlistobject) {
         boardlistobject = JSON.parse(localboardlistobject);
     } else { boardlistobject = []} ;// If there is a localStorage boardlist array, retrieve it
+    if (localboardtypeobject) {
+        boardTypeObject = [];
+        boardTypeBoard = JSON.parse(localboardtypeobject);
+        var gid = boardTypeBoard["groups"][0];
+             for (j = 0; j < boardTypeBoard["groupColumns"][gid].length; ++j) {
+            var tit = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
+                 boardTypeObject.push(tit);
+        };
+    } else { boardTypeObject = [] };// If there is a localStorage boardtype board, retrieve it
 
     function updateboardlistoptions() {
         //board load options
@@ -45,6 +56,7 @@ $(function () {
                     .text(value));
         });//Update board load options
     };
+
 
     makeSortable(); //Runs to add sortable fields to the uploaded HTML
 
@@ -124,7 +136,7 @@ $(function () {
                    
                     newboard(filename, settingsBoard);
                     //board["name"] = filename;
-
+                  
                     // createBoardJSON(filename.val());
                     $(this).dialog("close");
 
@@ -135,7 +147,7 @@ $(function () {
                 $(this).dialog("close");
             }
         }
-    });// Confirm Save board
+    });// Confirm New board
     dialog = $("#load-confirm").dialog({
         autoOpen: false,
         resizable: false,
@@ -180,7 +192,7 @@ $(function () {
                 $(this).dialog("close");
             }
         }
-    });// Confirm Load board
+    });// Confirm board settings
 
     newboardform = dialog.find("form").on("submit", function (event) {
         event.preventDefault();
@@ -395,16 +407,23 @@ $(function () {
     function toggleGroups() {
         $("#group").toggle();
     }
-    $(document).on("click", "#menuRows", function () {
+ /*   $(document).on("click", "#menuRows", function () {
         //  toggleRows();
         document.getElementById("menuRows").checked ? $(".rowsheadingtext").show() : $(".rowsheadingtext").hide();
         document.getElementById("menuRows").checked ? $(".iteration").show() : $(".iteration").hide();
         document.getElementById("menuRows").checked ? $(".addrelease").show() : $(".addrelease").hide();
-    });//Toggle rows
+       
+    });//Toggle rows */
     function toggleRows() {
         $(".rowsheadingtext").toggle();
         $(".iteration").toggle();
         $(".addrelease").toggle();
+    };
+    function boardRowsHidden() {
+        document.getElementById("boardType") == "List" ? $(".rowsheadingtext").hide() : $(".rowsheadingtext").show();
+        document.getElementById("boardType") == "List" ? $(".iteration").hide() : $(".iteration").show();
+        document.getElementById("boardType") == "List" ? $(".addrelease").hide() : $(".addrelease").show();
+
     };
     $(document).on("click", "#colwidth", function () {
 
@@ -437,6 +456,16 @@ $(function () {
                     .text(value));
         });//Update board load options
     }
+    function updateBoardTypeList() {
+        //board load options
+        $('#boardType').empty();//empty board options
+        $.each(boardTypeObject, function (i, value) {
+            $('#boardType')
+                .append($("<option></option>")
+                    .attr("value", value)
+                    .text(value));
+        });//Update board load options
+    }
        
     openFile = function (event) {
 
@@ -457,10 +486,12 @@ $(function () {
         $("#boardMenu").toggle();
         $("#boardname").toggle();
     });
-
+    //Board menu actions
     $(document).on("click", "#new", function () { //open new map from html template
         updateSettingsBoardList();
-        $("#settingsBoardNew").val(null)
+        updateBoardTypeList();
+        $("#settingsBoardNew").val(null);
+        $("#boardType").val(null);
         $("#save-confirm").dialog("open");
 
         //newboard();
@@ -482,6 +513,7 @@ $(function () {
     $(document).on("click", "#savearray", function () { //open new map from array
         $("#save-confirm").dialog("open");
     });
+    //Update block details when editing from the infobox
     $(document).on("focusout", ".textbox", function () {
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
@@ -497,6 +529,7 @@ $(function () {
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
         saveToLocalStorage();
     });
+    //Block menu actions
     $(document).on("click", "#toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");
         $("#manageblock").toggle();
@@ -515,7 +548,7 @@ $(function () {
         $("#deleteblock-confirm").dialog("open");
 
     });
-    //Move board items
+    //Move board item actions
     $(document).on("click", "#moveright", function () {
         sleft = $("#board").scrollLeft();
         stop = $("#board").scrollTop();
