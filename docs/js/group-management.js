@@ -22,20 +22,27 @@ $(function () {
     }; // Generate GUID
 
     //// PAGE LOAD MANAGEMENT /////
-    
+           
     var currentBoard = localStorage.getItem("currentboard");
-
+  
+        
     loadfilename = currentBoard;
     if (loadfilename) {
         loadJSONobjects(loadfilename);
         htmlfromarray(loadfilename);
-    };
+    };//Load current board
+    //var localboardlistobject = localStorage.getItem("boardlist");
 
-    var localboardlistobject = localStorage.getItem("boardlist");
+    var localboardlistobject = getboardlist();
+   
+
     var localboardtypeobject = localStorage.getItem("BoardTypes");
-    if (localboardlistobject) {
-        boardlistobject = JSON.parse(localboardlistobject);
-    } else { boardlistobject = []} ;// If there is a localStorage boardlist array, retrieve it
+
+   // if (localboardlistobject) {
+   //     boardlistobject = JSON.parse(localboardlistobject);
+   //     console.log("Board json2: " + boardlistobject);
+   // } else { boardlistobject = [] };// If there is a localStorage boardlist array, retrieve it
+
     if (localboardtypeobject) {
         boardTypeObject = [];
         boardTypeBoard = JSON.parse(localboardtypeobject);
@@ -56,7 +63,6 @@ $(function () {
                     .text(value));
         });//Update board load options
     };
-
 
     makeSortable(); //Runs to add sortable fields to the uploaded HTML
 
@@ -199,11 +205,29 @@ $(function () {
         filename = $("#filename");
         createBoardJSON(filename.val());
     });
-    function newboard(boardname, settings) {  // Generate new board
+    function newboard(boardname, settings, boardType) {  // Generate new board
+        var columnsVisible = true;
+        var columnGroupsVisible = true;
+        var rowsVisible = true;
 
         $("#board").empty(); //Clear current board html
 
-        board = { "name": boardname, "columns":[], "groupColumns": {}, "groups": [], "items": {}, "rows": [], "titles": {}, "details": {}, "itemtypes": {}, "subsets": {}, "settings": settings};
+        board = {
+            "name": boardname,
+            "columns": [],
+            "groupColumns": {},
+            "groups": [],
+            "items": {},
+            "rows": [],
+            "titles": {},
+            "details": {},
+            "itemtypes": {},
+            "subsets": {},
+            "settings": settings,
+            "columnsVisible": columnsVisible,
+            "columnGroupsVisible": columnGroupsVisible,
+            "rowsVisible": rowsVisible
+        };
         groupsObj = [];
         groupColumnsObj = {};
         columnsArray = [];
@@ -216,7 +240,7 @@ $(function () {
         typeItemsObj = {};
         statusItemsObj = {};
         subsetsObj = {};
-        settings = "";
+        seittings = "";
 
         localStorage.setItem("currentboard", boardname);
         loadfilename = boardname;
@@ -243,13 +267,19 @@ $(function () {
         appendNewcolumn("0");
         toggleGroups();
         //   toggleRows();
-        //Add board to boardlist
-        updateboardlist(boardname);
+        
         //updateboardlistoptions();
         localStorage.setItem("currentboard", boardname);
         var boarddata = JSON.stringify(board);
         localStorage.setItem(boardname, boarddata);
-    };
+       //var newboardid = createJSON(boardname, boarddata);
+        //console.log(newboardid);
+        //Add board to boardlist
+        createJSON(boardname, boarddata);
+        //updateboardlist();
+
+    }; //Generate a new board
+
     function htmlfromarray(filename) {  // Generate board html from locally stored array
 
         $("#board").empty();
@@ -936,6 +966,77 @@ $(function () {
       //  console.log(blockdetailsarray);
         saveToLocalStorage();
     };
+
+    // JSON calls
+
+    function createJSON(name, newjson) {
+        const request = new XMLHttpRequest();
+        var jsonID
+        var jsonparsed = {};
+        request.open("POST", "https://json.extendsclass.com/bin", true);
+        request.responseType = "json";
+        request.setRequestHeader("Api-key", "2e9badc3-1630-11ec-8e13-0242ac110002");
+        request.setRequestHeader("Security-key", "random-brick-diamond");
+        request.setRequestHeader("Private", "true");
+        request.onreadystatechange = () => {
+            var jsonstring = request.response;
+            jsonstring = JSON.stringify(jsonstring);
+            // alert(jsonstring);
+            console.log("Create JSON: " + jsonstring);
+            jsonparsed = JSON.parse(jsonstring);
+            jsonID = jsonparsed.id;
+            console.log("Create JSON ID: " + jsonID);
+           // return jsonID;
+            updateboardlist(jsonID);
+        };
+        request.send('{"' + name + '": ' + newjson + '}');
+        
+        
+    };
+    function updateJSON(jsonID,jsonName, jsonValue) {
+        const request = new XMLHttpRequest();
+        var jsonstring;
+        var jsonparsed = {};
+        request.open("PUT", "https://json.extendsclass.com/bin/" + jsonID, true);
+        request.setRequestHeader("Api-key", "2e9badc3-1630-11ec-8e13-0242ac110002");
+        request.setRequestHeader("Security-key", "random-brick-diamond");
+        request.setRequestHeader("Private", "true");
+        request.onreadystatechange = () => {
+            
+            jsonstring = request.response;
+            jsonstring = JSON.stringify(jsonstring);
+            //alert(jsonstring);
+            console.log("Update JSON before parse: " + jsonstring);
+           
+            jsonparsed = JSON.parse(jsonstring);
+
+        };
+        request.send('{"' + jsonName + '": ' + jsonValue + '}');
+       
+        var jsonID = jsonparsed.id;
+        console.log('Update JSON {"' + jsonName + '": (' + jsonID + ') ' + jsonValue + '}');
+    };
+    function getboardlist() {
+        var jsonstring;
+        const request = new XMLHttpRequest();
+        request.open("GET", "https://json.extendsclass.com/bin/baec30811a60", true);
+        request.responseType = "json";
+        request.setRequestHeader("Security-key", "random-brick-diamond");
+        request.onreadystatechange = () => {
+            jsonstring = request.response;
+            jsonstring = JSON.stringify(jsonstring);
+            alert(jsonstring);
+            console.log("Get boardlist: " + jsonstring);
+            var jsonparsed = {};
+            jsonparsed = JSON.parse(jsonstring);
+            //jsonparsed = jsonparsed.boardlist;
+            boardlistobject = jsonparsed.boardlist;
+            console.log("Board list object: " + boardlistobject);
+
+        };
+        request.send();
+        return jsonstring;
+    };
     function updateboardlist(filename) {       
        // createBoardJSON(filename);
        // boardlistobject[filename] = board;
@@ -943,6 +1044,9 @@ $(function () {
 
         var boardlist = JSON.stringify(boardlistobject);
         localStorage.setItem("boardlist", boardlist);
+
+        updateJSON("baec30811a60","boardlist", boardlist)
+
         localStorage.setItem(filename, boardlist);
      
     };
