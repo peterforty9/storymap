@@ -985,7 +985,8 @@ $(function () {
             console.log("Create JSON: " + jsonstring);
             jsonparsed = JSON.parse(jsonstring);
             jsonID = jsonparsed.id;
-            console.log("Create JSON ID: " + jsonID);
+            console.log("Create JSON ID: " + jsonID + " with value: " + newjson);
+            localStorage.setItem(jsonID, newjson);
            // return jsonID;
             updateboardlist(jsonID);
         };
@@ -1010,11 +1011,14 @@ $(function () {
            
             jsonparsed = JSON.parse(jsonstring);
 
+            //var jsonID = jsonparsed.id;
+            //localStorage.setItem(jsonID, jsonValue);
+            console.log('Update JSON {"' + jsonName + '": (' + jsonID + ') ' + jsonValue + '}');
+
         };
         request.send('{"' + jsonName + '": ' + jsonValue + '}');
        
-        var jsonID = jsonparsed.id;
-        console.log('Update JSON {"' + jsonName + '": (' + jsonID + ') ' + jsonValue + '}');
+       
     };
     function getboardlist() {
         var jsonstring;
@@ -1047,7 +1051,7 @@ $(function () {
 
         updateJSON("baec30811a60","boardlist", boardlist)
 
-        localStorage.setItem(filename, boardlist);
+      //  localStorage.setItem(filename, boardlist);
      
     };
     function createBoardJSON(boardname) {
