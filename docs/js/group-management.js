@@ -7,68 +7,126 @@ $(function () {
 
     //// GLOBAL VARIABLES /////
 
-    var n, htmlstring, filename, loadfilename, newboardform,
+    var n, htmlstring, boardid, currentBoardID, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, groupColumnsObj, groupColumnsArray, columnsArray, rowsObj, itemsObj, itemsArray, selectedBlock, sleft, stop,
         typeItemsObj, statusItemsObj, subsetsObj, settingsBoard, relationshipArray, boardlistobject, boardTypeBoard,
-        boardTypeObject;
+        boardTypeObject, boardid;
        
     //Build status list from status board items
   
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); };// Generate GUID variables
     function guid() {
-        var id = (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
+        var id = (S4() + S4() + "-" + S4() + "-4" + S4().substring(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
         return id;
     }; // Generate GUID
 
-    //// PAGE LOAD MANAGEMENT /////
-           
-    var currentBoard = localStorage.getItem("currentboard");
-  
-        
-    loadfilename = currentBoard;
-    if (loadfilename) {
-        loadJSONobjects(loadfilename);
-        htmlfromarray(loadfilename);
-    };//Load current board
-    //var localboardlistobject = localStorage.getItem("boardlist");
+///////////////////////////////////// PAGE LOAD MANAGEMENT ////////////////////////
 
-    var localboardlistobject = getboardlist();
+    /// Get current board ///       
+    
+    var currentBoardID = localStorage.getItem("currentboard");
+    console.log("Current board: " + currentBoardID);
+    if (currentBoardID) {
+        loadJSONobjects(currentBoardID);
+      
+    };
    
+    currentBoardID = currentBoardID; ////need to deprecate this
 
-    var localboardtypeobject = localStorage.getItem("BoardTypes");
-
-   // if (localboardlistobject) {
-   //     boardlistobject = JSON.parse(localboardlistobject);
-   //     console.log("Board json2: " + boardlistobject);
-   // } else { boardlistobject = [] };// If there is a localStorage boardlist array, retrieve it
-
-    if (localboardtypeobject) {
-        boardTypeObject = [];
-        boardTypeBoard = JSON.parse(localboardtypeobject);
-        var gid = boardTypeBoard["groups"][0];
-             for (j = 0; j < boardTypeBoard["groupColumns"][gid].length; ++j) {
-            var tit = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
-                 boardTypeObject.push(tit);
+    
+    //var jsonstorageboardlistobject = getboardlist();
+    var retrievejsonstoragebin = function (bin) {
+        return new Promise(function(resolve, reject){
+        //  function getboardlist() {
+              var jsonstring;
+              boardlistobject = [];
+              const request = new XMLHttpRequest();
+              request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
+              request.responseType = "json";
+              request.setRequestHeader("Security-key", "random-brick-diamond");
+              request.onreadystatechange = () => {
+                   // In local files, status is 0 upon success in Mozilla Firefox
+                  if (request.readyState === XMLHttpRequest.DONE) {
+                      const status = request.status;
+                      if (status === 0 || (status >= 200 && status < 400)) {
+                      // The request has been completed successfully
+                      jsonstring = request.response;
+                      jsonstring = JSON.stringify(jsonstring);
+                      alert(jsonstring);
+                      console.log("Get json bin, " + bin + " ="+ jsonstring);
+                      //var jsonparsed = {};
+                      //jsonparsed = JSON.parse(jsonstring);
+                      //jsonparsed = jsonparsed.boardlist;
+                      //boardlistobject = jsonparsed.data;
+                      //console.log("Board list object: " + boardlistobject);
+                      //return jsonstring;
+                      resolve(jsonstring);
+                      } else {
+                      // Oh no! There has been an error with the request!
+                      reject(Error("json retrieve error " + status));
+                      }
+                  }
+              };
+              request.send();
+              
+          });
         };
-    } else { boardTypeObject = [] };// If there is a localStorage boardtype board, retrieve it
+        // Retrieve board list from storage bin ///////
+
+        retrievejsonstoragebin("baec30811a60").then(function(result) {
+            console.log("Board list retrieved: " + result); // "Stuff worked!"
+            boardlistobject = JSON.parse(result).data;
+            //console.log("Board list object retrieved: " + boardlistobject);
+          }, function(err) {
+            console.log(err); // Error: "It broke"
+            boardlistobject = [];
+          });
+
+      
+            /*
+                console.log("Board list retrieved: " + jsonstorageboardlistobject);
+                if (jsonstorageboardlistobject) {
+                    boardlistobject = JSON.parse(jsonstorageboardlistobject);
+                    console.log("Board list object retrieved: " + boardlistobject);
+                } else { boardlistobject = [] };// If there is a jsonStorage boardlist array, retrieve it
+            */
+
+    // If there is a localStorage boarddate array, retrieve it
+
+            var localboardtypeobject = localStorage.getItem("BoardTypes");
+            if (localboardtypeobject) {
+                boardTypeObject = [];
+                boardTypeBoard = JSON.parse(localboardtypeobject);
+                var gid = boardTypeBoard["groups"][0];
+                    for (j = 0; j < boardTypeBoard["groupColumns"][gid].length; ++j) {
+                    var tit = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
+                        boardTypeObject.push(tit);
+                };
+            } else { boardTypeObject = [] };// If there is a localStorage boardtype board, retrieve it
+
+            makeSortable(); //Runs to add sortable fields to the uploaded HTML
+
+ //////////////////////////////////// PAGE LOAD MANAGEMENT OVER  ////////////////////////    
+
+            
 
     function updateboardlistoptions() {
         //board load options
-        $('#loadfilename').empty();//empty board options
+        $('#currentBoardID').empty();//empty board options
         $.each(boardlistobject, function (i, value) {
-            $('#loadfilename')
+            $('#currentBoardID')
                 .append($("<option></option>")
                     .attr("value", value)
                     .text(value));
         });//Update board load options
     };
 
-    makeSortable(); //Runs to add sortable fields to the uploaded HTML
+   
 
-    // If there is a localStorage boarddate array, retrieve it
 
-    //// MENU MANAGEMENT /////
+
+    ///////////////////////// MENU MANAGEMENT ///////////////////////////////////////////
 
     $("#deleteblock-confirm").dialog({
         autoOpen: false,
@@ -88,7 +146,7 @@ $(function () {
                     var column = $(blockid).parents("li")
                     if (columnempty(column)) {
                         removecolumn(column);
-                        saveToLocalStorage()
+                        saveToLocalStorage(board)
                     }}
             },
             Cancel: function () {
@@ -104,13 +162,13 @@ $(function () {
         modal: true,
         buttons: {
             "Continue": function () {
-                var index = boardlistobject.indexOf(loadfilename);
+                var index = boardlistobject.indexOf(currentBoardID);
                 boardlistobject.splice(index, 1);
-                //delete boardlistobject[loadfilename];
+                //delete boardlistobject[currentBoardID];
                 var boardlist = JSON.stringify(boardlistobject);
                 localStorage.setItem("boardlist", boardlist);
-                localStorage.removeItem(loadfilename);
-                loadfilename = "";
+                localStorage.removeItem(currentBoardID);
+                currentBoardID = "";
                 localStorage.setItem("currentboard", "");
                 $("#board").empty();
 
@@ -132,22 +190,22 @@ $(function () {
         modal: true,
         buttons: {
             "Continue": function () {
-                filename = $("#filename").val();
-                var fileexists = boardlistobject.indexOf(filename);
-                if (fileexists >= 0) {
+                var boardname = $("#filename").val();
+             //   var fileexists = boardlistobject.indexOf(boardid);
+             //   if (fileexists >= 0) {
 
-                } else {
+             //   } else {
                     /// settings board
                     settingsBoard = $("#settingsBoardNew").val();
                    
-                    newboard(filename, settingsBoard);
-                    //board["name"] = filename;
+                    newboard(boardname, settingsBoard);
+                    //board["name"] = boardid;
                   
-                    // createBoardJSON(filename.val());
+                    // createBoardJSON(boardid.val());
                     $(this).dialog("close");
 
                    
-                };
+              //  };
             },
             Cancel: function () {
                 $(this).dialog("close");
@@ -162,12 +220,12 @@ $(function () {
         modal: true,
         buttons: {
             "Continue": function () {
-                loadfilename = $("#loadfilename").val();
-                loadJSONobjects(loadfilename);
-                htmlfromarray(loadfilename);
-                localStorage.setItem("currentboard", loadfilename);
-                //updateboardlist(loadfilename.val());
-                // createBoardJSON(filename.val());
+                currentBoardID = $("#filename").val();
+                loadJSONobjects(currentBoardID);
+                
+                localStorage.setItem("currentboard", currentBoardID);
+                //updateboardlist(currentBoardID.val());
+                // createBoardJSON(boardid.val());
                 $(this).dialog("close");
             },
             Cancel: function () {
@@ -185,13 +243,13 @@ $(function () {
             "Continue": function () {
                 settingsBoard = $("#settingsBoard").val();
                 board["settings"] = settingsBoard;
-                saveToLocalStorage();
+                saveToLocalStorage(board);
                 console.log("Settings board = " + settingsBoard);
-               // loadJSONobjects(loadfilename);
-               // htmlfromarray(loadfilename);
-               // localStorage.setItem("currentboard", loadfilename);
-                //updateboardlist(loadfilename.val());
-                // createBoardJSON(filename.val());
+               // loadJSONobjects(currentBoardID);
+               // htmlfromarray(currentBoardID);
+               // localStorage.setItem("currentboard", currentBoardID);
+                //updateboardlist(currentBoardID.val());
+                // createBoardJSON(boardid.val());
                 $(this).dialog("close");
             },
             Cancel: function () {
@@ -202,8 +260,8 @@ $(function () {
 
     newboardform = dialog.find("form").on("submit", function (event) {
         event.preventDefault();
-        filename = $("#filename");
-        createBoardJSON(filename.val());
+        boardid = $("#boardid");
+        createBoardJSON(boardid.val());
     });
     function newboard(boardname, settings, boardType) {  // Generate new board
         var columnsVisible = true;
@@ -242,10 +300,8 @@ $(function () {
         subsetsObj = {};
         seittings = "";
 
-        localStorage.setItem("currentboard", boardname);
-        loadfilename = boardname;
-
-        $("#boardname").text(filename);
+       
+        $("#boardname").text(boardid);
 
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
@@ -267,29 +323,47 @@ $(function () {
         appendNewcolumn("0");
         toggleGroups();
         //   toggleRows();
-        
-        //updateboardlistoptions();
-        localStorage.setItem("currentboard", boardname);
         var boarddata = JSON.stringify(board);
-        localStorage.setItem(boardname, boarddata);
+        //boardid = createJSON(boardname, boarddata);
+
+        createJSON(boardname,boarddata)
+        .then((result) => {
+        console.log("New board ID: " + result); 
+        var boardid = result
+        console.log("Board loaded: " + boardid);
+        //updateboardlistoptions();
+        localStorage.setItem("currentboard", boardid);
+        localStorage.setItem(boardid, boarddata);
+
+        currentBoardID = boardname;
+        
+        }) 
+        .catch((err) => {
+        console.log(err); // Error: "It broke"
+        });
+        
+
+
        //var newboardid = createJSON(boardname, boarddata);
         //console.log(newboardid);
         //Add board to boardlist
-        createJSON(boardname, boarddata);
+        
         //updateboardlist();
 
     }; //Generate a new board
 
-    function htmlfromarray(filename) {  // Generate board html from locally stored array
-
+    function htmlfromarray(boardarray) {  // Generate board html from locally stored array
+        
+        console.log("Board data for building HTML: " + boardarray);
         $("#board").empty();
-
+        //board = JSON.parse(boardarray);
+        //board = JSON.stringify(board);
         //var boarddata = localStorage.getItem("boarddata");
-        var boarddata = localStorage.getItem(filename);
+        //var boarddata = localStorage.getItem(boardid);
         //if (boarddata) {
-        board = JSON.parse(boarddata);
-        // loadfilename = board["name"]
-        loadfilename = filename;
+        
+        // currentBoardID = board["name"]
+        //currentBoardID = boardid;
         // };// If there is a localStorage boarddate array, retrieve it
 
         //count groups
@@ -367,7 +441,7 @@ $(function () {
                         var columnId = board["groupColumns"][gid][i];
                         console.log("Column ID: " + columnId);
                         //create stories
-                        if (board["items"][crowid][columnId] != undefined) {
+                        if (board["items"][crowid][columnId]) {
                             // var storiescount = Object.keys(board["items"].rows[crownum].groups[k].columns[i]["stories"]).length;
 
                             var storiescount = board["items"][crowid][columnId].length;
@@ -425,8 +499,9 @@ $(function () {
         //UPDATE ARRAYS
 
         toggleGroups();
-        saveToLocalStorage();
+        saveToLocalStorage(board);
     };//Toggle groups
+
     $(document).on("click", "#menuGroups", function () {
         //  toggleGroups();
         document.getElementById("menuGroups").checked ? $(".group").show() : $(".group").hide()
@@ -516,7 +591,9 @@ $(function () {
         $("#boardMenu").toggle();
         $("#boardname").toggle();
     });
-    //Board menu actions
+
+////////////////////Board menu actions/////////////////
+
     $(document).on("click", "#new", function () { //open new map from html template
         updateSettingsBoardList();
         updateBoardTypeList();
@@ -540,8 +617,12 @@ $(function () {
         //htmlfromarray();
         // console.log("array map loaded");
     });
-    $(document).on("click", "#savearray", function () { //open new map from array
-        $("#save-confirm").dialog("open");
+    $(document).on("click", "#savearray", function () { //save board to json storage
+       // $("#save-confirm").dialog("open");
+       //board =  localStorage.getItem("currentboarddata");
+       const jsondata = JSON.stringify(board); 
+       updateJSON(currentBoardID, jsondata); 
+       console.log("Save clicked");
     });
     //Update block details when editing from the infobox
     $(document).on("focusout", ".textbox", function () {
@@ -549,7 +630,7 @@ $(function () {
         var blockid = $(this).parent().attr("id");
         updateBlockTitle(blockid, currentText);
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
-        saveToLocalStorage();
+        saveToLocalStorage(board);
        
     });
     $(document).on("focusout", "#blockname", function () {
@@ -557,9 +638,11 @@ $(function () {
         var blockid = $(this).parent().attr("id");
         updateBlockTitle(blockid, currentText);
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
-        saveToLocalStorage();
+        saveToLocalStorage(board);
     });
-    //Block menu actions
+    
+/////////////////////////Block menu actions////////////////////
+
     $(document).on("click", "#toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");
         $("#manageblock").toggle();
@@ -578,7 +661,8 @@ $(function () {
         $("#deleteblock-confirm").dialog("open");
 
     });
-    //Move board item actions
+////////////////////Move board item actions//////////////////////////
+
     $(document).on("click", "#moveright", function () {
         sleft = $("#board").scrollLeft();
         stop = $("#board").scrollTop();
@@ -618,8 +702,8 @@ $(function () {
                 board["columns"] = columnsArray;
                 groupColumnsArray = Object.values(groupColumnsObj);
                 board["groupColumnsArray"] = groupColumnsArray;
-                saveToLocalStorage();
-                htmlfromarray(loadfilename);
+                saveToLocalStorage(board);
+                htmlfromarray(board);
                 // location.reload();
             };
 
@@ -663,8 +747,8 @@ $(function () {
                     //columnsObj[gid] = tstories;
                 board["items"] = itemsObj;
 
-                    saveToLocalStorage();
-                htmlfromarray(loadfilename);
+                    saveToLocalStorage(board);
+                htmlfromarray(board);
 
                 var blockid = document.getElementById(textbox);
                 blockid.scrollIntoView(false);
@@ -684,8 +768,8 @@ $(function () {
                     console.log("array after: " + cols);
                     rowsObj = cols;
                     board["rows"] = rowsObj;
-                    saveToLocalStorage();
-                    htmlfromarray(loadfilename);
+                    saveToLocalStorage(board);
+                    htmlfromarray(board);
                     // location.reload();
                 }
 
@@ -740,8 +824,8 @@ $(function () {
                     //columnsObj[gid] = tstories;
                     board["items"] = itemsObj;
 
-                    saveToLocalStorage();
-                    htmlfromarray(loadfilename);
+                    saveToLocalStorage(board);
+                    htmlfromarray(board);
 
                     blockid = document.getElementById(textbox);
                     
@@ -762,8 +846,8 @@ $(function () {
                     console.log("array after: " + cols);
                     rowsObj = cols;
                     board["rows"] = rowsObj;
-                    saveToLocalStorage();
-                    htmlfromarray(loadfilename);
+                    saveToLocalStorage(board);
+                    htmlfromarray(board);
 
                     blockid = document.getElementById(textbox);
                
@@ -824,8 +908,8 @@ $(function () {
                 groupColumnsArray = Object.values(groupColumnsObj);
                 board["groupColumnsArray"] = groupColumnsArray;
 
-                saveToLocalStorage();
-                htmlfromarray(loadfilename);
+                saveToLocalStorage(board);
+                htmlfromarray(board);
                 // location.reload();
             };
 
@@ -836,32 +920,85 @@ $(function () {
     });
     
  
-    //JSON OBJECTS//
-    function loadJSONobjects(filename) {
-    var boarddata = localStorage.getItem(filename);
-    if (boarddata) {
-        board = JSON.parse(boarddata);
-        //board = boardlistobject[filename];
-        // filename = board["name"];
-        groupsObj = board["groups"];
-        groupColumnsObj = board["groupColumns"];
-        rowsObj = board["rows"];
-        itemsObj = board["items"];
-        blocktitlearray = board["titles"];
-        blockdetailsarray = board["details"];
-        if (board["subsets"]) { subsetsObj = board["subsets"] } else {
-            subsetsObj = {};
+////////////////////////////JSON OBJECTS////////////////////
+
+    function loadJSONobjects(boardid) {
+        console.log("boardid: " + boardid);
+        var boarddata; //= localStorage.getItem(boardid);
+
+        //Get boarddata from jsonstorage instead
+        ///*
+        var retrievebin = function (bin) {
+            return new Promise(function(resolve, reject){
+                //  function getboardlist() {
+              var jsonstring;
+              boardlistobject = [];
+              const request = new XMLHttpRequest();
+              request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
+              request.responseType = "json";
+              request.setRequestHeader("Security-key", "random-brick-diamond");
+              request.onreadystatechange = () => {
+                   // In local files, status is 0 upon success in Mozilla Firefox
+                  if (request.readyState === XMLHttpRequest.DONE) {
+                      const status = request.status;
+                      if (status === 0 || (status >= 200 && status < 400)) {
+                      // The request has been completed successfully
+                      jsonstring = request.response;
+                      jsonstring = JSON.stringify(jsonstring);
+                      alert(jsonstring);
+                      console.log("Get json bin, " + bin + " ="+ jsonstring);
+                      resolve(jsonstring);
+                      } else {
+                      
+                      reject(Error("json retrieve error " + status));
+                      }
+                  }
+              };
+              request.send();
+              
+          });
         };
-        if (board["settings"]) { settingsBoard = board["settings"] };
 
-        $("#boardname").text(filename);
-    };
+
+        retrievebin(boardid).then(function(result) {
+            console.log("Boarddata retrieved: " + result); // "Stuff worked!"
+            boarddata = JSON.parse(result);
+            boarddata = boarddata.data;
+            board = boarddata;
+            htmlfromarray(boarddata);
+            //console.log("Board list object retrieved: " + boardlistobject);
+            
+                
+               
+                groupsObj = board["groups"];
+                groupColumnsObj = board["groupColumns"];
+                rowsObj = board["rows"];
+                itemsObj = board["items"];
+                blocktitlearray = board["titles"];
+                blockdetailsarray = board["details"];
+                if (board["subsets"]) { subsetsObj = board["subsets"] } else {
+                    subsetsObj = {};
+                };
+                if (board["settings"]) { settingsBoard = board["settings"] };
+    
+                $("#boardname").text(boardid);
+
+                          
+        }, function(err) {
+            console.log(err); // Error: "It broke"
+            boarddata = [];
+        });
+        //*/
+
+      
     };
 
-    //SUBSETS//
+////////////////////////////////////SUBSETS/////////////////////////////////
 
     //var boardlistobject = [];
+   // /*
     var subsetBoard = localStorage.getItem(settingsBoard);
+    console.log("Settings board: " + subsetBoard);
     if (subsetBoard) {
         var subsetlist = [];
         var subsetBoardData = JSON.parse(subsetBoard);
@@ -918,6 +1055,7 @@ $(function () {
 
         };
     };// If there is a localStorage boardlist array, retrieve it
+  //  */
     function subsetChange() {
 
         console.log("Subset " + this.id + " changed to:" + this.value);
@@ -941,11 +1079,13 @@ $(function () {
 
     };
 
-    function saveToLocalStorage() { //  SAVE BOARD 
+    function saveToLocalStorage(boarddata) { //  SAVE BOARD 
      
-        var boardobject = JSON.stringify(board);
-        localStorage.setItem(loadfilename, boardobject);
-        console.log("board saved");
+        var boardobject = JSON.stringify(boarddata);
+    //    localStorage.setItem(currentBoardID, boardobject); // to deprecate after currentboarddata implemented
+        localStorage.setItem("currentboarddata", boardobject);
+        //updateJSON(currentBoardID, boardobject); //Update jsonstorage
+        console.log(currentBoardID + " Board saved locally");
          
      };
     function updateBlockTitle(blockid, title) {  // Update block title
@@ -964,12 +1104,14 @@ $(function () {
         board["details"] = blockdetailsarray;
         console.log("Details:");
       //  console.log(blockdetailsarray);
-        saveToLocalStorage();
+        saveToLocalStorage(board);
     };
 
-    // JSON calls
-
+    ///////////////////////////// JSON calls //////////////////////////
+    
     function createJSON(name, newjson) {
+        return new Promise(function(resolve, reject){
+        // function createJSON(name, newjson) {
         const request = new XMLHttpRequest();
         var jsonID
         var jsonparsed = {};
@@ -979,6 +1121,11 @@ $(function () {
         request.setRequestHeader("Security-key", "random-brick-diamond");
         request.setRequestHeader("Private", "true");
         request.onreadystatechange = () => {
+             // In local files, status is 0 upon success in Mozilla Firefox
+             if (request.readyState === XMLHttpRequest.DONE) {
+                const status = request.status;
+                if (status === 0 || (status >= 200 && status < 400)) {
+                // The request has been completed successfully
             var jsonstring = request.response;
             jsonstring = JSON.stringify(jsonstring);
             // alert(jsonstring);
@@ -987,23 +1134,34 @@ $(function () {
             jsonID = jsonparsed.id;
             console.log("Create JSON ID: " + jsonID + " with value: " + newjson);
             localStorage.setItem(jsonID, newjson);
-           // return jsonID;
-            updateboardlist(jsonID);
+           
+            updateboardlist(jsonID, name);
+            } else {
+            // Oh no! There has been an error with the request!
+            }
+            }
         };
-        request.send('{"' + name + '": ' + newjson + '}');
+        request.send('{"data": ' + newjson + '}');
+        return jsonID;
         
-        
+        });
     };
-    function updateJSON(jsonID,jsonName, jsonValue) {
+    
+
+    function updateJSON(jsonID, jsonValue) {
         const request = new XMLHttpRequest();
         var jsonstring;
         var jsonparsed = {};
-        request.open("PUT", "https://json.extendsclass.com/bin/" + jsonID, true);
-        request.setRequestHeader("Api-key", "2e9badc3-1630-11ec-8e13-0242ac110002");
+        request.open("PUT", "https://json.extendsclass.com/bin/" + jsonID , true);
+        //request.setRequestHeader("Api-key", "2e9badc3-1630-11ec-8e13-0242ac110002");
         request.setRequestHeader("Security-key", "random-brick-diamond");
-        request.setRequestHeader("Private", "true");
+        //request.setRequestHeader("Private", "true");
         request.onreadystatechange = () => {
-            
+            // In local files, status is 0 upon success in Mozilla Firefox
+            if (request.readyState === XMLHttpRequest.DONE) {
+            const status = request.status;
+            if (status === 0 || (status >= 200 && status < 400)) {
+            // The request has been completed successfully
             jsonstring = request.response;
             jsonstring = JSON.stringify(jsonstring);
             //alert(jsonstring);
@@ -1013,45 +1171,35 @@ $(function () {
 
             //var jsonID = jsonparsed.id;
             //localStorage.setItem(jsonID, jsonValue);
-            console.log('Update JSON {"' + jsonName + '": (' + jsonID + ') ' + jsonValue + '}');
+            console.log('Update JSONstorage with {"data": ' + jsonValue + '}');
 
+            
+        } else {
+            // Oh no! There has been an error with the request!
+            }
+        }
         };
-        request.send('{"' + jsonName + '": ' + jsonValue + '}');
+        request.send('{"data": ' + jsonValue + '}');
        
        
     };
-    function getboardlist() {
-        var jsonstring;
-        const request = new XMLHttpRequest();
-        request.open("GET", "https://json.extendsclass.com/bin/baec30811a60", true);
-        request.responseType = "json";
-        request.setRequestHeader("Security-key", "random-brick-diamond");
-        request.onreadystatechange = () => {
-            jsonstring = request.response;
-            jsonstring = JSON.stringify(jsonstring);
-            alert(jsonstring);
-            console.log("Get boardlist: " + jsonstring);
-            var jsonparsed = {};
-            jsonparsed = JSON.parse(jsonstring);
-            //jsonparsed = jsonparsed.boardlist;
-            boardlistobject = jsonparsed.boardlist;
-            console.log("Board list object: " + boardlistobject);
 
-        };
-        request.send();
-        return jsonstring;
-    };
-    function updateboardlist(filename) {       
-       // createBoardJSON(filename);
-       // boardlistobject[filename] = board;
-        boardlistobject.push(filename);
-
+    function updateboardlist(fileid, boardid) {       
+       // createBoardJSON(boardid);
+       // boardlistobject[boardid] = board;
+       var newboarditem;
+       newboarditem = {};
+       newboarditem.id  =  fileid;
+       newboarditem.name = boardid;
+        boardlistobject.push(newboarditem);
+        console.log("Local Boardlist updated: " + boardlistobject)
         var boardlist = JSON.stringify(boardlistobject);
         localStorage.setItem("boardlist", boardlist);
 
-        updateJSON("baec30811a60","boardlist", boardlist)
+        //updateJSON("baec30811a60","boardlist", boardlist);
+        updateJSON("baec30811a60",  boardlist);
 
-      //  localStorage.setItem(filename, boardlist);
+        //localStorage.setItem(boardid, boardlist);
      
     };
     function createBoardJSON(boardname) {
@@ -1189,7 +1337,7 @@ $(function () {
 
         board["items"] = itemsObj;
 
-        saveToLocalStorage();
+        saveToLocalStorage(board);
         
        // console.log("board");
         //console.log(board);
@@ -1205,21 +1353,21 @@ $(function () {
         board["subsets"] = subsetsObj;
         console.log("subsets object saved:" + subsetsObj);
         //  console.log(blockdetailsarray);
-        saveToLocalStorage();
+        saveToLocalStorage(board);
     };
     function updateTypeItemsObj(blockid,type) {
         typeItemsObj[blockid] = type;
         board["itemtypes"] = typeItemsObj;
         console.log("Type items:" + typeItemsObj);
         //  console.log(blockdetailsarray);
-        saveToLocalStorage();       
+        saveToLocalStorage(board);       
     };
     function updateStatusItemsObj(blockid, status) {
         statusItemsObj[blockid] = status;
         board["itemstatus"] = statusItemsObj;
         console.log("Status items:" + statusItemsObj);
         //  console.log(blockdetailsarray);
-        saveToLocalStorage();
+        saveToLocalStorage(board);
     };
     function boxhtml(boxtype, textboxid, title, childitems) {
         var htmlData = "";
@@ -1252,6 +1400,9 @@ $(function () {
     $("body").on("DOMNodeInserted", "#board", makeSortable);//Listen out for newly created blocks and make sortable
 
     function makeSortable() {
+        console.log(
+            "Make sortable"
+        );
         makeGroupsSortable();
         makeActivitiesSortable();
         makeEpicsSortable();
@@ -1302,7 +1453,7 @@ $(function () {
                     });
 
                 }
-                saveToLocalStorage();
+                saveToLocalStorage(board);
             }
         });
     }
@@ -1313,7 +1464,7 @@ $(function () {
             handle: ".iteration",
             cancel: ".epic, .newrelease, .iterationtext",
             stop: function (event, ui){
-                saveToLocalStorage();
+                saveToLocalStorage(board);
             },
         });
     }
@@ -1409,7 +1560,7 @@ $(function () {
             },
            // */
             update: function (event, ui) {
-                saveToLocalStorage();
+                saveToLocalStorage(board);
             },
             
         });
@@ -1612,7 +1763,7 @@ $(function () {
                     }
                 }
 
-                saveToLocalStorage();
+                saveToLocalStorage(board);
                 
             }
         });
@@ -1960,7 +2111,7 @@ $(function () {
 
         var block = document.getElementById(storytextid);
         $(block).find(".textbox").focus();
-        saveToLocalStorage();
+        saveToLocalStorage(board);
         event.stopPropagation();
                 
     //    $(this).hide();
@@ -1983,7 +2134,9 @@ $(function () {
             event.stopPropagation();
         } else if (event.which == 13 && ((event.shiftKey && event.ctrlKey) == false)) { //Insert story
             event.preventDefault();
-            if ($(this).is(':empty')) { deletestory($(this)) }
+            if ($(this).is(':empty')) { 
+                console.log("Double return, empty story delete");
+                deletestory($(this)) }
             else {
                 var storytextid = guid();
                 var htmlData = boxhtml("story", storytextid);
@@ -2001,14 +2154,15 @@ $(function () {
         if ($(this).is(':empty')) { deletestory($(this)) }
     });//Remove empty story
     function deletestory(thisObj) {
-        var stories = thisObj.parent().parent().parent();
-        var laststory = $(stories).length;
+        //var stories = thisObj.parent().parent().parent();
+        //var laststory = $(stories).length;
+        thisObj.parent().parent().empty();
         thisObj.parent().parent().remove();
 
         //Show "add story" if it was the last story in the epic
-        if (laststory == 1) {
+        //if (laststory == 1) {
   //          $(stories).parent().children('.addStory').show();
-        };
+        //};
         //update array
         updateItemsObj();
     }; //Delete story
@@ -2133,7 +2287,6 @@ $(function () {
     $(document).on("focus", ".textbox", function (event) {
         $("#blockdetails").html("");
         var currentText = $(this).text();
-       
         var blockid = $(this).parent().attr("id");
         selectedBlock = blockid;
         $("#blockname").val(currentText);
@@ -2173,12 +2326,12 @@ $(function () {
     $(document).on("focusout", "#blockname", function (event) {
         var currentText = $(this).val();
         updateBlockTitle(textbox, currentText);
-        saveToLocalStorage;
+        saveToLocalStorage(board);
     });
     $(document).on("focusout", "#blockdetails", function (event) {
         var detailsText = $(this).html();
         updateBlockDetails(textbox, detailsText); 
-        saveToLocalStorage;
+        saveToLocalStorage(board);
     });
    
     $(document).on("keydown", "#blockdetails", function (event) {
