@@ -114,11 +114,11 @@ $(function () {
     function updateboardlistoptions() {
         //board load options
         $('#currentBoardID').empty();//empty board options
-        $.each(boardlistobject, function (i, value) {
-            $('#currentBoardID')
+        $.each(boardlistobject, function (key, value) {
+            $('#loadfilename')
                 .append($("<option></option>")
-                    .attr("value", value)
-                    .text(value));
+                    .attr("value", key.id)
+                    .text(value.name));
         });//Update board load options
     };
 
