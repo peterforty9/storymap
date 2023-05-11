@@ -21,26 +21,24 @@ $(function () {
         return id;
     }; // Generate GUID
 
-///////////////////////////////////// PAGE LOAD MANAGEMENT ////////////////////////
+///////////////////////////////////// PAGE LOAD MANAGEMENT ////////////////////
 
-    /// Get current board ///       
+///////////// Get current board ///       
     
     var currentBoardID = localStorage.getItem("currentboard");
     console.log("Current board: " + currentBoardID);
     if (currentBoardID) {
         loadJSONobjects(currentBoardID);
-      
     };
    
-    currentBoardID = currentBoardID; ////need to deprecate this
+    ///currentBoardID = currentBoardID; ////need to deprecate this
 
-    
     //var jsonstorageboardlistobject = getboardlist();
-    var retrievejsonstoragebin = function (bin) {
+    var getjsonboardlist = function (bin) {
         return new Promise(function(resolve, reject){
         //  function getboardlist() {
               var jsonstring;
-              boardlistobject = [];
+              //boardlistobject = [];
               const request = new XMLHttpRequest();
               request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
               request.responseType = "json";
@@ -53,7 +51,7 @@ $(function () {
                       // The request has been completed successfully
                       jsonstring = request.response;
                       jsonstring = JSON.stringify(jsonstring);
-                      alert(jsonstring);
+                      //alert(jsonstring);
                       console.log("Get json bin, " + bin + " ="+ jsonstring);
                       //var jsonparsed = {};
                       //jsonparsed = JSON.parse(jsonstring);
@@ -74,9 +72,11 @@ $(function () {
         };
         // Retrieve board list from storage bin ///////
 
-        retrievejsonstoragebin("baec30811a60").then(function(result) {
+        getjsonboardlist("baec30811a60").then(function(result) {
             console.log("Board list retrieved: " + result); // "Stuff worked!"
             boardlistobject = JSON.parse(result).data;
+            var boardlist = JSON.stringify(boardlistobject);
+            localStorage.setItem("boardlist", boardlist);
             //console.log("Board list object retrieved: " + boardlistobject);
           }, function(err) {
             console.log(err); // Error: "It broke"
@@ -113,18 +113,18 @@ $(function () {
 
     function updateboardlistoptions() {
         //board load options
-        $('#currentBoardID').empty();//empty board options
+        $('#loadfilename').empty();//empty board options
         $.each(boardlistobject, function (key, value) {
             $('#loadfilename')
-                .append($("<option></option>")
-                    .attr("value", key.id)
-                    .text(value.name));
+                .append($("<option value=" + value.id + ">" + value.name + "</option>")
+                    //.attr("value", key.id)
+                    //.text(value.name));
+                );
         });//Update board load options
+        console.log("Boardlist options updated: " + JSON.stringify(boardlistobject))
     };
 
    
-
-
 
     ///////////////////////// MENU MANAGEMENT ///////////////////////////////////////////
 
@@ -146,8 +146,8 @@ $(function () {
                     var column = $(blockid).parents("li")
                     if (columnempty(column)) {
                         removecolumn(column);
-                        saveToLocalStorage(board)
-                    }}
+                    }};
+                    saveToLocalStorage(board);
             },
             Cancel: function () {
                 $(this).dialog("close");
@@ -220,7 +220,7 @@ $(function () {
         modal: true,
         buttons: {
             "Continue": function () {
-                currentBoardID = $("#filename").val();
+                currentBoardID = $("#loadfilename").val();
                 loadJSONobjects(currentBoardID);
                 
                 localStorage.setItem("currentboard", currentBoardID);
@@ -326,21 +326,7 @@ $(function () {
         var boarddata = JSON.stringify(board);
         //boardid = createJSON(boardname, boarddata);
 
-        createJSON(boardname,boarddata)
-        .then((result) => {
-        console.log("New board ID: " + result); 
-        var boardid = result
-        console.log("Board loaded: " + boardid);
-        //updateboardlistoptions();
-        localStorage.setItem("currentboard", boardid);
-        localStorage.setItem(boardid, boarddata);
-
-        currentBoardID = boardname;
-        
-        }) 
-        .catch((err) => {
-        console.log(err); // Error: "It broke"
-        });
+        createJSON(boardname,boarddata);
         
 
 
@@ -624,13 +610,14 @@ $(function () {
        updateJSON(currentBoardID, jsondata); 
        console.log("Save clicked");
     });
-    //Update block details when editing from the infobox
+    
+    ////////////////////////Update block details when editing from the infobox ////////////////
     $(document).on("focusout", ".textbox", function () {
         var currentText = $(this).text();
         var blockid = $(this).parent().attr("id");
         updateBlockTitle(blockid, currentText);
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
-        saveToLocalStorage(board);
+        //saveToLocalStorage(board);
        
     });
     $(document).on("focusout", "#blockname", function () {
@@ -638,7 +625,7 @@ $(function () {
         var blockid = $(this).parent().attr("id");
         updateBlockTitle(blockid, currentText);
         if ($(this).not(':empty')) $(this).attr('contenteditable', 'false');
-        saveToLocalStorage(board);
+        //saveToLocalStorage(board);
     });
     
 /////////////////////////Block menu actions////////////////////
@@ -746,8 +733,7 @@ $(function () {
                   //  console.log("array after: " + cols);
                     //columnsObj[gid] = tstories;
                 board["items"] = itemsObj;
-
-                    saveToLocalStorage(board);
+                saveToLocalStorage(board);
                 htmlfromarray(board);
 
                 var blockid = document.getElementById(textbox);
@@ -823,7 +809,6 @@ $(function () {
                     //  console.log("array after: " + cols);
                     //columnsObj[gid] = tstories;
                     board["items"] = itemsObj;
-
                     saveToLocalStorage(board);
                     htmlfromarray(board);
 
@@ -923,7 +908,7 @@ $(function () {
 ////////////////////////////JSON OBJECTS////////////////////
 
     function loadJSONobjects(boardid) {
-        console.log("boardid: " + boardid);
+        console.log("Load boardid: " + boardid);
         var boarddata; //= localStorage.getItem(boardid);
 
         //Get boarddata from jsonstorage instead
@@ -932,7 +917,7 @@ $(function () {
             return new Promise(function(resolve, reject){
                 //  function getboardlist() {
               var jsonstring;
-              boardlistobject = [];
+              //boardlistobject = [];
               const request = new XMLHttpRequest();
               request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
               request.responseType = "json";
@@ -945,7 +930,7 @@ $(function () {
                       // The request has been completed successfully
                       jsonstring = request.response;
                       jsonstring = JSON.stringify(jsonstring);
-                      alert(jsonstring);
+                      //alert("Bin: " + bin + ", JSON: " +jsonstring);
                       console.log("Get json bin, " + bin + " ="+ jsonstring);
                       resolve(jsonstring);
                       } else {
@@ -965,10 +950,9 @@ $(function () {
             boarddata = JSON.parse(result);
             boarddata = boarddata.data;
             board = boarddata;
-            htmlfromarray(boarddata);
+            //htmlfromarray(boarddata);
             //console.log("Board list object retrieved: " + boardlistobject);
-            
-                
+                           
                
                 groupsObj = board["groups"];
                 groupColumnsObj = board["groupColumns"];
@@ -981,7 +965,10 @@ $(function () {
                 };
                 if (board["settings"]) { settingsBoard = board["settings"] };
     
-                $("#boardname").text(boardid);
+                $("#boardname").text(board["name"]);
+
+                saveToLocalStorage(board);
+                htmlfromarray(board);
 
                           
         }, function(err) {
@@ -1096,6 +1083,8 @@ $(function () {
         board["titles"] = blocktitlearray;
         console.log("Titles:");
             updateItemsObj();
+            saveToLocalStorage(board);
+           
         };
 
     };
@@ -1104,13 +1093,13 @@ $(function () {
         board["details"] = blockdetailsarray;
         console.log("Details:");
       //  console.log(blockdetailsarray);
-        saveToLocalStorage(board);
-    };
+      saveToLocalStorage(board);
+     };
 
     ///////////////////////////// JSON calls //////////////////////////
     
     function createJSON(name, newjson) {
-        return new Promise(function(resolve, reject){
+      
         // function createJSON(name, newjson) {
         const request = new XMLHttpRequest();
         var jsonID
@@ -1133,8 +1122,11 @@ $(function () {
             jsonparsed = JSON.parse(jsonstring);
             jsonID = jsonparsed.id;
             console.log("Create JSON ID: " + jsonID + " with value: " + newjson);
-            localStorage.setItem(jsonID, newjson);
-           
+            //localStorage.setItem(jsonID, newjson);
+            localStorage.setItem("currentboard", jsonID);
+            //localStorage.setItem(boardid, boarddata);
+    
+            currentBoardID = jsonID;
             updateboardlist(jsonID, name);
             } else {
             // Oh no! There has been an error with the request!
@@ -1144,7 +1136,8 @@ $(function () {
         request.send('{"data": ' + newjson + '}');
         return jsonID;
         
-        });
+        
+        
     };
     
 
@@ -1165,7 +1158,7 @@ $(function () {
             jsonstring = request.response;
             jsonstring = JSON.stringify(jsonstring);
             //alert(jsonstring);
-            console.log("Update JSON before parse: " + jsonstring);
+            //console.log("Update JSON before parse: " + jsonstring);
            
             jsonparsed = JSON.parse(jsonstring);
 
@@ -1197,7 +1190,7 @@ $(function () {
         localStorage.setItem("boardlist", boardlist);
 
         //updateJSON("baec30811a60","boardlist", boardlist);
-        updateJSON("baec30811a60",  boardlist);
+        updateJSON("baec30811a60", boardlist);
 
         //localStorage.setItem(boardid, boardlist);
      
@@ -1220,6 +1213,8 @@ $(function () {
         console.log(groupsObj);
   
         board["groups"] = groupsObj;
+        saveToLocalStorage(board);
+       
     };
     function updateColumnsObj() {
         groupColumnsObj = {};
@@ -1243,6 +1238,7 @@ $(function () {
         console.log(groupColumnsObj);
 
         board["groupColumns"] = groupColumnsObj;
+        saveToLocalStorage(board);
   
     };
     function updateRowsObj() {
@@ -1256,6 +1252,7 @@ $(function () {
         console.log(rowsObj);
 
         board["rows"] = rowsObj;
+        saveToLocalStorage(board);
   
     };
     function updateItemsObj() {
@@ -2326,12 +2323,12 @@ $(function () {
     $(document).on("focusout", "#blockname", function (event) {
         var currentText = $(this).val();
         updateBlockTitle(textbox, currentText);
-        saveToLocalStorage(board);
+        //saveToLocalStorage(board);
     });
     $(document).on("focusout", "#blockdetails", function (event) {
         var detailsText = $(this).html();
         updateBlockDetails(textbox, detailsText); 
-        saveToLocalStorage(board);
+        //saveToLocalStorage(board);
     });
    
     $(document).on("keydown", "#blockdetails", function (event) {
