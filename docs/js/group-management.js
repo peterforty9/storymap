@@ -1203,6 +1203,8 @@ $(function () {
         updateItemsObj();
        // saveToLocalStorage();
     };
+/////////////////// UPDATE board from visible board //////////////////////
+
     function updateGroupsObj() {
         groupsObj = [];
         $(".group").each(function () {
@@ -1366,6 +1368,9 @@ $(function () {
         //  console.log(blockdetailsarray);
         saveToLocalStorage(board);
     };
+
+///////////////// GENERATE new block objects /////////////////////////////////////////////
+
     function boxhtml(boxtype, textboxid, title, childitems) {
         var htmlData = "";
         var groupcount
@@ -1414,26 +1419,13 @@ $(function () {
             items: ".groupcontainer",
 
             start: function (event, ui) {
-
-              //  clone = $(ui.item[0].outerHTML).clone();
-               // startgroup = (ui.item.index()) + 1;
+             
                 ui.item.data('originIndex', ui.item.index());
-               // var startgroupindex = ui.item.data('startgroupindex')
-               // startgroupindex = ui.item.index();
+           
             },
-/*
-            placeholder: {
-                element: function (clone, ui) {
-                    return $('<div class="selected"></div>');
-                },
-                update: function () {
-                    return;
-                }
-            },
-            */
+
             update: function (event, ui) {
-                updateGroupsObj();  // Update group array
-               // var targetgroup = (ui.item.index()) + 1;
+                            
                 var startgroupindex = ui.item.data('originIndex');
                 var targetgroupindex = ui.item.index();
                 if (targetgroupindex < startgroupindex) {
@@ -1450,7 +1442,8 @@ $(function () {
                     });
 
                 }
-                saveToLocalStorage(board);
+                //saveToLocalStorage(board);
+                updateGroupsObj();  // Update group array
             }
         });
     }
@@ -1461,7 +1454,8 @@ $(function () {
             handle: ".iteration",
             cancel: ".epic, .newrelease, .iterationtext",
             stop: function (event, ui){
-                saveToLocalStorage(board);
+                updateRowsObj();
+                //saveToLocalStorage(board);
             },
         });
     }
@@ -1499,6 +1493,8 @@ $(function () {
                // totalcolumncount();
                // moveEpics(event, ui);
                 console.log("Changed order");
+                //Update rows array
+                
                 // saveToLocalStorage();
 
             },
@@ -1557,7 +1553,8 @@ $(function () {
             },
            // */
             update: function (event, ui) {
-                saveToLocalStorage(board);
+                updateColumnsObj();
+                //saveToLocalStorage(board);
             },
             
         });
@@ -1622,6 +1619,8 @@ $(function () {
         ui.item.data('changeFromIndex', currentIndex);
         ui.item.data('changeFromGroup', currentGroup);
 
+        updateColumnsObj();  //Update board columns object with column movement
+
     };
     function removeEpics(event, ui) {
         var originGroup = ui.item.data('originGroup');
@@ -1648,6 +1647,7 @@ $(function () {
             //Change class from column to story
             ui.item.find(".column").addClass('story').removeClass('column');
             childtext.addClass('storytext').removeClass('columntext');
+            updateColumnsObj();  //Update board columns object with column deletion
 
         } else if (storycount > 0) {
             $(".columnheader").sortable("cancel");
@@ -1758,9 +1758,14 @@ $(function () {
                             $(newepic).appendTo($(this).find(" .grouprelease:eq(" + targetgroupindex + ") .cell-flex-container"));
                         });
                     }
+                //update column and items array as item has resulted in a new column
+                    updateColumnsObj();
+                    updateItemsObj();
                 }
-
-                saveToLocalStorage(board);
+                //update items array as item has moved between columns
+                              
+                updateItemsObj();
+                //saveToLocalStorage(board);
                 
             }
         });
@@ -2179,7 +2184,7 @@ $(function () {
 
     }
 
-    /////////// RELEASE MANAGEMENT ////////////////
+    /////////// ROW MANAGEMENT ////////////////
           
     $(document).on("click", ".addrelease", function () {
         addNewRelease();
