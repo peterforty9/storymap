@@ -11,7 +11,7 @@ $(function () {
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, groupColumnsObj, groupColumnsArray, columnsArray, rowsObj, itemsObj, itemsArray, selectedBlock, sleft, stop,
         typeItemsObj, statusItemsObj, subsetsObj, settingsBoard, relationshipArray, boardlistobject, boardTypeBoard,
-        boardTypeObject, boardid;
+        boardTypeObject, boardid, subsetBoard, subsetBoardData, gro;
        
     //Build status list from status board items
   
@@ -22,6 +22,7 @@ $(function () {
     }; // Generate GUID
 
 ///////////////////////////////////// PAGE LOAD MANAGEMENT ////////////////////
+
 
 ///////////// Get current board ///       
     
@@ -536,7 +537,16 @@ $(function () {
         //board load options
         $('#settingsBoard').empty();//empty board options
         $('#settingsBoardNew').empty();//empty board options
-        $.each(boardlistobject, function (i, value) {
+
+        $.each(boardlistobject, function (key, value) {
+            $('#settingsBoard')
+                .append($("<option value=" + value.id + ">" + value.name + "</option>"));
+            $('#settingsBoardNew')
+                .append($("<option value=" + value.id + ">" + value.name + "</option>"));
+                    //.attr("value", key.id)
+                    //.text(value.name));
+                
+     /*   $.each(boardlistobject, function (i, value) {
             $('#settingsBoard')
                 .append($("<option></option>")
                     .attr("value", value)
@@ -545,7 +555,9 @@ $(function () {
                 .append($("<option></option>")
                     .attr("value", value)
                     .text(value));
+                    */
         });//Update board load options
+        
     }
     function updateBoardTypeList() {
         //board load options
@@ -628,7 +640,7 @@ $(function () {
         //saveToLocalStorage(board);
     });
     
-/////////////////////////Block menu actions////////////////////
+ /////////////////////////Block menu actions////////////////////
 
     $(document).on("click", "#toggledetails", function (event) {
         $("#infobox").toggleClass("hidden");
@@ -648,7 +660,7 @@ $(function () {
         $("#deleteblock-confirm").dialog("open");
 
     });
-////////////////////Move board item actions//////////////////////////
+ ////////////////////Move board item actions//////////////////////////
 
     $(document).on("click", "#moveright", function () {
         sleft = $("#board").scrollLeft();
@@ -905,7 +917,7 @@ $(function () {
     });
     
  
-////////////////////////////JSON OBJECTS////////////////////
+  ////////////////////////////JSON OBJECTS////////////////////
 
     function loadJSONobjects(boardid) {
         console.log("Load boardid: " + boardid);
@@ -970,6 +982,8 @@ $(function () {
                 saveToLocalStorage(board);
                 htmlfromarray(board);
 
+                getsettingsboarddata(board["settings"]);
+
                           
         }, function(err) {
             console.log(err); // Error: "It broke"
@@ -980,69 +994,123 @@ $(function () {
       
     };
 
-////////////////////////////////////SUBSETS/////////////////////////////////
+  ////////////////////////////////////SUBSETS/////////////////////////////////
 
     //var boardlistobject = [];
    // /*
-    var subsetBoard = localStorage.getItem(settingsBoard);
-    console.log("Settings board: " + subsetBoard);
-    if (subsetBoard) {
-        var subsetlist = [];
-        var subsetBoardData = JSON.parse(subsetBoard);
-        var gro = subsetBoardData["groups"][0];
-        for (i = 0; i < subsetBoardData["groupColumns"][gro].length; i++) {
-            var subsetvalues = [];
-            var row = subsetBoardData["rows"][0];
+    
+   function getsettingsboarddata(settingsboardid){
+        
 
-            var col = subsetBoardData["groupColumns"][gro][i];
-            var boarditemstatuskeys = subsetBoardData["items"][row][col];
-            var label = subsetBoardData["titles"][subsetBoardData["groupColumns"][gro][i]];
-            //  $("label[for='subset" + i + "']").html(label);
-            console.log("row:" + row + ",col," + col + ", " + boarditemstatuskeys);
-
-            boarditemstatuskeys.forEach(setItemStatus)
-            function setItemStatus(item) {
-                subsetvalues.push(item);
-                console.log("set subset value:" + item + "," + subsetBoardData["titles"][item]);
-            };
-            subsetlist.push(subsetvalues);
-
-            if (subsetsObj[col]) { } else {
-                
-                subsetsObj[col] = {};
-            }; //create board object if it does not exist
-
-            //var listname = "subset" + i;
-            var listname = subsetBoardData["groupColumns"][gro][i]
-            //  <label for="subset1">Type</label>
-            //     <select id="subset1"></select>
-            var subsetSelect = document.createElement('select');
-            subsetSelect.id = listname;
-            subsetSelect.name = label;
-
-            var subsetLabel = document.createElement('label');
-            subsetLabel.setAttribute("for", subsetSelect);
-            subsetLabel.innerHTML = label;
-
-            $("#subsetsfieldset").append(subsetLabel);
-            $("#subsetsfieldset").append(subsetSelect);
-
-            subsetSelect.onchange = subsetChange; //add onchange event
-
-            console.log(subsetLabel + "," + subsetSelect);
-
-            $("#" + listname).empty();//empty board options
-            $.each(subsetlist[i], function (j, value) {
-                var text = subsetBoardData["titles"][value];
-                $("#" + listname)
-                    .append($("<option></option>")
-                        .attr("value", value)
-                        .text(text));
-            });//Update subset list options
-
+        var getsettingsboard = function (bin) {
+            return new Promise(function(resolve, reject){
+                //  function getboardlist() {
+                var jsonstring;
+                //boardlistobject = [];
+                const request = new XMLHttpRequest();
+                request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
+                request.responseType = "json";
+                request.setRequestHeader("Security-key", "random-brick-diamond");
+                request.onreadystatechange = () => {
+                    // In local files, status is 0 upon success in Mozilla Firefox
+                    if (request.readyState === XMLHttpRequest.DONE) {
+                        const status = request.status;
+                        if (status === 0 || (status >= 200 && status < 400)) {
+                        // The request has been completed successfully
+                        jsonstring = request.response;
+                        jsonstring = JSON.stringify(jsonstring);
+                        //alert("Bin: " + bin + ", JSON: " +jsonstring);
+                        console.log("Get json bin, " + bin + " ="+ jsonstring);
+                        resolve(jsonstring);
+                        } else {
+                        
+                        reject(Error("json retrieve error " + status));
+                        }
+                    }
+                };
+                request.send();
+            
+            });
         };
-    };// If there is a localStorage boardlist array, retrieve it
-  //  */
+
+
+        getsettingsboard(settingsboardid).then(function(result) 
+        {
+            console.log("Serttings Boarddata retrieved: " + result); // "Stuff worked!"
+                    subsetBoard = JSON.parse(result);
+            
+                    console.log("Settings board: " + subsetBoard);
+                    if (subsetBoard) {
+                    var subsetlist = [];
+                    subsetBoardData = subsetBoard.data;
+                    gro = subsetBoardData["groups"][0];
+                    for (i = 0; i < subsetBoardData["groupColumns"][gro].length; i++) {
+                        var subsetvalues = [];
+                        var row = subsetBoardData["rows"][0];
+            
+                        var col = subsetBoardData["groupColumns"][gro][i];
+                        var boarditemstatuskeys = subsetBoardData["items"][row][col];
+                        var label = subsetBoardData["titles"][subsetBoardData["groupColumns"][gro][i]];
+                        //  $("label[for='subset" + i + "']").html(label);
+                        console.log("row:" + row + ",col," + col + ", " + boarditemstatuskeys);
+            
+                        boarditemstatuskeys.forEach(setItemStatus)
+                        function setItemStatus(item) {
+                            subsetvalues.push(item);
+                            console.log("set subset value:" + item + "," + subsetBoardData["titles"][item]);
+                        };
+                        subsetlist.push(subsetvalues);
+            
+                        if (subsetsObj[col]) { } else {
+                            
+                            subsetsObj[col] = {};
+                        }; //create board object if it does not exist
+            
+                        //var listname = "subset" + i;
+                        var listname = subsetBoardData["groupColumns"][gro][i]
+                        //  <label for="subset1">Type</label>
+                        //     <select id="subset1"></select>
+                        var subsetSelect = document.createElement('select');
+                        subsetSelect.id = listname;
+                        subsetSelect.name = label;
+            
+                        var subsetLabel = document.createElement('label');
+                        subsetLabel.setAttribute("for", subsetSelect);
+                        subsetLabel.innerHTML = label;
+            
+                        $("#subsetsfieldset").append(subsetLabel);
+                        $("#subsetsfieldset").append(subsetSelect);
+            
+                        subsetSelect.onchange = subsetChange; //add onchange event
+            
+                        console.log(subsetLabel + "," + subsetSelect);
+            
+                        $("#" + listname).empty();//empty board options
+                        $.each(subsetlist[i], function (j, value) {
+                            var text = subsetBoardData["titles"][value];
+                            $("#" + listname)
+                                .append($("<option></option>")
+                                    .attr("value", value)
+                                    .text(text));
+                        });//Update subset list options
+            
+                    };
+                };// If there is a localStorage boardlist array, retrieve it
+                 //  */
+                
+                
+                            
+        }, function(err) {
+                console.log(err); // Error: "It broke"
+                boarddata = [];
+                });
+             //*/
+
+  
+    };
+
+    
+  
     function subsetChange() {
 
         console.log("Subset " + this.id + " changed to:" + this.value);
