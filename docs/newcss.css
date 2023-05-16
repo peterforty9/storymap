@@ -148,21 +148,25 @@ i {
     position: sticky;
     top: 0px;
     padding-bottom:5px;
+    min-height: 0;
 }
 #headingcontainer {
     display: flex;
     flex-direction: column;
     width: var(--first-column-width);
     margin: 0;
+    min-height: 0;
 }
 .groupcontainer {
     display: flex;
     flex-direction: column;
     min-width: 136px;
+    min-height: 0;
 }
 #grouparraycontainer {
     display: flex;
     flex-direction: row;
+    min-height: 0;
 }
 .groupcolumns {
     display: flex;
@@ -322,13 +326,14 @@ j {
 #groupsheading {
     display: flex;
     flex-direction: row;
-    height: var(--group-header-height);
+    /*height: var(--group-header-height);*/
+    height: 0px;
     width: var(--first-column-width);
 }
 
 .groupsheadingtext {
     width: var(--first-column-width);
-    height: inherit;
+    min-height: 0px;
     text-align: right;
     background-color: transparent;
     color: #B7B8B6;
@@ -370,7 +375,8 @@ j {
     padding: 0;
     float: left;
     min-width: 20px;
-    height: var(--column-header-height);
+    /*height: var(--column-header-height);*/
+    min-height: 0px;
 }
 .columnheader.smaller {
    
@@ -385,7 +391,8 @@ j {
         height:inherit;
     }
 .columnheaderheading {
-    height: var(--column-header-height);
+    /*height: var(--column-header-height);*/
+    height: 0px;
     width: var(--first-column-width);
     text-align: left;
     float: right;

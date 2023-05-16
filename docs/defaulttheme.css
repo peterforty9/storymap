@@ -37,7 +37,7 @@
 .column {
     display: inline-block;
     width: 136px;
-    height: inherit;
+    height: 76px;
     max-height: 76px;
     text-align: left;
     padding-left: 10px;
