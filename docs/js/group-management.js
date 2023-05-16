@@ -11,7 +11,7 @@ $(function () {
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, groupColumnsObj, groupColumnsArray, columnsArray, rowsObj, itemsObj, itemsArray, selectedBlock, sleft, stop,
         typeItemsObj, statusItemsObj, subsetsObj, settingsBoard, relationshipArray, boardlistobject, boardTypeBoard,
-        boardTypeObject, boardid, subsetBoard, subsetBoardData, gro;
+        boardTypeObject, boardid, subsetBoard, subsetBoardData, gro, columnsVisible, columnGroupsVisible, rowsVisible;
        
     //Build status list from status board items
   
@@ -266,9 +266,9 @@ $(function () {
         createBoardJSON(boardid.val());
     });
     function newboard(boardname, settings, boardType) {  // Generate new board
-        var columnsVisible = true;
-        var columnGroupsVisible = true;
-        var rowsVisible = true;
+        columnsVisible = true;
+        columnGroupsVisible = true;
+        rowsVisible = true;
 
         $("#board").empty(); //Clear current board html
 
@@ -517,6 +517,24 @@ $(function () {
         document.getElementById("boardType") == "List" ? $(".iteration").hide() : $(".iteration").show();
         document.getElementById("boardType") == "List" ? $(".addrelease").hide() : $(".addrelease").show();
 
+    };
+    function boardRowsvisibility(visible) {
+        console.log("Setting row visibility: " + visible);
+        visible == false ? $(".rowsheadingtext").hide() : $(".rowsheadingtext").show();
+        visible == false ? $(".iteration").hide() : $(".iteration").show();
+        visible == false ? $(".addrelease").hide() : $(".addrelease").show();
+
+    };
+    function boardColumnsvisibility(visible) {
+        console.log("Setting column visibility: " + visible);
+        visible == false ? $(".groupline").hide() : $(".groupline").show();
+        visible == false ? $(".group").hide() : $(".group").show();
+    };
+    function boardColumnGroupsvisibility(visible) {
+        console.log("Setting column groups visibility: " + visible);
+        visible == false ? $(".groupcolumns").hide() : $(".groupcolumns").show();
+        visible == false ? $(".columnheader").hide() : $(".columnheader").show();
+       
     };
     $(document).on("click", "#colwidth", function () {
 
@@ -987,7 +1005,14 @@ $(function () {
                 saveToLocalStorage(board);
                 htmlfromarray(board);
 
+                boardRowsvisibility(board["rowsVisible"]);
+                boardColumnsvisibility(board["columnsVisible"]);
+                boardColumnGroupsvisibility(board["columnGroupsVisible"]);
+
                 getsettingsboarddata(board["settings"]);
+
+                /// Show/hide board sections
+                
 
                           
         }, function(err) {
