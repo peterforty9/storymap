@@ -97,13 +97,26 @@ $(function () {
 
             var localboardtypeobject = localStorage.getItem("BoardTypes");
             if (localboardtypeobject) {
-                boardTypeObject = [];
+                boardTypeObject = {};
                 boardTypeBoard = JSON.parse(localboardtypeobject);
                 var gid = boardTypeBoard["groups"][0];
                     for (j = 0; j < boardTypeBoard["groupColumns"][gid].length; ++j) {
-                    var tit = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
-                        boardTypeObject.push(tit);
+                        var boardTypeVisibilityObject = [];
+
+                    var typename = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
+                    console.log(typename);
+                    //var visibilitytext = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
+                    var cid = [boardTypeBoard["groupColumns"][gid][j]];
+                    
+                    for (k = 0; k < boardTypeBoard["rows"].length; ++k) {
+                        var rid = boardTypeBoard["rows"][k];
+                    var vis = boardTypeBoard["titles"][boardTypeBoard["items"][rid][cid]]; // values from rows
+                    boardTypeVisibilityObject.push(vis);
+                    };
+                        //boardTypeObject.push(tit);
+                        boardTypeObject[typename] = boardTypeVisibilityObject;
                 };
+                console.log("Boardtype object: " + JSON.stringify(boardTypeObject))
             } else { boardTypeObject = [] };// If there is a localStorage boardtype board, retrieve it
 
             makeSortable(); //Runs to add sortable fields to the uploaded HTML
@@ -198,8 +211,9 @@ $(function () {
              //   } else {
                     /// settings board
                     settingsBoard = $("#settingsBoardNew").val();
+                    var boardType = $("#boardType").val();
                    
-                    newboard(boardname, settingsBoard);
+                    newboard(boardname, settingsBoard, boardType);
                     //board["name"] = boardid;
                   
                     // createBoardJSON(boardid.val());
@@ -266,9 +280,11 @@ $(function () {
         createBoardJSON(boardid.val());
     });
     function newboard(boardname, settings, boardType) {  // Generate new board
-        columnsVisible = true;
-        columnGroupsVisible = true;
-        rowsVisible = true;
+        columnsVisible = (boardTypeObject[boardType][0].toLowerCase() === 'true');
+        columnGroupsVisible = (boardTypeObject[boardType][1].toLowerCase() === 'true');
+        rowsVisible = (boardTypeObject[boardType][2].toLowerCase() === 'true');
+
+        console.log("Visibility: " + columnsVisible, columnGroupsVisible, rowsVisible)
 
         $("#board").empty(); //Clear current board html
 
@@ -324,6 +340,11 @@ $(function () {
         addNewRelease();
         appendNewcolumn("0");
         toggleGroups();
+
+        boardRowsvisibility(board["rowsVisible"]);
+        boardColumnsvisibility(board["columnsVisible"]);
+        boardColumnGroupsvisibility(board["columnGroupsVisible"]);
+
         //   toggleRows();
         var boarddata = JSON.stringify(board);
         //boardid = createJSON(boardname, boarddata);
@@ -486,6 +507,10 @@ $(function () {
 
         //UPDATE ARRAYS
 
+        boardRowsvisibility(board["rowsVisible"]);
+        boardColumnsvisibility(board["columnsVisible"]);
+        boardColumnGroupsvisibility(board["columnGroupsVisible"]);
+
         toggleGroups();
         saveToLocalStorage(board);
     };//Toggle groups
@@ -584,8 +609,8 @@ $(function () {
         $.each(boardTypeObject, function (i, value) {
             $('#boardType')
                 .append($("<option></option>")
-                    .attr("value", value)
-                    .text(value));
+                    .attr("value", i)
+                    .text(i));
         });//Update board load options
     }
        
@@ -1005,9 +1030,7 @@ $(function () {
                 saveToLocalStorage(board);
                 htmlfromarray(board);
 
-                boardRowsvisibility(board["rowsVisible"]);
-                boardColumnsvisibility(board["columnsVisible"]);
-                boardColumnGroupsvisibility(board["columnGroupsVisible"]);
+               
 
                 getsettingsboarddata(board["settings"]);
 
