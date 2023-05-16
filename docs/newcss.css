@@ -133,10 +133,13 @@ i {
     width:100%;
 }
 
-    #infobox.hidden {
+    #infobox.full {
         height: 95%;
     }
 
+    #infobox.hide {
+        height: 0%;
+    }
 
 #boardheader {
     display: flex;

@@ -225,6 +225,7 @@ $(function () {
                 loadJSONobjects(currentBoardID);
                 
                 localStorage.setItem("currentboard", currentBoardID);
+                
                 //updateboardlist(currentBoardID.val());
                 // createBoardJSON(boardid.val());
                 $(this).dialog("close");
@@ -643,14 +644,14 @@ $(function () {
  /////////////////////////Block menu actions////////////////////
 
     $(document).on("click", "#toggledetails", function (event) {
-        $("#infobox").toggleClass("hidden");
+        $("#infobox").toggleClass("full");
         $("#manageblock").toggle();
         $("#blockmenu").toggle();
         $("#subsets").toggle();
         //  $("#toggledetails").toggleClass("hidden");
         $('.arrow-down-close').toggleClass('open');
         $('#board').toggleClass("displayinfo");
-        hiddenblockdetails = $("#infobox").hasClass("hidden");
+        hiddenblockdetails = $("#infobox").hasClass("full");
         event.stopPropagation();
     });
     $(document).on("click", "#toggleBlockmenu", function (event) {
@@ -958,13 +959,17 @@ $(function () {
 
 
         retrievebin(boardid).then(function(result) {
+            
+            // Clear subsets and hide infobox
+            $("#infobox").toggleClass("hide");
+            $("#subsetsfieldset").html("");
+
             console.log("Boarddata retrieved: " + result); // "Stuff worked!"
             boarddata = JSON.parse(result);
             boarddata = boarddata.data;
             board = boarddata;
             //htmlfromarray(boarddata);
-            //console.log("Board list object retrieved: " + boardlistobject);
-                           
+            //console.log("Board list object retrieved: " + boardlistobject);        
                
                 groupsObj = board["groups"];
                 groupColumnsObj = board["groupColumns"];
@@ -1037,6 +1042,7 @@ $(function () {
         getsettingsboard(settingsboardid).then(function(result) 
         {
             console.log("Serttings Boarddata retrieved: " + result); // "Stuff worked!"
+          
                     subsetBoard = JSON.parse(result);
             
                     console.log("Settings board: " + subsetBoard);
@@ -1849,13 +1855,14 @@ $(function () {
     };
     $(document).on("click", ".textbox", function (event) {
         console.log("textbox clicked");
+        $("#infobox").removeClass("hide");
         // Set block selected style
         //$(".textbox").parent().removeClass('blockselected');
         //$(this).parent().addClass('blockselected')
         textbox = $(this).parent().attr("id");
       
         // Display infobox if hidden
-        $("#infobox").removeClass("hidden");
+        $("#infobox").removeClass("full");
         $('.arrow-down-close').addClass('open');
         $('#board').addClass("displayinfo");
         $("#infobox").focus();
@@ -1888,11 +1895,11 @@ $(function () {
     });
     $(document).on("keydown", ".textbox", function (event) {
         if (event.shiftKey && event.ctrlKey && event.which == 13) {
-            $("#infobox").removeClass("hidden");
+            $("#infobox").removeClass("full");
             $('.arrow-down-close').addClass('open');
             $('#board').addClass("displayinfo");
             $('#blockdetails').focus();
-            hiddenblockdetails = $("#infobox").hasClass("hidden");
+            hiddenblockdetails = $("#infobox").hasClass("full");
             event.stopPropagation();
         }
     });  //Edit textbox details
