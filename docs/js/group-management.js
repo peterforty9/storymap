@@ -566,9 +566,11 @@ $(function () {
         $("head link#columns").attr("href", function (i, attr) {
             return attr == "singlecolumn.css" ? "twocolumns.css" : (
                 attr == "twocolumns.css" ? "threecolumns.css" : (
-                    attr == "threecolumns.css" ? "fourcolumns.css" : "singlecolumn.css"))
+                    attr == "threecolumns.css" ? "fourcolumns.css" : (
+                        attr ==  "fourcolumns.css" ? "transposed.css" : "singlecolumn.css")))
         });
     }); // Update number of column columns
+
     $(document).on("click", "#boardSettingsbutton", function () { //open new map from array
         updateSettingsBoardList();
         if (settingsBoard) {

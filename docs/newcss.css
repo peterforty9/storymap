@@ -145,11 +145,9 @@ i {
     display: flex;
     flex-direction: row;
     background-color: white;
-    position: sticky;
     top: 0px;
     padding-bottom:5px;
-    min-height: 0;
-}
+   }
 #headingcontainer {
     display: flex;
     flex-direction: column;
@@ -197,8 +195,7 @@ i {
    
 }
 .rowheader {
-    position: sticky;
-    top: 75px;
+    
 }
 
 #infobox-title {
