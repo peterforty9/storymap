@@ -1,15 +1,18 @@
+.columnheader li {
+    width: 90vw;
+}
 .column {
-    width: 436px;
+    width: 88vw;
     height: 36px;
 }
 .stories {
-    width: 450px;
+    width: 90vw;
 }
 .epic {
-    width: 450px;
+    width: 90vw;
 }
 .story {
-    width: 436px;
+    width: 88vw;
     height: 36px;
 }
 
