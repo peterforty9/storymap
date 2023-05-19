@@ -92,32 +92,82 @@ $(function () {
                     console.log("Board list object retrieved: " + boardlistobject);
                 } else { boardlistobject = [] };// If there is a jsonStorage boardlist array, retrieve it
             */
+//////////////// get boardtype from json storage /////////////////////////
+
+var getjsonboardtypes= function (bin) {
+    return new Promise(function(resolve, reject){
+    //  function getboardlist() {
+          var jsonstring;
+          //boardlistobject = [];
+          const request = new XMLHttpRequest();
+          request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
+          request.responseType = "json";
+          request.setRequestHeader("Security-key", "random-brick-diamond");
+          request.onreadystatechange = () => {
+               // In local files, status is 0 upon success in Mozilla Firefox
+              if (request.readyState === XMLHttpRequest.DONE) {
+                  const status = request.status;
+                  if (status === 0 || (status >= 200 && status < 400)) {
+                  // The request has been completed successfully
+                  jsonstring = request.response;
+                  jsonstring = JSON.stringify(jsonstring);
+                  console.log("Get json bin, " + bin + " ="+ jsonstring);
+                
+                  resolve(jsonstring);
+                  } else {
+                  // Oh no! There has been an error with the request!
+                  reject(Error("json retrieve error " + status));
+                  }
+              }
+          };
+          request.send();
+          
+      });
+    };
+    // Retrieve board list from storage bin ///////
+
+    getjsonboardtypes("9fa536bdf1a5").then(function(result) {
+        console.log("Board types retrieved: " + result); // "Stuff worked!"
+        var localboardtypeobject = JSON.parse(result).data;
+        localboardtypeobject = JSON.stringify(localboardtypeobject);
+       
+
+       // var localboardtypeobject = localStorage.getItem("BoardTypes");
+        if (localboardtypeobject) {
+            boardTypeObject = {};
+            boardTypeBoard = JSON.parse(localboardtypeobject);
+            var gid = boardTypeBoard["groups"][0];
+                for (j = 0; j < boardTypeBoard["groupColumns"][gid].length; ++j) {
+                    var boardTypeVisibilityObject = [];
+
+                var typename = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
+                console.log(typename);
+                //var visibilitytext = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
+                var cid = [boardTypeBoard["groupColumns"][gid][j]];
+                
+                for (k = 0; k < boardTypeBoard["rows"].length; ++k) {
+                    var rid = boardTypeBoard["rows"][k];
+                var vis = boardTypeBoard["titles"][boardTypeBoard["items"][rid][cid]]; // values from rows
+                boardTypeVisibilityObject.push(vis);
+                };
+                    //boardTypeObject.push(tit);
+                    boardTypeObject[typename] = boardTypeVisibilityObject;
+            };
+            console.log("Boardtype object: " + JSON.stringify(boardTypeObject))
+        } else { boardTypeObject = [] };// If there is a localStorage boardtype board, retrieve it
+
+
+
+      }, function(err) {
+        console.log(err); // Error: "It broke"
+        boardlistobject = [];
+      });
+
+
 
     // If there is a localStorage boarddate array, retrieve it
 
-            var localboardtypeobject = localStorage.getItem("BoardTypes");
-            if (localboardtypeobject) {
-                boardTypeObject = {};
-                boardTypeBoard = JSON.parse(localboardtypeobject);
-                var gid = boardTypeBoard["groups"][0];
-                    for (j = 0; j < boardTypeBoard["groupColumns"][gid].length; ++j) {
-                        var boardTypeVisibilityObject = [];
-
-                    var typename = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
-                    console.log(typename);
-                    //var visibilitytext = boardTypeBoard["titles"][boardTypeBoard["groupColumns"][gid][j]]; //column title from title array
-                    var cid = [boardTypeBoard["groupColumns"][gid][j]];
-                    
-                    for (k = 0; k < boardTypeBoard["rows"].length; ++k) {
-                        var rid = boardTypeBoard["rows"][k];
-                    var vis = boardTypeBoard["titles"][boardTypeBoard["items"][rid][cid]]; // values from rows
-                    boardTypeVisibilityObject.push(vis);
-                    };
-                        //boardTypeObject.push(tit);
-                        boardTypeObject[typename] = boardTypeVisibilityObject;
-                };
-                console.log("Boardtype object: " + JSON.stringify(boardTypeObject))
-            } else { boardTypeObject = [] };// If there is a localStorage boardtype board, retrieve it
+         
 
             makeSortable(); //Runs to add sortable fields to the uploaded HTML
 
