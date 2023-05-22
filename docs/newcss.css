@@ -109,6 +109,9 @@ i {
 
     overflow:auto;
     padding-bottom:5px;
+
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
     
     /*   border-collapse: separate;
     border-spacing: 6px; */
@@ -469,6 +472,10 @@ j {
     display: flex;
     flex-direction: column;
     margin:2px;
+
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+   
 }
     .epic ul {
         white-space: nowrap;
@@ -513,6 +520,8 @@ textarea {
     box-sizing: border-box;
     border:0;
     float: left;
+
+    
 }
 .releasename {
     height: 80px;
