@@ -375,8 +375,8 @@ j {
     padding: 0;
     float: left;
     min-width: 20px;
-    /*height: var(--column-header-height);*/
-    min-height: 0px;
+    min-height: var(--column-header-height);
+    /*min-height: 0px;*/
 }
 .columnheader.smaller {
    

@@ -9,7 +9,7 @@ $(function () {
 
     var n, htmlstring, boardid, currentBoardID, newboardform,
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
-        groupsObj, groupColumnsObj, groupColumnsArray, columnsArray, rowsObj, itemsObj, itemsArray, selectedBlock, sleft, stop,
+        groupsObj, groupColumnsObj, groupColumnsArray, columnsArray, rowsObj, itemsObj, itemsArray, blockdetailsarray, selectedBlock, sleft, stop,
         typeItemsObj, statusItemsObj, subsetsObj, settingsBoard, relationshipArray, boardlistobject, boardTypeBoard,
         boardTypeObject, boardid, subsetBoard, subsetBoardData, gro, columnsVisible, columnGroupsVisible, rowsVisible;
        
@@ -37,14 +37,18 @@ $(function () {
     //var jsonstorageboardlistobject = getboardlist();
     var getjsonboardlist = function (bin) {
         return new Promise(function(resolve, reject){
-        //  function getboardlist() {
-              var jsonstring;
-              //boardlistobject = [];
-              const request = new XMLHttpRequest();
-              request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
-              request.responseType = "json";
-              request.setRequestHeader("Security-key", "random-brick-diamond");
-              request.onreadystatechange = () => {
+            var jsonstring;
+            const request = new XMLHttpRequest();
+            request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
+            request.responseType = "json";
+
+            // disable browser caching in request header
+            request.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+            request.setRequestHeader('Expires', 'Thu, 1 Jan 1970 00:00:00 GMT');
+            request.setRequestHeader('Pragma', 'no-cache');
+
+            request.setRequestHeader("Security-key", "random-brick-diamond");
+            request.onreadystatechange = () => {
                    // In local files, status is 0 upon success in Mozilla Firefox
                   if (request.readyState === XMLHttpRequest.DONE) {
                       const status = request.status;
@@ -52,14 +56,7 @@ $(function () {
                       // The request has been completed successfully
                       jsonstring = request.response;
                       jsonstring = JSON.stringify(jsonstring);
-                      //alert(jsonstring);
-                      console.log("Get json bin, " + bin + " ="+ jsonstring);
-                      //var jsonparsed = {};
-                      //jsonparsed = JSON.parse(jsonstring);
-                      //jsonparsed = jsonparsed.boardlist;
-                      //boardlistobject = jsonparsed.data;
-                      //console.log("Board list object: " + boardlistobject);
-                      //return jsonstring;
+                      console.log("Get boardlist json bin, " + bin + " ="+ jsonstring);
                       resolve(jsonstring);
                       } else {
                       // Oh no! There has been an error with the request!
@@ -96,12 +93,16 @@ $(function () {
 
 var getjsonboardtypes= function (bin) {
     return new Promise(function(resolve, reject){
-    //  function getboardlist() {
           var jsonstring;
-          //boardlistobject = [];
           const request = new XMLHttpRequest();
           request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
           request.responseType = "json";
+          
+            // disable browser caching in request header
+            request.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+            request.setRequestHeader('Expires', 'Thu, 1 Jan 1970 00:00:00 GMT');
+            request.setRequestHeader('Pragma', 'no-cache');
+
           request.setRequestHeader("Security-key", "random-brick-diamond");
           request.onreadystatechange = () => {
                // In local files, status is 0 upon success in Mozilla Firefox
@@ -111,7 +112,7 @@ var getjsonboardtypes= function (bin) {
                   // The request has been completed successfully
                   jsonstring = request.response;
                   jsonstring = JSON.stringify(jsonstring);
-                  console.log("Get json bin, " + bin + " ="+ jsonstring);
+                  console.log("Get board type json bin, " + bin + " ="+ jsonstring);
                 
                   resolve(jsonstring);
                   } else {
@@ -330,30 +331,19 @@ var getjsonboardtypes= function (bin) {
         createBoardJSON(boardid.val());
     });
     function newboard(boardname, settings, boardType) {  // Generate new board
+
         columnsVisible = (boardTypeObject[boardType][0].toLowerCase() === 'true');
         columnGroupsVisible = (boardTypeObject[boardType][1].toLowerCase() === 'true');
         rowsVisible = (boardTypeObject[boardType][2].toLowerCase() === 'true');
-
         console.log("Visibility: " + columnsVisible, columnGroupsVisible, rowsVisible)
-
-        $("#board").empty(); //Clear current board html
-
-        board = {
-            "name": boardname,
-            "columns": [],
-            "groupColumns": {},
-            "groups": [],
-            "items": {},
-            "rows": [],
-            "titles": {},
-            "details": {},
-            "itemtypes": {},
-            "subsets": {},
-            "settings": settings,
-            "columnsVisible": columnsVisible,
-            "columnGroupsVisible": columnGroupsVisible,
-            "rowsVisible": rowsVisible
-        };
+        var groupId = guid();
+        var groupColumnId = guid();
+        var groupColumnsStr = '"' + groupId + '":["' + groupColumnId + '"]';
+        var rowId = guid();
+        board = '{"name":"' + boardname + '","columns":[],"groupColumns":{'+ groupColumnsStr +'},"groups":["' + groupId + '"],"items":{},"rows":["' + rowId + '"],"titles":{},"details":{},"itemtypes":{},"subsets":{},"settings":"' + settings + '","columnsVisible":'+ columnsVisible +',"columnGroupsVisible":'+ columnGroupsVisible +',"rowsVisible":'+ rowsVisible +'}'
+        //var boardobject = JSON.parse(board);
+        createJSON(boardname, board);
+          
         groupsObj = [];
         groupColumnsObj = {};
         columnsArray = [];
@@ -366,48 +356,9 @@ var getjsonboardtypes= function (bin) {
         typeItemsObj = {};
         statusItemsObj = {};
         subsetsObj = {};
-        seittings = "";
+              
+        $("#boardname").text(boardname);
 
-       
-        $("#boardname").text(boardid);
-
-        var boardheader = "<div id='boardheader'></div>";
-        var groups = "<div id='headingcontainer'>" +
-            "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
-            "<div class='columnheaderheading' id='columnheader1'><div class='columnheaderheadingtext textbox'>Activities</div></div>" +
-            "</div><div id='grouparraycontainer'></div>";
-        var rowheading = "";
-        //"<div id='headingrow'><div class='rowsheading' id='rows1'><div class='rowsheadingtext textbox'>Rows</div></div><div class='itemsheadingtext textbox' id='items1'>Stories</div></div>";
-
-        var rows = "<div id='rows'></div>";
-        var addrow = "<div class='newrelease'><div class='addrelease cell'>Add release</div></div>";
-        $("#board").prepend(boardheader);
-        $("#boardheader").prepend(groups);
-        $("#board").append(rowheading);
-        $("#board").append(rows);
-        $("#board").append(addrow);
-        insertGroup("-1");
-        addNewRelease();
-        appendNewcolumn("0");
-        toggleGroups();
-
-        boardRowsvisibility(board["rowsVisible"]);
-        boardColumnsvisibility(board["columnsVisible"]);
-        boardColumnGroupsvisibility(board["columnGroupsVisible"]);
-
-        //   toggleRows();
-        var boarddata = JSON.stringify(board);
-        //boardid = createJSON(boardname, boarddata);
-
-        createJSON(boardname,boarddata);
-        
-
-
-       //var newboardid = createJSON(boardname, boarddata);
-        //console.log(newboardid);
-        //Add board to boardlist
-        
-        //updateboardlist();
 
     }; //Generate a new board
 
@@ -415,20 +366,8 @@ var getjsonboardtypes= function (bin) {
         
         console.log("Board data for building HTML: " + boardarray);
         $("#board").empty();
-        //board = JSON.parse(boardarray);
-        //board = JSON.stringify(board);
-        //var boarddata = localStorage.getItem("boarddata");
-        //var boarddata = localStorage.getItem(boardid);
-        //if (boarddata) {
-        
-        // currentBoardID = board["name"]
-        //currentBoardID = boardid;
-        // };// If there is a localStorage boarddate array, retrieve it
-
-        //count groups
-        // numgroups = board["groups"].length;
-        // numrows = board["rows"].length;
-
+        board = boardarray;
+       
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
             "<div class='groupsheading' id='groupsheading'><div class='groupsheadingtext textbox'>Groups</div></div>" +
@@ -500,7 +439,7 @@ var getjsonboardtypes= function (bin) {
                         var columnId = board["groupColumns"][gid][i];
                         console.log("Column ID: " + columnId);
                         //create stories
-                        if (board["items"][crowid][columnId]) {
+                        if (board["items"][crowid] !== undefined && board["items"][crowid][columnId] !== undefined) {
                             // var storiescount = Object.keys(board["items"].rows[crownum].groups[k].columns[i]["stories"]).length;
 
                             var storiescount = board["items"][crowid][columnId].length;
@@ -1029,6 +968,12 @@ var getjsonboardtypes= function (bin) {
               const request = new XMLHttpRequest();
               request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
               request.responseType = "json";
+              
+            // disable browser caching in request header
+            request.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+            request.setRequestHeader('Expires', 'Thu, 1 Jan 1970 00:00:00 GMT');
+            request.setRequestHeader('Pragma', 'no-cache');
+
               request.setRequestHeader("Security-key", "random-brick-diamond");
               request.onreadystatechange = () => {
                    // In local files, status is 0 upon success in Mozilla Firefox
@@ -1039,7 +984,7 @@ var getjsonboardtypes= function (bin) {
                       jsonstring = request.response;
                       jsonstring = JSON.stringify(jsonstring);
                       //alert("Bin: " + bin + ", JSON: " +jsonstring);
-                      console.log("Get json bin, " + bin + " ="+ jsonstring);
+                      console.log("Get json bin, " + bin + " = "+ jsonstring);
                       resolve(jsonstring);
                       } else {
                       
@@ -1075,7 +1020,9 @@ var getjsonboardtypes= function (bin) {
                 if (board["subsets"]) { subsetsObj = board["subsets"] } else {
                     subsetsObj = {};
                 };
-                if (board["settings"]) { settingsBoard = board["settings"] };
+                if (board["settings"]) { settingsBoard = board["settings"];
+                getsettingsboarddata(board["settings"]);
+             };
     
                 $("#boardname").text(board["name"]);
 
@@ -1084,7 +1031,7 @@ var getjsonboardtypes= function (bin) {
 
                
 
-                getsettingsboarddata(board["settings"]);
+                
 
                 /// Show/hide board sections
                 
@@ -1115,6 +1062,12 @@ var getjsonboardtypes= function (bin) {
                 const request = new XMLHttpRequest();
                 request.open("GET", "https://json.extendsclass.com/bin/" + bin, true);
                 request.responseType = "json";
+
+            // disable browser caching in request header
+            request.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+            request.setRequestHeader('Expires', 'Thu, 1 Jan 1970 00:00:00 GMT');
+            request.setRequestHeader('Pragma', 'no-cache');
+
                 request.setRequestHeader("Security-key", "random-brick-diamond");
                 request.onreadystatechange = () => {
                     // In local files, status is 0 upon success in Mozilla Firefox
@@ -1243,29 +1196,54 @@ var getjsonboardtypes= function (bin) {
     function saveToLocalStorage(boarddata) { //  SAVE BOARD 
      
         var boardobject = JSON.stringify(boarddata);
-    //    localStorage.setItem(currentBoardID, boardobject); // to deprecate after currentboarddata implemented
         localStorage.setItem("currentboarddata", boardobject);
-        //updateJSON(currentBoardID, boardobject); //Update jsonstorage
         console.log(currentBoardID + " Board saved locally");
          
      };
     function updateBlockTitle(blockid, title) {  // Update block title
         //update attributes
         if (title){
-        $("#"+ blockid).attr({ 'title': title });
-        blocktitlearray[blockid] = title;
-        board["titles"] = blocktitlearray;
-        console.log("Titles:");
-            updateItemsObj();
+             
+       if (blocktitlearray[blockid]){
+        var patchstr = '{"op": "replace","path": "/data/titles/'+blockid+'", "value": "' + title + '" }';
+      
+       } else
+       {
+        var patchstr = '{"op": "add","path": "/data/titles/'+blockid+'", "value": "' + title + '" }';
+      
+       };
+       console.log(patchstr);
+       patchJSON(currentBoardID, patchstr);
+        //    updateItemsObj();
+
+         $("#"+ blockid).attr({ 'title': title });
+         blocktitlearray[blockid] = title;
+         board["titles"] = blocktitlearray;
+         console.log("Titles:");
+
             saveToLocalStorage(board);
            
         };
 
     };
     function updateBlockDetails(blockid, text) {
-        blockdetailsarray[blockid] = text;
-        board["details"] = blockdetailsarray;
-        console.log("Details:");
+     
+        if (blockdetailsarray[blockid]){
+            var patchstr = '{"op": "replace","path": "/data/details/'+blockid+'", "value": "' + text + '" }';
+          
+           } else
+           {
+            var patchstr = '{"op": "add","path": "/data/details/'+blockid+'", "value": "' + text + '" }';
+          
+           };
+           console.log(patchstr);
+           patchJSON(currentBoardID, patchstr);
+
+           blockdetailsarray[blockid] = text;
+           board["details"] = blockdetailsarray;
+           console.log("Details:");
+   
+
       //  console.log(blockdetailsarray);
       saveToLocalStorage(board);
      };
@@ -1280,6 +1258,12 @@ var getjsonboardtypes= function (bin) {
         var jsonparsed = {};
         request.open("POST", "https://json.extendsclass.com/bin", true);
         request.responseType = "json";
+        
+            // disable browser caching in request header
+            request.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+            request.setRequestHeader('Expires', 'Thu, 1 Jan 1970 00:00:00 GMT');
+            request.setRequestHeader('Pragma', 'no-cache');
+
         request.setRequestHeader("Api-key", "2e9badc3-1630-11ec-8e13-0242ac110002");
         request.setRequestHeader("Security-key", "random-brick-diamond");
         request.setRequestHeader("Private", "true");
@@ -1302,6 +1286,7 @@ var getjsonboardtypes= function (bin) {
     
             currentBoardID = jsonID;
             updateboardlist(jsonID, name);
+            loadJSONobjects(jsonID);
             } else {
             // Oh no! There has been an error with the request!
             }
@@ -1320,9 +1305,7 @@ var getjsonboardtypes= function (bin) {
         var jsonstring;
         var jsonparsed = {};
         request.open("PUT", "https://json.extendsclass.com/bin/" + jsonID , true);
-        //request.setRequestHeader("Api-key", "2e9badc3-1630-11ec-8e13-0242ac110002");
         request.setRequestHeader("Security-key", "random-brick-diamond");
-        //request.setRequestHeader("Private", "true");
         request.onreadystatechange = () => {
             // In local files, status is 0 upon success in Mozilla Firefox
             if (request.readyState === XMLHttpRequest.DONE) {
@@ -1331,14 +1314,11 @@ var getjsonboardtypes= function (bin) {
             // The request has been completed successfully
             jsonstring = request.response;
             jsonstring = JSON.stringify(jsonstring);
-            //alert(jsonstring);
-            //console.log("Update JSON before parse: " + jsonstring);
+           
            
             jsonparsed = JSON.parse(jsonstring);
 
-            //var jsonID = jsonparsed.id;
-            //localStorage.setItem(jsonID, jsonValue);
-            console.log('Update JSONstorage with {"data": ' + jsonValue + '}');
+            console.log('Update JSONstorage ' + jsonID + ' with {"data": ' + jsonValue + '}');
 
             
         } else {
@@ -1347,6 +1327,37 @@ var getjsonboardtypes= function (bin) {
         }
         };
         request.send('{"data": ' + jsonValue + '}');
+       
+       
+    };
+
+    function patchJSON(jsonID, jsonValue) {
+        const request = new XMLHttpRequest();
+        var jsonstring;
+        var jsonparsed = {};
+        request.open("PATCH", "https://json.extendsclass.com/bin/" + jsonID , true);
+        request.setRequestHeader("Content-type", "application/json-patch+json");
+        request.setRequestHeader("Security-key", "random-brick-diamond");
+        request.onreadystatechange = () => {
+            // In local files, status is 0 upon success in Mozilla Firefox
+            if (request.readyState === XMLHttpRequest.DONE) {
+            const status = request.status;
+            if (status === 0 || (status >= 200 && status < 400)) {
+            // The request has been completed successfully
+            jsonstring = request.response;
+            jsonstring = JSON.stringify(jsonstring);
+            jsonparsed = JSON.parse(jsonstring);
+
+            console.log(jsonID + ' Patch: ' + jsonValue +' - status: ' + status);
+
+            
+        } else {
+            // Oh no! There has been an error with the request!
+            console.log(jsonID + ' Patch: ' + jsonValue + ' - ERROR status: ' + status);
+            }
+        }
+        };
+        request.send("[" + jsonValue + "]");
        
        
     };
@@ -1389,6 +1400,12 @@ var getjsonboardtypes= function (bin) {
         console.log(groupsObj);
   
         board["groups"] = groupsObj;
+
+        var groupstr = JSON.stringify(groupsObj);
+        var patchstr = '{"op": "replace","path": "/data/groups", "value": ' + groupstr + ' }';
+        console.log(patchstr);
+        patchJSON(currentBoardID, patchstr);
+
         saveToLocalStorage(board);
        
     };
@@ -1412,8 +1429,13 @@ var getjsonboardtypes= function (bin) {
         });
         console.log("Columns updated:");
         console.log(groupColumnsObj);
-
         board["groupColumns"] = groupColumnsObj;
+
+        var gcolstr = JSON.stringify(groupColumnsObj);
+        var patchstr = '{"op": "replace","path": "/data/groupColumns", "value": ' + gcolstr + ' }';
+        console.log(patchstr);
+        patchJSON(currentBoardID, patchstr);
+    
         saveToLocalStorage(board);
   
     };
@@ -1428,6 +1450,12 @@ var getjsonboardtypes= function (bin) {
         console.log(rowsObj);
 
         board["rows"] = rowsObj;
+
+        var rowsstr = JSON.stringify(rowsObj);
+        var patchstr = '{"op": "replace","path": "/data/rows", "value": ' + rowsstr + ' }';
+        console.log(patchstr);
+        patchJSON(currentBoardID, patchstr);
+
         saveToLocalStorage(board);
   
     };
@@ -1464,56 +1492,31 @@ var getjsonboardtypes= function (bin) {
                         storyDetails = {};
                         var itemId = $(this).attr("id");
                         var title = $(this).attr("title");
-                        //storyObj.push(itemid);
-                       // storyDetails["id"] = itemId;
-                      //  storyDetails["title"] = title;
-                       // storyObj["stories"] = epicObj;
-                       // storyObj["" + itemid + ""] = storyDetails;
+                      
                         storyObj.push(itemId);
                         x++;
                     });
-                    //item = {}
-                    //item[columnId] = storyObj;
-                    //epicObj.push(item);
-                 //   colDetails["id"] = columnId;
-                 //   colDetails["title"] = "";
-                  //  colDetails["stories"] = storyObj;
+                  
                     colObj["" + columnId + ""] = storyObj //colDetails;
                     y++;
 
                 });
-               // groupDetails["id"] = groupId;
-              //  groupDetails["title"] = grouptitle;
-              //  groupDetails["columns"] = colObj;
-              //  groupObj["" + z + ""] = groupDetails;
+             
                 z++;
             });
-            //item = {}
-            //item[rowid] = epicObj;
-            //itemsObj.push(item);
-            //itemsObj["id"] = rowId;
-           // itemsObj["groups"] = groupObj;
-
-           // rowDetails["id"] = rowId;
-          //  rowDetails["title"] = rowTitle;
-          //  rowDetails["groups"] = groupObj;
-          //  rowsObj["" + rowId + ""] = rowDetails;
+       
             itemsObj[rowId] = colObj;
             w++;
         });
-      //  itemsObj["id"] = "id";
-      //  itemsObj["title"] = "";
-      //  itemsObj["rows"] = rowsObj;
-        
-        console.log("Items updated:");
+    
         console.log(itemsObj);
-
         board["items"] = itemsObj;
-
+        var itemsstr = JSON.stringify(itemsObj);
+        var patchstr = '{"op": "replace","path": "/data/items", "value": ' + itemsstr + ' }';
+        patchJSON(currentBoardID, patchstr);
         saveToLocalStorage(board);
         
-       // console.log("board");
-        //console.log(board);
+    
     };
     function updatesubsetObj(blockid, value, label) {
         console.log("update subset (id, value, label):" + blockid + ", " + value + "," + label);
@@ -1523,6 +1526,12 @@ var getjsonboardtypes= function (bin) {
             subsetsObj[label] = {};
             subsetsObj[label][blockid] = value;
         };
+
+        var subsetstr = JSON.stringify(subsetsObj);
+        var patchstr = '{"op": "replace","path": "/data/subsets", "value": ' + subsetstr + ' }';
+        console.log(patchstr);
+        patchJSON(currentBoardID, patchstr);
+
         board["subsets"] = subsetsObj;
         console.log("subsets object saved:" + subsetsObj);
         //  console.log(blockdetailsarray);
@@ -1531,6 +1540,7 @@ var getjsonboardtypes= function (bin) {
     function updateTypeItemsObj(blockid,type) {
         typeItemsObj[blockid] = type;
         board["itemtypes"] = typeItemsObj;
+        
         console.log("Type items:" + typeItemsObj);
         //  console.log(blockdetailsarray);
         saveToLocalStorage(board);       
@@ -1567,7 +1577,7 @@ var getjsonboardtypes= function (bin) {
             htmlData = "<div class='epic'><ul class='stories'>" + childitems +
                 "</ul ></div > ";
         } else { };
-        console.log(boxtype + " created");
+        console.log(boxtype + " created: " + textboxid);
         return htmlData;
     };  //Generate object html
  
@@ -1642,9 +1652,7 @@ var getjsonboardtypes= function (bin) {
             cancel: ".columntext",
 
             start: function (event, ui) {
-                // clone = $(ui.item[0].outerHTML).clone();
-                // columnstartindex = ui.item.index();
-                //columnstartplaceholderindex = ui.placeholder.index();
+              
                 ui.item.data('originIndex', ui.item.index());
                 ui.item.data('originGroup', ui.item.parents(".groupcontainer").index());
                 ui.item.data('changeFromGroup', ui.item.parents(".groupcontainer").index());
@@ -1672,17 +1680,7 @@ var getjsonboardtypes= function (bin) {
                 // saveToLocalStorage();
 
             },
-            /* remove: function (event, ui) {
-                 if (ui.placeholder.parents().hasClass("columnheader") === false) {
- 
-                     console.log("Activity removed");
- 
-                     removeEpics(event, ui);
-                     console.log("Changed to story");
-                     saveToLocalStorage();
-                 };
-             },     
-           */
+         
             placeholder: {
                 element: function (clone, ui) {
                     //   return $('<li class="selected">' + clone[0].innerHTML + '</li>');
@@ -2063,7 +2061,7 @@ var getjsonboardtypes= function (bin) {
 
         $(".rowgroups").each(function (index) {
             $(groupreleasehtml).insertAfter($(this).find('.grouprelease:eq(' + (groupindex) + ')' ));
-          
+          console.log('Added .grouprelease:eq(' + (groupindex) + ')')
         });
 
         //Insert group
@@ -2071,6 +2069,8 @@ var getjsonboardtypes= function (bin) {
         //Update groups array
         updateGroupsObj();
         updateColumnsObj();
+
+        //appendNewcolumn(grouptextid);
        
         //Add columnheader
        // $(columnlisthtml).insertAfter(columnlist);
@@ -2288,6 +2288,8 @@ var getjsonboardtypes= function (bin) {
 
         var block = document.getElementById(storytextid);
         $(block).find(".textbox").focus();
+        console.log('Updating items after epic click');
+        updateItemsObj();
         saveToLocalStorage(board);
         event.stopPropagation();
                 
