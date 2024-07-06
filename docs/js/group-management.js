@@ -340,7 +340,9 @@ var getjsonboardtypes= function (bin) {
         var groupColumnId = guid();
         var groupColumnsStr = '"' + groupId + '":["' + groupColumnId + '"]';
         var rowId = guid();
-        board = '{"name":"' + boardname + '","columns":[],"groupColumns":{'+ groupColumnsStr +'},"groups":["' + groupId + '"],"items":{},"rows":["' + rowId + '"],"titles":{},"details":{},"itemtypes":{},"subsets":{},"settings":"' + settings + '","columnsVisible":'+ columnsVisible +',"columnGroupsVisible":'+ columnGroupsVisible +',"rowsVisible":'+ rowsVisible +'}'
+      //  board = '{"name":"' + boardname + '","columns":[],"groupColumns":{'+ groupColumnsStr +'},"groups":["' + groupId + '"],"items":{},"rows":["' + rowId + '"],"titles":{},"details":{},"itemtypes":{},"subsets":{},"settings":"' + settings + '","columnsVisible":'+ columnsVisible +',"columnGroupsVisible":'+ columnGroupsVisible +',"rowsVisible":'+ rowsVisible +'}'
+        board = '{"name":"' + boardname + '","columns":[],"groupColumns":{'+ groupColumnsStr +'},"groups":["' + groupId + '"],"items":{},"rows":["' + rowId + '"],"details":{},"itemtypes":{},"subsets":{},"settings":"' + settings + '","columnsVisible":'+ columnsVisible +',"columnGroupsVisible":'+ columnGroupsVisible +',"rowsVisible":'+ rowsVisible +'}'
+
         //var boardobject = JSON.parse(board);
         createJSON(boardname, board);
           
@@ -367,6 +369,9 @@ var getjsonboardtypes= function (bin) {
         console.log("Board data for building HTML: " + boardarray);
         $("#board").empty();
         board = boardarray;
+        if(board["titles"] === undefined){
+            board["titles"] = {};
+        };
        
         var boardheader = "<div id='boardheader'></div>";
         var groups = "<div id='headingcontainer'>" +
@@ -514,13 +519,8 @@ var getjsonboardtypes= function (bin) {
     function toggleGroups() {
         $("#group").toggle();
     }
- /*   $(document).on("click", "#menuRows", function () {
-        //  toggleRows();
-        document.getElementById("menuRows").checked ? $(".rowsheadingtext").show() : $(".rowsheadingtext").hide();
-        document.getElementById("menuRows").checked ? $(".iteration").show() : $(".iteration").hide();
-        document.getElementById("menuRows").checked ? $(".addrelease").show() : $(".addrelease").hide();
        
-    });//Toggle rows */
+   //Toggle rows */
     function toggleRows() {
         $(".rowsheadingtext").toggle();
         $(".iteration").toggle();
@@ -578,19 +578,7 @@ var getjsonboardtypes= function (bin) {
                 .append($("<option value=" + value.id + ">" + value.name + "</option>"));
             $('#settingsBoardNew')
                 .append($("<option value=" + value.id + ">" + value.name + "</option>"));
-                    //.attr("value", key.id)
-                    //.text(value.name));
-                
-     /*   $.each(boardlistobject, function (i, value) {
-            $('#settingsBoard')
-                .append($("<option></option>")
-                    .attr("value", value)
-                    .text(value));
-            $('#settingsBoardNew')
-                .append($("<option></option>")
-                    .attr("value", value)
-                    .text(value));
-                    */
+
         });//Update board load options
         
     }
@@ -634,10 +622,6 @@ var getjsonboardtypes= function (bin) {
         $("#boardType").val(null);
         $("#save-confirm").dialog("open");
 
-        //newboard();
-        // $("#dialog-confirm").dialog("open");
-        // newboard();
-        // console.log("new map loaded");
     });
     $(document).on("click", "#deleteboard", function () { //open new map from html template
         $("#delete-confirm").dialog("open");
@@ -921,12 +905,9 @@ var getjsonboardtypes= function (bin) {
                     groupColumnsObj[gid] = cols;
 
                     gid = groupsObj[gind - 1];
-                    
-                    //var k = columnsObj[gid].length;
+
                     cols = groupColumnsObj[gid];
-                    //  cols.splice(k, 0, j);
-                    //   console.log("array after: " + cols);
-                    //   columnsObj[gid] = cols;
+
                     cols.push(j);
                 }
                
@@ -942,7 +923,7 @@ var getjsonboardtypes= function (bin) {
 
                 saveToLocalStorage(board);
                 htmlfromarray(board);
-                // location.reload();
+
             };
 
         };
@@ -1008,8 +989,7 @@ var getjsonboardtypes= function (bin) {
             boarddata = JSON.parse(result);
             boarddata = boarddata.data;
             board = boarddata;
-            //htmlfromarray(boarddata);
-            //console.log("Board list object retrieved: " + boardlistobject);        
+  
                
                 groupsObj = board["groups"];
                 groupColumnsObj = board["groupColumns"];
@@ -1203,7 +1183,11 @@ var getjsonboardtypes= function (bin) {
     function updateBlockTitle(blockid, title) {  // Update block title
         //update attributes
         if (title){
-             
+
+        var patchstr = '{"data":{"titles":{"'+ blockid +'":"' + title + '"}}}';
+        //patchstr = JSON.stringify(patchstr);
+
+       /* Replaced with merge-patch      
        if (blocktitlearray[blockid]){
         var patchstr = '{"op": "replace","path": "/data/titles/'+blockid+'", "value": "' + title + '" }';
       
@@ -1212,22 +1196,24 @@ var getjsonboardtypes= function (bin) {
         var patchstr = '{"op": "add","path": "/data/titles/'+blockid+'", "value": "' + title + '" }';
       
        };
+
+       */
        console.log(patchstr);
        patchJSON(currentBoardID, patchstr);
         //    updateItemsObj();
-
+/* Removed code for reading from JSON after patch
          $("#"+ blockid).attr({ 'title': title });
          blocktitlearray[blockid] = title;
          board["titles"] = blocktitlearray;
          console.log("Titles:");
 
             saveToLocalStorage(board);
-           
+         */ 
         };
 
     };
     function updateBlockDetails(blockid, text) {
-     
+ /*    
         if (blockdetailsarray[blockid]){
             var patchstr = '{"op": "replace","path": "/data/details/'+blockid+'", "value": "' + text + '" }';
           
@@ -1236,13 +1222,16 @@ var getjsonboardtypes= function (bin) {
             var patchstr = '{"op": "add","path": "/data/details/'+blockid+'", "value": "' + text + '" }';
           
            };
+*/
+        var patchstr = '{"data":"details":"'+ blockid +'":"' + text + '"}';
+
            console.log(patchstr);
            patchJSON(currentBoardID, patchstr);
-
+/* Removed code for reading from JSON after patch
            blockdetailsarray[blockid] = text;
            board["details"] = blockdetailsarray;
            console.log("Details:");
-   
+   */
 
       //  console.log(blockdetailsarray);
       saveToLocalStorage(board);
@@ -1306,6 +1295,12 @@ var getjsonboardtypes= function (bin) {
         var jsonparsed = {};
         request.open("PUT", "https://json.extendsclass.com/bin/" + jsonID , true);
         request.setRequestHeader("Security-key", "random-brick-diamond");
+
+         // disable browser caching in request header
+         request.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+         request.setRequestHeader('Expires', 'Thu, 1 Jan 1970 00:00:00 GMT');
+         request.setRequestHeader('Pragma', 'no-cache');
+
         request.onreadystatechange = () => {
             // In local files, status is 0 upon success in Mozilla Firefox
             if (request.readyState === XMLHttpRequest.DONE) {
@@ -1332,11 +1327,27 @@ var getjsonboardtypes= function (bin) {
     };
 
     function patchJSON(jsonID, jsonValue) {
+        //jsonValue = JSON.stringify(jsonValue);
         const request = new XMLHttpRequest();
         var jsonstring;
-        var jsonparsed = {};
-        request.open("PATCH", "https://json.extendsclass.com/bin/" + jsonID , true);
-        request.setRequestHeader("Content-type", "application/json-patch+json");
+        var jsonparsed;
+       
+        request.open("PATCH", "https://json.extendsclass.com/bin/" + jsonID, true);
+
+        // disable browser caching in request header
+        request.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+        request.setRequestHeader('Expires', 'Thu, 1 Jan 1970 00:00:00 GMT');
+        request.setRequestHeader('Pragma', 'no-cache');
+        
+        if (jsonValue.includes('{"op":')){
+            request.setRequestHeader("Content-type", "application/json-patch+json");
+            console.log("json-patch: " + jsonValue);
+        } else {
+            request.setRequestHeader("Content-type", "application/merge-patch+json");
+            console.log("merge-patch: " + jsonValue);
+        };
+        
+        //request.setRequestHeader("Content-type", "application/json-patch+json");
         request.setRequestHeader("Security-key", "random-brick-diamond");
         request.onreadystatechange = () => {
             // In local files, status is 0 upon success in Mozilla Firefox
@@ -1344,12 +1355,12 @@ var getjsonboardtypes= function (bin) {
             const status = request.status;
             if (status === 0 || (status >= 200 && status < 400)) {
             // The request has been completed successfully
-            jsonstring = request.response;
-            jsonstring = JSON.stringify(jsonstring);
-            jsonparsed = JSON.parse(jsonstring);
+           jsonstring = request.response;
+           jsonstring = JSON.stringify(jsonstring);
+           jsonparsed = JSON.parse(jsonstring);
 
             console.log(jsonID + ' Patch: ' + jsonValue +' - status: ' + status);
-
+           // loadJSONobjects(currentBoardID); Implement this line once all pacthes are updated
             
         } else {
             // Oh no! There has been an error with the request!
@@ -1357,14 +1368,19 @@ var getjsonboardtypes= function (bin) {
             }
         }
         };
-        request.send("[" + jsonValue + "]");
        
+        if (jsonValue.includes('{"op":')){
+            request.send("[" + jsonValue + "]");
+            console.log("Request send json-patch: [" + jsonValue + "]");
+        } else {
+            request.send(jsonValue);
+            console.log("Request send merge-patch: " + jsonValue);
+        };
        
     };
 
     function updateboardlist(fileid, boardid) {       
-       // createBoardJSON(boardid);
-       // boardlistobject[boardid] = board;
+
        var newboarditem;
        newboarditem = {};
        newboarditem.id  =  fileid;
@@ -1391,6 +1407,7 @@ var getjsonboardtypes= function (bin) {
 /////////////////// UPDATE board from visible board //////////////////////
 
     function updateGroupsObj() {
+       
         groupsObj = [];
         $(".group").each(function () {
             var id = $(this).attr("id");
@@ -1418,7 +1435,6 @@ var getjsonboardtypes= function (bin) {
             var groupId = $(this).parent().parent().find(".group").attr("id");
             ($(this).find(".column")).each(function () {
                 var columnid = $(this).attr("id");
-               // relationshipArray[columnid] ???
                 columngroupObj.push(columnid);
                 columnsArray.push(columnid);
              });
@@ -1512,7 +1528,7 @@ var getjsonboardtypes= function (bin) {
         console.log(itemsObj);
         board["items"] = itemsObj;
         var itemsstr = JSON.stringify(itemsObj);
-        var patchstr = '{"op": "replace","path": "/data/items", "value": ' + itemsstr + ' }';
+        var patchstr = '{"op": "replace","path": "/data/items", "value":' + itemsstr + '}';
         patchJSON(currentBoardID, patchstr);
         saveToLocalStorage(board);
         
@@ -2045,6 +2061,21 @@ var getjsonboardtypes= function (bin) {
         }
     });  //Insert new group from group
     function insertGroup(groupindex) {
+
+        // Add Group, Add ColumnGroup, reload JSON
+     var groupId = guid();
+     var groupColumnId = guid();
+    // var gcolstr = JSON.stringify(groupColumnsObj);
+     var patchstr = '{"op": "add","path": "/data/groups/-", "value": "' + groupId + '"}';
+     console.log(patchstr);
+     patchJSON(currentBoardID, patchstr);
+
+     var patchstr = '{"op": "add","path": "/data/groupColumns/' + groupId + '", "value":["' + groupColumnId + '"] }';
+     console.log(patchstr);
+     patchJSON(currentBoardID, patchstr);
+
+       
+       /* removing original code
         //var groupindex = groupnumber - 1
         var grouptextid = guid();
         var newgrouphtml = boxhtml("group", grouptextid);
@@ -2078,8 +2109,10 @@ var getjsonboardtypes= function (bin) {
                
         var block = document.getElementById(grouptextid);
         $(block).find(".textbox").focus();
+        */
     }; //Insert new group
     function appendNewcolumn(groupindex) {
+    //    /* Previous code to be removed
         var columntextid = guid();
         var columnhtml = boxhtml("column", columntextid);
         var columnlist = $('.groupcontainer:eq(' + groupindex + ') .columnheader');
@@ -2090,7 +2123,9 @@ var getjsonboardtypes= function (bin) {
         $(block).find(".textbox").focus();
         //Update columns array    
         updateColumnsObj();
-      
+     // */
+     //New code for manipulating JSON and THEN updating HTML
+     
         //Append new epic
 
 
@@ -2139,8 +2174,6 @@ var getjsonboardtypes= function (bin) {
     }); //column text return functions
     function insertNewcolumn(columnindex, groupindex) {
         var columntextid = guid();
-       // var groupindex = groupnumber - 1;
-       // var columnindex = columnnumber - 1;
         var htmlData = boxhtml("column", columntextid);
         var columnli = $('.groupcontainer:eq(' + groupindex + ') .columnheader li:eq('+ columnindex + ')');
         //Insert column 
