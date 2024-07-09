@@ -558,7 +558,7 @@ var getjsonboardtypes= function (bin) {
                     attr == "threecolumns.css" ? "fourcolumns.css" : (
                         attr ==  "fourcolumns.css" ? "transposed.css" : "singlecolumn.css")))
         });
-    }); // Update number of column columns
+    }); // Update number of columns
 
     $(document).on("click", "#boardSettingsbutton", function () { //open new map from array
         updateSettingsBoardList();
@@ -1000,8 +1000,9 @@ var getjsonboardtypes= function (bin) {
                 if (board["subsets"]) { subsetsObj = board["subsets"] } else {
                     subsetsObj = {};
                 };
-                if (board["settings"]) { settingsBoard = board["settings"];
-                getsettingsboarddata(board["settings"]);
+                if (board["settings"] !== "null" ) { 
+                    settingsBoard = board["settings"];
+                    getsettingsboarddata(board["settings"]);
              };
     
                 $("#boardname").text(board["name"]);
@@ -1223,7 +1224,7 @@ var getjsonboardtypes= function (bin) {
           
            };
 */
-        var patchstr = '{"data":"details":"'+ blockid +'":"' + text + '"}';
+        var patchstr = '{"data":{"details":{"'+ blockid +'":"' + text + '"}}}';
 
            console.log(patchstr);
            patchJSON(currentBoardID, patchstr);
@@ -1326,11 +1327,11 @@ var getjsonboardtypes= function (bin) {
        
     };
 
-    function patchJSON(jsonID, jsonValue) {
+    function patchJSON(jsonID, jsonValue, thisObj, boardObj, objId, objId2) {
         //jsonValue = JSON.stringify(jsonValue);
         const request = new XMLHttpRequest();
-        var jsonstring;
-        var jsonparsed;
+        //var jsonstring;
+        //var jsonparsed;
        
         request.open("PATCH", "https://json.extendsclass.com/bin/" + jsonID, true);
 
@@ -1355,12 +1356,15 @@ var getjsonboardtypes= function (bin) {
             const status = request.status;
             if (status === 0 || (status >= 200 && status < 400)) {
             // The request has been completed successfully
-           jsonstring = request.response;
-           jsonstring = JSON.stringify(jsonstring);
-           jsonparsed = JSON.parse(jsonstring);
+           //jsonstring = request.response;
+           //jsonstring = JSON.stringify(jsonstring);
+           //jsonparsed = JSON.parse(jsonstring);
 
             console.log(jsonID + ' Patch: ' + jsonValue +' - status: ' + status);
-           // loadJSONobjects(currentBoardID); Implement this line once all pacthes are updated
+            console.log(' thisObj: ' + thisObj + ' boardObj: ' + boardObj +' - objId: ' + objId);
+            boardPatchUpdate(thisObj,boardObj,objId,objId2);
+           
+           //loadJSONobjects(jsonID); //Implement this line once all pacthes are updated
             
         } else {
             // Oh no! There has been an error with the request!
@@ -1599,7 +1603,32 @@ var getjsonboardtypes= function (bin) {
  
     ////////// BLOCK MOVEMENT MANAGEMENT ////////////////
         
-    $("body").on("DOMNodeInserted", "#board", makeSortable);//Listen out for newly created blocks and make sortable
+   // $("body").on("DOMNodeInserted", "#board", makeSortable);//Listen out for newly created blocks and make sortable
+
+    // Select the node that will be observed for mutations
+    const targetNode = document.getElementById("board");
+
+    // Options for the observer (which mutations to observe)
+    const config = { attributes: false, childList: true, subtree: true, CharacterData: false };
+
+    // Callback function to execute when mutations are observed
+    const callback = (mutationList, observer) => {
+    for (const mutation of mutationList) {
+        makeSortable();
+        console.log("A subtree node has been added or removed.");
+      }
+    }
+   
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(callback);
+
+  // Start observing the target node for configured mutations
+  observer.observe(targetNode, config);
+   /* 
+  // Later, you can stop observing
+  observer.disconnect();
+
+*/
 
     function makeSortable() {
         console.log(
@@ -2009,11 +2038,11 @@ var getjsonboardtypes= function (bin) {
     });
     $(document).on("keydown", ".textbox", function (event) {
         if (event.shiftKey && event.ctrlKey && event.which == 13) {
-            $("#infobox").removeClass("full");
-            $('.arrow-down-close').addClass('open');
-            $('#board').addClass("displayinfo");
+           // $("#infobox").removeClass("full");
+           // $('.arrow-down-close').addClass('open');
+           // $('#board').addClass("displayinfo");
             $('#blockdetails').focus();
-            hiddenblockdetails = $("#infobox").hasClass("full");
+            //hiddenblockdetails = $("#infobox").hasClass("full");
             event.stopPropagation();
         }
     });  //Edit textbox details
@@ -2066,13 +2095,18 @@ var getjsonboardtypes= function (bin) {
      var groupId = guid();
      var groupColumnId = guid();
     // var gcolstr = JSON.stringify(groupColumnsObj);
-     var patchstr = '{"op": "add","path": "/data/groups/-", "value": "' + groupId + '"}';
+    /*
+     var patchstr = '{"op": "add","path": "/data/groups/-", "value":"' + groupId + '"}';
      console.log(patchstr);
      patchJSON(currentBoardID, patchstr);
 
-     var patchstr = '{"op": "add","path": "/data/groupColumns/' + groupId + '", "value":["' + groupColumnId + '"] }';
+     var patchstr = '{"op": "add","path": "/data/groupColumns/' + groupId + '", "value":["' + groupColumnId + '"]}';
      console.log(patchstr);
      patchJSON(currentBoardID, patchstr);
+*/
+     var patchstr = '{"op": "add","path": "/data/groups/-", "value":"' + groupId + '"}, {"op": "add","path": "/data/groupColumns/' + groupId + '", "value":["' + groupColumnId + '"]}';
+     console.log(patchstr);
+     patchJSON(currentBoardID, patchstr,null,"group",groupId,groupColumnId);
 
        
        /* removing original code
@@ -2310,24 +2344,71 @@ var getjsonboardtypes= function (bin) {
         
     $(document).on("click", ".epic", function () {
         var storytextid = guid();
-        var htmlData = boxhtml("story", storytextid);
 
-        if (($(this).find("li .story").length > 0)) {
-            $(htmlData).insertAfter($(this).find("li:last-child"));
+        var rowId = $(this).closest('.row').find('.iteration').attr('id');
+        var itemId = storytextid;
+        var groupIndex = $(this).closest('.grouprelease').index();
+        var epicIndex = $(this).index();
+        var hasItems =  $(this).find('li').index();
+        //var itemIndex = thisObj.parent().parent().index();
+        var columnId = $(".groupcontainer:eq(" + groupIndex + ")").find(".columnheader li:eq(" + epicIndex + ") .column").attr("id");
+        console.log("rowid:  "+  rowId + ", itemid:  "+  itemId  + ", columnId: "+  columnId + ", hasItems: " + hasItems);
+        var patchstr 
+        if( hasItems >= 0){
+        patchstr = '{"op": "add", "path": "/data/items/' + rowId + '/' + columnId + '/-",  "value": "' + itemId + '"}';
+        } else
+        {
+       // patchstr = '{"op": "add", "path": "/data/items/' + rowId + '/' + columnId + '",  "value": ["' + itemId + '"]}';
+        patchstr = '{"data":{"items":{"' + rowId + '":{"' + columnId + '":["' + itemId + '"]}}}}'
+        };
+        patchJSON(currentBoardID,patchstr,$(this),"item",storytextid);
+    });//Create new story when addStory clicked
+
+    function boardPatchUpdate(thisObj,boardObj,objId,objId2){
+
+        if(boardObj === "item"){
+        var htmlData = boxhtml("story", objId);
+
+        if (thisObj.find("li .story") === true) {
+            $(htmlData).insertAfter(thisObj.find("li:last-child"));
         }
         else {
-            ($(this).children(".stories")).append(htmlData);
+            (thisObj.children(".stories")).append(htmlData);
         };
 
-        var block = document.getElementById(storytextid);
+        var block = document.getElementById(objId);
         $(block).find(".textbox").focus();
-        console.log('Updating items after epic click');
-        updateItemsObj();
-        saveToLocalStorage(board);
-        event.stopPropagation();
-                
-    //    $(this).hide();
-    });//Create new story when addStory clicked
+        console.log('Updating board items after epic click');
+        } else
+        if(boardObj === "group"){
+
+        var grouptextid = objId;
+        var newgrouphtml = boxhtml("group", grouptextid);
+        var groupreleasehtml = "<div class='grouprelease'><div class='cell-flex-container'></div></div>";
+        $(newgrouphtml).appendTo($("#grouparraycontainer"));
+      
+        //Insert releasegroups
+
+        $(".rowgroups").each(function (index) {
+            $(groupreleasehtml).appendTo('.rowgroups');
+          console.log('Added .grouprelease');
+        });
+
+        //Insert group
+        
+       
+        //Add columnheader
+       // $(columnlisthtml).insertAfter(columnlist);
+        // Update columns array
+               
+        var block = document.getElementById(grouptextid);
+        $(block).find(".textbox").focus();
+
+        };
+
+    };  
+   
+
     $(document).on("keydown", ".storytext", function (event) {
         var columnindex = $(this).parents(".epic").index();
         var groupindex = $(this).parents(".grouprelease").index();
@@ -2362,14 +2443,28 @@ var getjsonboardtypes= function (bin) {
         };
 
     });//Create new story when enter key pressed
+
     $(document).on("focusout", ".storytext", function () {
         if ($(this).is(':empty')) { deletestory($(this)) }
     });//Remove empty story
+
     function deletestory(thisObj) {
         //var stories = thisObj.parent().parent().parent();
         //var laststory = $(stories).length;
-        thisObj.parent().parent().empty();
-        thisObj.parent().parent().remove();
+       // thisObj.parent().parent().empty();
+       // thisObj.parent().parent().remove();
+       // itemId = thisObj.parent().id;
+        var rowId = thisObj.closest('.row').find('.iteration').attr('id');
+        var itemId = thisObj.closest('.story').attr('id');
+        var groupIndex = thisObj.closest('.grouprelease').index();
+        var epicIndex = thisObj.closest('.epic').index();
+        var itemIndex = thisObj.parent().parent().index();
+        var columnId = $(".groupcontainer:eq(" + groupIndex + ")").find(".columnheader li:eq(" + epicIndex + ") .column").attr("id");
+        console.log("rowid:  "+  rowId + ", itemid:  "+  itemId  + ", columnId: "+  columnId + ", itemIndex: " + itemIndex);
+        //var patchstr = '{"op": "add","path": "/data/items/' + rowId + '/' + columnId + '/'+ itemIndex +'", "value":' + itemsstr + '}';
+        //patchJSON(currentBoardID,patchstr)
+                   
+             // columnIdId = thisObj.parent().id;
 
         //Show "add story" if it was the last story in the epic
         //if (laststory == 1) {
@@ -2377,7 +2472,11 @@ var getjsonboardtypes= function (bin) {
         //};
         //update array
         updateItemsObj();
+       //var patchstr = '{"op": "add","path": "/data/items/' + rowId + '/' + columnId + '/'+ itemIndex +'", "value":' + itemsstr + '}';
+       //patchJSON(currentBoardID,patchstr)
+
     }; //Delete story
+
     function hideaddstory() {
 
         //hide the add story button when stories exist
