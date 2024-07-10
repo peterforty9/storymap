@@ -212,7 +212,7 @@ var getjsonboardtypes= function (bin) {
                     if (columnempty(column)) {
                         removecolumn(column);
                     }};
-                    saveToLocalStorage(board);
+                    //saveToLocalStorage(board);
             },
             Cancel: function () {
                 $(this).dialog("close");
@@ -312,6 +312,9 @@ var getjsonboardtypes= function (bin) {
                 board["settings"] = settingsBoard;
                 saveToLocalStorage(board);
                 console.log("Settings board = " + settingsBoard);
+                var patchstr = '{"op": "replace","path": "/data/settings", "value": "' + settingsBoard + '" }';
+                console.log(patchstr);
+                patchJSON(currentBoardID, patchstr);
                // loadJSONobjects(currentBoardID);
                // htmlfromarray(currentBoardID);
                // localStorage.setItem("currentboard", currentBoardID);
@@ -2334,7 +2337,7 @@ var getjsonboardtypes= function (bin) {
         //   $(this).hide();
     });//Create new column when addColumn clicked
     
-    ///////////// STORY MANAGEMENT /////////////////
+    ///////////// ITEM MANAGEMENT /////////////////
 
     var storedStory
     var storyHtml
@@ -2361,12 +2364,12 @@ var getjsonboardtypes= function (bin) {
        // patchstr = '{"op": "add", "path": "/data/items/' + rowId + '/' + columnId + '",  "value": ["' + itemId + '"]}';
         patchstr = '{"data":{"items":{"' + rowId + '":{"' + columnId + '":["' + itemId + '"]}}}}'
         };
-        patchJSON(currentBoardID,patchstr,$(this),"item",storytextid);
+        patchJSON(currentBoardID,patchstr,$(this),"addItem",storytextid);
     });//Create new story when addStory clicked
 
     function boardPatchUpdate(thisObj,boardObj,objId,objId2){
 
-        if(boardObj === "item"){
+        if(boardObj === "addItem"){
         var htmlData = boxhtml("story", objId);
 
         if (thisObj.find("li .story") === true) {
@@ -2375,10 +2378,15 @@ var getjsonboardtypes= function (bin) {
         else {
             (thisObj.children(".stories")).append(htmlData);
         };
-
         var block = document.getElementById(objId);
         $(block).find(".textbox").focus();
-        console.log('Updating board items after epic click');
+        console.log('Adding board items after epic click');
+        } else
+        if(boardObj === "deleteItem"){
+           var deleteitem = thisObj.closest('li')    
+           deleteitem.remove();
+           console.log('Item removed');
+           
         } else
         if(boardObj === "group"){
 
@@ -2460,9 +2468,9 @@ var getjsonboardtypes= function (bin) {
         var epicIndex = thisObj.closest('.epic').index();
         var itemIndex = thisObj.parent().parent().index();
         var columnId = $(".groupcontainer:eq(" + groupIndex + ")").find(".columnheader li:eq(" + epicIndex + ") .column").attr("id");
-        console.log("rowid:  "+  rowId + ", itemid:  "+  itemId  + ", columnId: "+  columnId + ", itemIndex: " + itemIndex);
-        //var patchstr = '{"op": "add","path": "/data/items/' + rowId + '/' + columnId + '/'+ itemIndex +'", "value":' + itemsstr + '}';
-        //patchJSON(currentBoardID,patchstr)
+        console.log("Delete rowid:  "+  rowId + ", itemid:  "+  itemId  + ", columnId: "+  columnId + ", itemIndex: " + itemIndex);
+        var patchstr = '{"op": "remove","path": "/data/items/' + rowId + '/' + columnId + '/' + itemIndex + '"}';
+        patchJSON(currentBoardID,patchstr,thisObj,"deleteItem",itemId)
                    
              // columnIdId = thisObj.parent().id;
 
@@ -2471,7 +2479,7 @@ var getjsonboardtypes= function (bin) {
   //          $(stories).parent().children('.addStory').show();
         //};
         //update array
-        updateItemsObj();
+       // updateItemsObj();
        //var patchstr = '{"op": "add","path": "/data/items/' + rowId + '/' + columnId + '/'+ itemIndex +'", "value":' + itemsstr + '}';
        //patchJSON(currentBoardID,patchstr)
 
