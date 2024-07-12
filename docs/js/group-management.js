@@ -1230,7 +1230,7 @@ var getjsonboardtypes= function (bin) {
         var patchstr = '{"data":{"details":{"'+ blockid +'":"' + text + '"}}}';
 
            console.log(patchstr);
-           patchJSON(currentBoardID, patchstr);
+           patchJSON(currentBoardID, patchstr,"","details", blockid);
 /* Removed code for reading from JSON after patch
            blockdetailsarray[blockid] = text;
            board["details"] = blockdetailsarray;
@@ -2032,7 +2032,7 @@ var getjsonboardtypes= function (bin) {
         $("#blockname").val(currentText);
         console.log("Click on " + blockid);
         $("#blockdetails").html("");
-        var detailsText = blockdetailsarray[blockid];
+        var detailsText = blockdetailsarray[blockid]; //Get details from JSON
         $("#blockdetails").html(detailsText);
         event.stopPropagation();
     });
@@ -2636,7 +2636,7 @@ var getjsonboardtypes= function (bin) {
        // updateBlockTitle(blockid, currentText); 
         
     });
-    $(document).on("keyup", "#blockname", function (event) {
+    $(document).on("focusout", "#blockname", function (event) {
         var currentText = $(this).val();
         var blockid = document.getElementById(textbox);
         $(blockid).find(".textbox").text(currentText);
