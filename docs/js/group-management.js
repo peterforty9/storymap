@@ -638,10 +638,10 @@ var getjsonboardtypes= function (bin) {
         // console.log("array map loaded");
     });
     $(document).on("click", "#savearray", function () { //save board to json storage
-       // $("#save-confirm").dialog("open");
-       //board =  localStorage.getItem("currentboarddata");
-       const jsondata = JSON.stringify(board); 
-       updateJSON(currentBoardID, jsondata); 
+       
+       //Function disabled till offline functionality re-enabled
+        //const jsondata = JSON.stringify(board); 
+       //updateJSON(currentBoardID, jsondata); 
        console.log("Save clicked");
     });
     
@@ -1012,10 +1012,7 @@ var getjsonboardtypes= function (bin) {
 
                 saveToLocalStorage(board);
                 htmlfromarray(board);
-
-               
-
-                
+                              
 
                 /// Show/hide board sections
                 
@@ -1280,6 +1277,7 @@ var getjsonboardtypes= function (bin) {
             currentBoardID = jsonID;
             updateboardlist(jsonID, name);
             loadJSONobjects(jsonID);
+
             } else {
             // Oh no! There has been an error with the request!
             }
@@ -1396,9 +1394,9 @@ var getjsonboardtypes= function (bin) {
         console.log("Local Boardlist updated: " + boardlistobject)
         var boardlist = JSON.stringify(boardlistobject);
         localStorage.setItem("boardlist", boardlist);
-
-        //updateJSON("baec30811a60","boardlist", boardlist);
-        updateJSON("baec30811a60", boardlist);
+        patchstr = '{"op": "add", "path": "/data/-",  "value": { "id": "' + fileid + '", "name":"' + boardid + '"}}';
+        console.log(patchstr);
+        patchJSON("baec30811a60",patchstr)
 
         //localStorage.setItem(boardid, boardlist);
      
