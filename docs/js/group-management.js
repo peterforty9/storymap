@@ -510,6 +510,8 @@ var getjsonboardtypes= function (bin) {
 
         toggleGroups();
         saveToLocalStorage(board);
+
+        makeSortable(); //Make all objects sortable
     };//Toggle groups
 
     $(document).on("click", "#menuGroups", function () {
@@ -1405,6 +1407,7 @@ var getjsonboardtypes= function (bin) {
         board["name"] = boardname;
         updateGroupsObj();
         updateColumnsObj();
+        console.log("createBoardJSON update column object");
         updateRowsObj;
         updateItemsObj();
        // saveToLocalStorage();
@@ -1603,7 +1606,7 @@ var getjsonboardtypes= function (bin) {
     };  //Generate object html
  
     ////////// BLOCK MOVEMENT MANAGEMENT ////////////////
-        
+ /*       
    // $("body").on("DOMNodeInserted", "#board", makeSortable);//Listen out for newly created blocks and make sortable
 
     // Select the node that will be observed for mutations
@@ -1613,13 +1616,14 @@ var getjsonboardtypes= function (bin) {
     const config = { attributes: false, childList: true, subtree: true, CharacterData: false };
 
     // Callback function to execute when mutations are observed
+ 
     const callback = (mutationList, observer) => {
     for (const mutation of mutationList) {
         makeSortable();
         console.log("A subtree node has been added or removed.");
       }
     }
-   
+ 
   // Create an observer instance linked to the callback function
   const observer = new MutationObserver(callback);
 
@@ -1701,6 +1705,7 @@ var getjsonboardtypes= function (bin) {
               
                 ui.item.data('originIndex', ui.item.index());
                 ui.item.data('originGroup', ui.item.parents(".groupcontainer").index());
+                ui.item.data('originGroupId', ui.item.parents(".groupcontainer").find(".group").attr("id"));
                 ui.item.data('changeFromGroup', ui.item.parents(".groupcontainer").index());
                 ui.item.data('changeFromIndex', ui.item.index());
                 ui.item.data('originblocktype', "activity");
@@ -1771,8 +1776,21 @@ var getjsonboardtypes= function (bin) {
             },
            // */
             update: function (event, ui) {
-                updateColumnsObj();
+                var stopindex = ui.item.index();
+                var targetGroupId = (ui.item.parents(".groupcontainer").find(".group").attr("id"));
+
+                var fromIndex = ui.item.data('originIndex');
+                var fromGroupId = ui.item.data('originGroupId');
+                
+                if(ui.item.data('originblocktype') === "story"){
+                } else {
+                console.log("Column header: update column object");
+                var patchstr = '{"op": "move", "from":  "/data/groupColumns/'+ fromGroupId +'/' + fromIndex + '", "path": "/data/groupColumns/'+ targetGroupId +'/' + stopindex + '"}';
+                patchJSON(currentBoardID, patchstr,"","column");
+               
+                //updateColumnsObj();
                 //saveToLocalStorage(board);
+                };
             },
             
         });
@@ -1837,7 +1855,8 @@ var getjsonboardtypes= function (bin) {
         ui.item.data('changeFromIndex', currentIndex);
         ui.item.data('changeFromGroup', currentGroup);
 
-        updateColumnsObj();  //Update board columns object with column movement
+       // console.log("Move epics: update column object");
+      //  updateColumnsObj();  //Update board columns object with column movement
 
     };
     function removeEpics(event, ui) {
@@ -1865,6 +1884,7 @@ var getjsonboardtypes= function (bin) {
             //Change class from column to story
             ui.item.find(".column").addClass('story').removeClass('column');
             childtext.addClass('storytext').removeClass('columntext');
+            console.log("Column delete: update column object");
             updateColumnsObj();  //Update board columns object with column deletion
 
         } else if (storycount > 0) {
@@ -1923,13 +1943,27 @@ var getjsonboardtypes= function (bin) {
             cursor: "move",
             cancel: ".storytext",
             connectWith: ".stories, .columnheader",
+
             start: function (event, ui) {
                     ui.item.data('originblocktype', "story");
                     ui.placeholder.width(ui.item.width());
+                    
+                    var fromgroupindex =  ui.item.parents('.grouprelease').index();
+                    var fromcolumnIndex =  ui.item.parents('.epic').index();
+                    var fromcolumnId = $('.groupcontainer:eq(' + fromgroupindex + ') .columnheader li:eq('+ fromcolumnIndex + ') .column').attr("id");
+                    ui.item.data('originColumnIndex', fromcolumnIndex);
+                    ui.item.data('originColumnId', fromcolumnId);
+                    ui.item.data('originItemIndex', ui.item.index());
+                    ui.item.data('originRow', ui.item.parents(".row").find(".iteration").attr("id"));
+                    
+                    console.log("groupIndex: " +  fromgroupindex);
+                    console.log("ColumnIndex: " +  fromcolumnIndex);
+                    console.log("ColumnId: " +  fromcolumnId);
             },
             over: function(event,ui) {
                 hideEpics(event,ui);
             },
+        
             placeholder: {
                 element: function () {
                     return $('<li class="selected"></li>');
@@ -1938,18 +1972,38 @@ var getjsonboardtypes= function (bin) {
                     return;
                 }
             },
+            update: function(event,ui)   {
+                var fromItemIndex = ui.item.data('originItemIndex');
+                var fromColumnId = ui.item.data('originColumnId');
+                var fromRowId = ui.item.data('originRow');
+                
+                var toItemIndex = ui.item.index();
+                var togroupindex =  ui.item.parents('.grouprelease').index();
+                var tocolumnIndex =  ui.item.parents('.epic').index();
+                var tocolumnId = $('.groupcontainer:eq(' + togroupindex + ') .columnheader li:eq('+ tocolumnIndex + ') .column').attr("id");
+                var toRowId = ui.item.parents(".row").find(".iteration").attr("id");
+    
+            if (fromColumnId === tocolumnId && fromRowId === toRowId) {
+           
+            var patchstr = '{"op": "move", "from": "/data/items/'+ fromRowId +'/'+ fromColumnId +'/' + fromItemIndex + '", "path": "/data/items/'+ toRowId +'/'+ tocolumnId +'/' + toItemIndex + '"}';
+            patchJSON(currentBoardID, patchstr,"","item");
+           
+            console.log("Item moved internally: " + ui.item.index());
+            }
+        },
             remove: function (event, ui) {
-                var newepic = boxhtml("epic");
-                var stopindex = ui.item.index();
-                var targetgroupindex = (ui.item.parents(".groupcontainer").index());
-                var targetgroup = targetgroupindex + 1;
-                var targetepic = stopindex + 1;
-                var targetepicindex = stopindex;
 
                 var movedtocolumnheader = ui.item.parents().hasClass("columnheader");
               //  hideaddstory(); //update add story buttons
                 if (movedtocolumnheader == true) {
-
+                    var newepic = boxhtml("epic");
+                    var stopindex = ui.item.index();
+                    var targetgroupindex = (ui.item.parents(".groupcontainer").index());
+                    var targetGroupId = (ui.item.parents(".groupcontainer").find(".group").attr("id"));
+                    var targetgroup = targetgroupindex + 1;
+                    var targetepic = stopindex + 1;
+                    var targetepicindex = stopindex;
+                    
                     var childtext = ui.item.children().children();
                     var actcount = groupcolumncount(targetgroupindex);
 
@@ -1977,12 +2031,38 @@ var getjsonboardtypes= function (bin) {
                         });
                     }
                 //update column and items array as item has resulted in a new column
-                    updateColumnsObj();
-                    updateItemsObj();
-                }
+                var fromItemIndex = ui.item.data('originItemIndex');
+                var fromColumnId = ui.item.data('originColumnId');
+                var fromRowId = ui.item.data('originRow');
+
+                var patchstr = '{"op": "move", "from": "/data/items/'+ fromRowId +'/'+ fromColumnId +'/' + fromItemIndex + '", "path": "/data/groupColumns/'+ targetGroupId +'/' + stopindex + '"}';
+                patchJSON(currentBoardID, patchstr,"","item");
+               
+                console.log("Item moved to columns: " + ui.item.index());
+
+
+                  //  updateColumnsObj();
+                  //  updateItemsObj();
+                } else 
+                {
+                    var fromItemIndex = ui.item.data('originItemIndex');
+                    var fromColumnId = ui.item.data('originColumnId');
+                    var fromRowId = ui.item.data('originRow');
+                    
+                    var toItemIndex = ui.item.index();
+                    var togroupindex =  ui.item.parents('.grouprelease').index();
+                    var tocolumnIndex =  ui.item.parents('.epic').index();
+                    var tocolumnId = $('.groupcontainer:eq(' + togroupindex + ') .columnheader li:eq('+ tocolumnIndex + ') .column').attr("id");
+                    var toRowId = ui.item.parents(".row").find(".iteration").attr("id");
+    
+                    var patchstr = '{"op": "move", "from": "/data/items/'+ fromRowId +'/'+ fromColumnId +'/' + fromItemIndex + '", "path": "/data/items/'+ toRowId +'/'+ tocolumnId +'/' + toItemIndex + '"}';
+                    patchJSON(currentBoardID, patchstr,"","item");
+                   
+                    console.log("Item moved: " + ui.item.index());
+                };
                 //update items array as item has moved between columns
                               
-                updateItemsObj();
+                //updateItemsObj();
                 //saveToLocalStorage(board);
                 
             }
@@ -2078,6 +2158,7 @@ var getjsonboardtypes= function (bin) {
                 console.log("delete group: " + groupstartindex);
                 $(this).parents('.groupcontainer').remove(); //Remove group
                 updateGroupsObj();//Update group array
+                console.log("Remove group on enter: update column object");
                 updateColumnsObj();// Update column array
 
                 //Remove releaserow containers
@@ -2157,6 +2238,7 @@ var getjsonboardtypes= function (bin) {
         var block = document.getElementById(columntextid);
         $(block).find(".textbox").focus();
         //Update columns array    
+        console.log("Append new column: update column object");
         updateColumnsObj();
      // */
      //New code for manipulating JSON and THEN updating HTML
@@ -2216,6 +2298,7 @@ var getjsonboardtypes= function (bin) {
         var block = document.getElementById(columntextid);
         $(block).find(".textbox").focus();
         //Update columns array
+        console.log("Insert new column: update column object");
         updateColumnsObj();
 
         //Insert new epic
@@ -2303,6 +2386,7 @@ var getjsonboardtypes= function (bin) {
         //Remove column
         columnli.remove();
         // Update columns array
+        console.log("Remove Column: update column object");
         updateColumnsObj();
        // hideaddColumn();
 
