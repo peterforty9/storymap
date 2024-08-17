@@ -1407,6 +1407,7 @@ var getjsonboardtypes= function (bin) {
         updateColumnsObj();
         updateRowsObj;
         updateItemsObj();
+         console.log("Create board JSON, updating all objects")
        // saveToLocalStorage();
     };
 /////////////////// UPDATE board from visible board //////////////////////
@@ -1431,10 +1432,11 @@ var getjsonboardtypes= function (bin) {
         saveToLocalStorage(board);
        
     };
-    function updateColumnsObj() {
+    function updateColumnsObj(fromGroup,toGroup, fromCol, toCol) {
         groupColumnsObj = {};
         columnsArray = [];
         
+        if(fromGroup === null ){
         $(".columnheader").each(function () {
             columngroupObj = [];
             var groupId = $(this).parent().parent().find(".group").attr("id");
@@ -1458,6 +1460,13 @@ var getjsonboardtypes= function (bin) {
         patchJSON(currentBoardID, patchstr);
     
         saveToLocalStorage(board);
+        } else
+        {
+            var patchstr = '{"op": "move","from": "/data/groupColumns/' + fromGroup +'/' + fromCol + '", "path": "/data/groupColumns/' + toGroup +'/' + toCol + '" }';
+            console.log(patchstr);
+            patchJSON(currentBoardID, patchstr);
+        };
+       
   
     };
     function updateRowsObj() {
@@ -1480,10 +1489,12 @@ var getjsonboardtypes= function (bin) {
         saveToLocalStorage(board);
   
     };
-    function updateItemsObj() {
+    function updateItemsObj(fromRow, fromCol, fromItemIndex, toRow, toCol, toItemIndex, toGroup, toColIndex) {
+        
+        if(fromCol === null){
+        
         itemsObj = {};
-      //  rowsObj = [];
-
+     
         var w = 0;
         $(".row").each(function () {
             var iteration = ($(this).find(".iteration"));
@@ -1536,7 +1547,22 @@ var getjsonboardtypes= function (bin) {
         var patchstr = '{"op": "replace","path": "/data/items", "value":' + itemsstr + '}';
         patchJSON(currentBoardID, patchstr);
         saveToLocalStorage(board);
-        
+
+    } else if (toRow !== null){
+
+        var patchstr = '{"op": "move","from": "/data/items/' + fromRow +'/' + fromCol + '/'+ fromItemIndex + '", "path": "/data/items/' + toRow +'/' + toCol + '/'+ toItemIndex + '" }';
+        console.log(patchstr);
+        patchJSON(currentBoardID, patchstr);
+
+
+    }else if (toGroup !== null){
+
+        var patchstr = '{"op": "move","from": "/data/items/' + fromRow +'/' + fromCol + '", "path": "/data/groupColumns/' + toRow +'/' + toCol + '" }';
+        console.log(patchstr);
+        patchJSON(currentBoardID, patchstr);
+
+
+    };
     
     };
     function updatesubsetObj(blockid, value, label) {
@@ -1606,6 +1632,8 @@ var getjsonboardtypes= function (bin) {
         
    // $("body").on("DOMNodeInserted", "#board", makeSortable);//Listen out for newly created blocks and make sortable
 
+
+   
     // Select the node that will be observed for mutations
     const targetNode = document.getElementById("board");
 
@@ -1625,11 +1653,11 @@ var getjsonboardtypes= function (bin) {
 
   // Start observing the target node for configured mutations
   observer.observe(targetNode, config);
-   /* 
+ 
   // Later, you can stop observing
-  observer.disconnect();
+  // observer.disconnect();
 
-*/
+
 
     function makeSortable() {
         console.log(
@@ -1701,6 +1729,7 @@ var getjsonboardtypes= function (bin) {
               
                 ui.item.data('originIndex', ui.item.index());
                 ui.item.data('originGroup', ui.item.parents(".groupcontainer").index());
+                ui.item.data('originGroupID', ui.item.parents(".groupcontainer").find(".group").attr("id"));//////////  var groupId = $(this).parent().parent().find(".group").attr("id");
                 ui.item.data('changeFromGroup', ui.item.parents(".groupcontainer").index());
                 ui.item.data('changeFromIndex', ui.item.index());
                 ui.item.data('originblocktype', "activity");
@@ -1771,7 +1800,11 @@ var getjsonboardtypes= function (bin) {
             },
            // */
             update: function (event, ui) {
-                updateColumnsObj();
+                var fromCol = ui.item.data('originIndex');
+                var fromGroup = ui.item.data('originGroupID');
+                var toGroup = ui.item.parents(".groupcontainer").find(".group").attr("id");
+                var toCol = ui.item.index();
+                updateColumnsObj(fromGroup,toGroup,fromCol,toCol);
                 //saveToLocalStorage(board);
             },
             
@@ -1837,7 +1870,7 @@ var getjsonboardtypes= function (bin) {
         ui.item.data('changeFromIndex', currentIndex);
         ui.item.data('changeFromGroup', currentGroup);
 
-        updateColumnsObj();  //Update board columns object with column movement
+        //updateColumnsObj();  //Update board columns object with column movement
 
     };
     function removeEpics(event, ui) {
