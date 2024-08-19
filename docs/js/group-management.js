@@ -2532,6 +2532,12 @@ var getjsonboardtypes= function (bin) {
         var groupindex = $(this).parents(".grouprelease").index();
         var rowindex = $(this).parents(".row").index();
         var ctrlrowindex = rowindex + 1;
+
+
+        var rowId = $(this).closest('.row').find('.iteration').attr('id');
+        var columnId = $(".groupcontainer:eq(" + groupindex + ")").find(".columnheader li:eq(" + columnindex + ") .column").attr("id");
+
+
        // var columnnumber = columnindex + 1;
        // var groupnumber = groupindex + 1;
 
@@ -2550,12 +2556,19 @@ var getjsonboardtypes= function (bin) {
                 deletestory($(this)) }
             else {
                 var storytextid = guid();
+                var itemId = storytextid;
                 var htmlData = boxhtml("story", storytextid);
                 $(htmlData).insertAfter($(this).parent().parent());
                 var block = document.getElementById(storytextid);
                 $(block).find(".textbox").focus();
                 //Update items array
-                updateItemsObj();                         
+                //updateItemsObj(); 
+
+                patchstr = '{"op": "add", "path": "/data/items/' + rowId + '/' + columnId + '/-",  "value": "' + itemId + '"}';
+           
+                patchJSON(currentBoardID,patchstr,$(this),"addItem",storytextid);
+                
+                
             };
             event.stopPropagation();
         };
