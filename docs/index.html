@@ -7,17 +7,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script type="text/javascript" src="js/jquery-3.3.1.js"></script>
-    <script type="text/javascript" src="js/jquery-ui.js"></script>
-
-    <script src="js/group-management.js"></script>
-    <script src="https://use.fontawesome.com/38fbd21692.js"></script>
     <link rel="stylesheet" href="js/jquery-ui.css" type="text/css">
     <link rel="stylesheet" type="text/css" href="newcss.css">
     <link rel="stylesheet" type="text/css" href="defaulttheme.css">
     <link rel="stylesheet" type="text/css" href="road.css">
     <link id="columns" rel="stylesheet" type="text/css" href="singlecolumn.css">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://use.fontawesome.com/38fbd21692.js" defer></script>
 
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -26,22 +21,27 @@
 </head>
 
 <body>
+    <script type="text/javascript" src="js/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+    <script type="text/javascript" src="js/group-management.js"></script>
+    <script type="text/javascript" src="js/newjavascript.js"></script>
     <div class="page">
         <div id='menubar'>
             <div id='boardTitle'>
-                <label id='boardname' class='title' maxlength='50' style="overflow:hidden"></label>
+                <label id='boardname' class='title' style="overflow:hidden"></label>
             </div>
             <div id="menuright">
                 <div id="boardMenu">
-                    <label class='container' id=new><i class="fa fa-table fa-fw" aria-hidden="true"></i></label>
-                    <label class='container' id=loadarray title='load'><i class='fa fa-upload fa-fw'></i></label>
-                    <label class='container' id=savearray><i class='fa fa-save fa-fw'></i></label>
+                    <label class='container' id="new"><i class="fa fa-table fa-fw" aria-hidden="true"></i></label>
+                    <label class='container' id="loadarray" title='load'><i class='fa fa-upload fa-fw'></i></label>
+                    <label class='container' id="savearray"><i class='fa fa-save fa-fw'></i></label>
                     <label class='container' id='boardSettingsbutton'><i class='fa fa-cog fa-fw'></i></label>
                     <label class='container' id='deleteboard'><i class='fa fa-trash fa-fw'></i></label>
                     <label class='container' id='colwidth'><i class="fa fa-exchange fa-fw"></i></label>
                 </div>
                 <div class="togglearea">
-                    <label class='blockmenu-item' id='toggleBoardMenu'><j class='fa fa-bars'></j></label>
+                    <label class='blockmenu-item' id='toggleBoardMenu'><i class='fa fa-bars'></i></label>
                 </div>
             </div>
         </div>
@@ -49,19 +49,19 @@
         <div id='infobox'>
             <div id='infobox-title'>
                 <textarea id='blockname' class='title' maxlength='50' style="overflow:hidden"></textarea>
-                <label class='blockmenu-item' id='toggleBlockmenu'><j class='fa fa-bars'></j></label>
-                <label class='blockmenu-item' id='toggledetails'><j class='fa fa-angle-double-up'></j></label>
+                <label class='blockmenu-item' id='toggleBlockmenu'><i class='fa fa-bars'></i></label>
+                <label class='blockmenu-item' id='toggledetails'><i class='fa fa-angle-double-up'></i></label>
             </div>
             <div id='infobox-navbar'>
                 <div id="blockmenu">
-                    <label class='blockmenu-item' id='addblock'><j class='fa fa-plus-square addGroup'></j></label>
-                    <label class='blockmenu-item' id='moveleft'><j class="fa fa-caret-square-o-left"></j></label>
-                    <label class='blockmenu-item' id='moveup' title="Move up"><j class="fa fa-caret-square-o-up"></j></label>
-                    <label class='blockmenu-item' id='movedown' title="Move down"><j class="fa fa-caret-square-o-down"></j></label>
-                    <label class='blockmenu-item' id='moveright'><j class="fa fa-caret-square-o-right"></j></label>
+                    <label class='blockmenu-item' id='addblock'><i class='fa fa-plus-square addGroup'></i></label>
+                    <label class='blockmenu-item' id='moveleft'><i class="fa fa-caret-square-o-left"></i></label>
+                    <label class='blockmenu-item' id='moveup' title="Move up"><i class="fa fa-caret-square-o-up"></i></label>
+                    <label class='blockmenu-item' id='movedown' title="Move down"><i class="fa fa-caret-square-o-down"></i></label>
+                    <label class='blockmenu-item' id='moveright'><i class="fa fa-caret-square-o-right"></i></label>
                 </div>
                 <div id="manageblock">
-                    <label class='blockmenu-item' id='deleteblock'><j class='fa fa-trash-o'></j></label>
+                    <label class='blockmenu-item' id='deleteblock'><i class='fa fa-trash-o'></i></label>
                 </div>
 
             </div>
@@ -135,6 +135,4 @@
     </div>
 
 </body>
-
-
-        </html>
+</html>

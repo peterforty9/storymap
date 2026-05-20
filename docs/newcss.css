@@ -12,6 +12,7 @@ and open the template in the editor.
     --first-column-width: 0;
     --column-header-height: 44px;
     --group-header-height: 22px;
+    --add-column-btn-width: 36px;
 }
 
 body {
@@ -198,7 +199,33 @@ i {
    
 }
 .rowheader {
-    
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+}
+
+.rowheader:active {
+    cursor: grabbing;
+}
+
+.row-collapse-btn {
+    position: sticky;
+    left: 5px;
+    cursor: pointer;
+    padding: 1px 6px;
+    font-size: 11px;
+    user-select: none;
+    flex-shrink: 0;
+    align-self: flex-start;
+}
+
+.row-collapse-btn i {
+    color: #aaa;
+    height: auto;
+}
+
+.row-collapse-btn:hover i {
+    color: #444;
 }
 
 #infobox-title {
@@ -349,6 +376,9 @@ j {
     flex-direction: row;
     height: var(--group-header-height);
     margin: 2px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 5px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 2px;
+    overflow: hidden;
 }
 .groupline.smaller {
     display: flex;
@@ -475,7 +505,11 @@ j {
 
     scroll-snap-align: start;
     scroll-snap-stop: normal;
-   
+
+}
+
+.cell-flex-container .epic:last-child {
+    margin-right: var(--add-column-btn-width);
 }
     .epic ul {
         white-space: nowrap;
