@@ -23,6 +23,11 @@
 .iteration {
     background-color: #874741;
 }
+
+.row-collapse-btn {
+    background-color: #874741;
+    color: white;
+}
 .iterationtext {
     background-color: transparent;
     color: white;

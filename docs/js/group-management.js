@@ -7,7 +7,8 @@ $(function () {
         dialog, textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, groupColumnsObj, groupColumnsArray, columnsArray, rowsObj, itemsObj, itemsArray, blockdetailsarray, selectedBlock, sleft, stop,
         typeItemsObj, statusItemsObj, subsetsObj, settingsBoard, relationshipArray, boardlistobject, boardTypeBoard,
-        boardTypeObject, subsetBoard, subsetBoardData, gro, columnsVisible, columnGroupsVisible, rowsVisible;
+        boardTypeObject, subsetBoard, subsetBoardData, gro, columnsVisible, columnGroupsVisible, rowsVisible,
+        quickEditMode = false;
 
     function S4() { return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1); }
     function guid() {
@@ -109,11 +110,18 @@ $(function () {
                     deletestory($(blockid).find(".textbox"));
                     console.log("block deleted");
                     $(this).dialog("close");
+                    $(".blockselected").removeClass("blockselected");
+                    $("#infobox").addClass("hide");
+                    $("#blockname").val("");
+                    $("#blockdetails").html("");
                 } else if ($(blockid).hasClass("column")) {
                     var column = $(blockid).parents("li");
-                    if (columnempty(column)) {
-                        removecolumn(column);
-                    }
+                    removecolumn(column);
+                    $(this).dialog("close");
+                    $(".blockselected").removeClass("blockselected");
+                    $("#infobox").addClass("hide");
+                    $("#blockname").val("");
+                    $("#blockdetails").html("");
                 }
             },
             Cancel: function () {
@@ -268,7 +276,7 @@ $(function () {
             var grouptitle = board["titles"][gid];
             groups += boxhtml("group", board["groups"][i], grouptitle, cols);
         }
-        groups += "</div>";
+        groups += "</div><div class='add-group-btn' title='Add group'>+</div>";
 
         var rows = "<div id='rows'>";
         var rowscount = board["rows"].length;
@@ -287,7 +295,7 @@ $(function () {
 
             var groupcount = board["groups"].length;
             var iteration = boxhtml("iteration", crowid, rowtitle);
-            var newrelease = "<div class='row'><div class='rowheader'>" + iteration + "<div class='row-collapse-btn' title='Collapse row'><i class='fa fa-chevron-up'></i></div></div><div class='rowgroups'>";
+            var newrelease = "<div class='row'><div class='rowheader'><div class='row-collapse-btn' title='Collapse row'><i class='fa fa-chevron-up'></i></div>" + iteration + "</div><div class='rowgroups'>";
             var newgroupstart = "<div class='grouprelease'><div class='cell-flex-container'>";
             var newgroupend = "</div></div>";
 
@@ -346,10 +354,13 @@ $(function () {
         toggleGroups();
         saveToLocalStorage(board);
         makeSortable();
+        initStickyRowHeaders();
     }
 
     $(document).on("click", "#menuGroups", function () {
-        document.getElementById("menuGroups").checked ? $(".group").show() : $(".group").hide();
+        var visible = document.getElementById("menuGroups").checked;
+        visible ? $(".group").show() : $(".group").hide();
+        visible ? $(".add-group-btn").show() : $(".add-group-btn").hide();
     });
 
     function toggleGroups() {
@@ -367,6 +378,7 @@ $(function () {
         console.log("Setting column visibility: " + visible);
         visible == false ? $(".groupline").hide() : $(".groupline").show();
         visible == false ? $(".group").hide() : $(".group").show();
+        visible == false ? $(".add-group-btn").hide() : $(".add-group-btn").show();
     }
 
     function boardColumnGroupsvisibility(visible) {
@@ -465,6 +477,25 @@ $(function () {
     });
 
     $(document).on("click", "#deleteblock", function () {
+        var blockid = document.getElementById(textbox);
+        if ($(blockid).hasClass("column")) {
+            var column = $(blockid).parents("li");
+            var columnNumber = column.index() + 1;
+            var groupIndex = column.parents('.groupcontainer').index();
+            var hasStories = false;
+            $(".row").each(function (i) {
+                if (!epicEmpty(i, groupIndex, columnNumber)) { hasStories = true; }
+            });
+            if (hasStories) {
+                $('<div>This column cannot be deleted because it contains one or more stories.</div>')
+                    .dialog({
+                        title: 'Cannot delete column',
+                        modal: true,
+                        buttons: { OK: function () { $(this).dialog('destroy').remove(); } }
+                    });
+                return;
+            }
+        }
         $("#deleteblock-confirm").dialog("open");
     });
 
@@ -1041,6 +1072,83 @@ $(function () {
         return htmlData;
     }
 
+////////// STICKY ROW HEADERS ////////////////
+
+    var naturalRowTops = [];
+
+    function calculateRowTops() {
+        naturalRowTops = [];
+        var $board = $('#board');
+        var boardScrollTop = $board.scrollTop();
+        var boardOffsetTop = $board.offset().top;
+        $('#rows .row').each(function () {
+            naturalRowTops.push($(this).offset().top - boardOffsetTop + boardScrollTop);
+        });
+    }
+
+    function initStickyRowHeaders() {
+        $('#sticky-row-headers').remove();
+        calculateRowTops();
+        $('#board').off('scroll.stickyRows').on('scroll.stickyRows', updateStickyRowHeaders);
+        updateStickyRowHeaders();
+    }
+
+    function updateStickyRowHeaders() {
+        var scrollTop = $('#board').scrollTop();
+        var boardHeaderHeight = $('#boardheader').outerHeight() || 0;
+        var cumStickyHeight = 0;
+
+        $('#rows .row').each(function (i) {
+            var $row = $(this);
+            var $header = $row.find('> .rowheader');
+            if (!$header.length || naturalRowTops[i] === undefined) return;
+
+            var naturalTop = naturalRowTops[i];
+            var rowHeight = $row.outerHeight(true) || 0;
+            var headerHeight = $header.outerHeight() || 0;
+            var T = boardHeaderHeight + cumStickyHeight;
+
+            $header.css('top', T + 'px');
+
+            // Accumulate if this header is currently in its sticky window
+            if (scrollTop >= naturalTop - T && scrollTop < naturalTop + rowHeight - T - headerHeight) {
+                cumStickyHeight += headerHeight;
+            }
+        });
+    }
+
+////////// QUICK EDIT MODE ////////////////
+
+    function focusNewBlock(block) {
+        if (quickEditMode) {
+            $(block).find('.textbox').attr('contenteditable', 'true').focus();
+        } else {
+            $(block).find('.textbox').trigger('click');
+            $('#blockname').focus();
+        }
+    }
+
+    function setQuickEditMode(enabled) {
+        quickEditMode = enabled;
+        $('#quickEdit').toggleClass('active', enabled);
+
+        var fixedEls = [document.getElementById('boardheader'), document.getElementById('rows')];
+        fixedEls.forEach(function (el) {
+            var s = el && Sortable.get(el);
+            if (s) s.option('disabled', enabled);
+        });
+        $('.columnheader, .stories').each(function () {
+            var s = Sortable.get(this);
+            if (s) s.option('disabled', enabled);
+        });
+
+        $('.textbox').attr('contenteditable', enabled ? 'true' : 'false');
+    }
+
+    $(document).on('click', '#quickEdit', function () {
+        setQuickEditMode(!quickEditMode);
+    });
+
 ////////// BLOCK MOVEMENT MANAGEMENT ////////////////
 
     function makeSortable() {
@@ -1111,7 +1219,7 @@ $(function () {
 
     function initColumnHeaderSortable(el) {
         if (Sortable.get(el)) return;
-        Sortable.create(el, {
+        var _colSort = Sortable.create(el, {
             group: { name: "columns", pull: true, put: ["columns", "stories"] },
             delay: 500,
             delayOnTouchOnly: true,
@@ -1203,6 +1311,7 @@ $(function () {
                 patchJSON(currentBoardID, patchstr, "", "column");
             }
         });
+        if (quickEditMode) _colSort.option('disabled', true);
     }
 
     function removeEpics(originGroup, originIndex) {
@@ -1250,7 +1359,7 @@ $(function () {
 
     function initStoriesSortable(el) {
         if (Sortable.get(el)) return;
-        Sortable.create(el, {
+        var _storySort = Sortable.create(el, {
             group: { name: "stories", pull: true, put: ["stories"] },
             delay: 500,
             delayOnTouchOnly: true,
@@ -1318,9 +1427,11 @@ $(function () {
                 $(newepic).find(".stories").each(function () { initStoriesSortable(this); });
             }
         });
+        if (quickEditMode) _storySort.option('disabled', true);
     }
 
     $(document).on("click", ".textbox", function (event) {
+        if (quickEditMode) { event.stopPropagation(); return; }
         console.log("textbox clicked");
         $("#infobox").removeClass("hide");
         textbox = $(this).parent().attr("id");
@@ -1344,6 +1455,8 @@ $(function () {
         $("#blockdetails").html("");
         var detailsText = blockdetailsarray[blockid];
         $("#blockdetails").html(detailsText);
+        $(".blockselected").removeClass("blockselected");
+        $(this).parent().addClass("blockselected");
         event.stopPropagation();
     });
 
@@ -1406,7 +1519,7 @@ $(function () {
         console.log("groupindex to append column: " + groupindex);
         $(columnhtml).appendTo(columnlist);
         var block = document.getElementById(columntextid);
-        $(block).find(".textbox").trigger("click"); $("#blockname").focus();
+        focusNewBlock(block);
         console.log("Append new column: update column object");
         updateColumnsObj();
 
@@ -1450,7 +1563,7 @@ $(function () {
         var columnli = $('.groupcontainer:eq(' + groupindex + ') .columnheader li:eq(' + columnindex + ')');
         $(htmlData).insertAfter($(columnli));
         var block = document.getElementById(columntextid);
-        $(block).find(".textbox").trigger("click"); $("#blockname").focus();
+        focusNewBlock(block);
         console.log("Insert new column: update column object");
         updateColumnsObj();
 
@@ -1470,7 +1583,7 @@ $(function () {
         var stories = $(".rowgroups").eq(rowindex).find('.grouprelease:eq(' + groupindex + ') .epic:eq(' + column + ') .stories');
         $(htmlData).appendTo(stories);
         var block = document.getElementById(storytextid);
-        $(block).find(".textbox").trigger("click"); $("#blockname").focus();
+        focusNewBlock(block);
         updateItemsObj();
     }
 
@@ -1527,6 +1640,10 @@ $(function () {
         appendNewcolumn(groupindex);
     });
 
+    $(document).on("click", ".add-group-btn", function () {
+        insertGroup($('.groupcontainer').length);
+    });
+
     $(document).on("click", "#addblock", function () {
         var blockid = document.getElementById(textbox);
         if ($(blockid).hasClass("group")) {
@@ -1569,7 +1686,7 @@ $(function () {
                 (thisObj.children(".stories")).append(htmlData);
             }
             var block = document.getElementById(objId);
-            $(block).find(".textbox").trigger("click"); $("#blockname").focus();
+            focusNewBlock(block);
             console.log('Adding board items after epic click');
         } else if (boardObj === "deleteItem") {
             var deleteitem = thisObj.closest('li');
@@ -1586,7 +1703,7 @@ $(function () {
                 console.log('Added .grouprelease');
             });
             var block = document.getElementById(grouptextid);
-            $(block).find(".textbox").trigger("click"); $("#blockname").focus();
+            focusNewBlock(block);
         }
     }
 
@@ -1644,7 +1761,11 @@ $(function () {
 ///////// ROW MANAGEMENT ////////////////
 
     $(document).on("click", ".addrelease", function () {
-        addNewRelease();
+        var iterationtextid = guid();
+        addNewRelease(iterationtextid);
+        if (quickEditMode) {
+            focusNewBlock(document.getElementById(iterationtextid));
+        }
     });
 
     function addNewRelease(iterationtextid) {
@@ -1652,7 +1773,7 @@ $(function () {
         var k = 0;
         var groupcount = $(".group").length;
         var iteration = boxhtml("iteration", iterationtextid);
-        var newrelease = "<div class='row'><div class='rowheader'>" + iteration + "<div class='row-collapse-btn' title='Collapse row'><i class='fa fa-chevron-up'></i></div></div><div class='rowgroups'>";
+        var newrelease = "<div class='row'><div class='rowheader'><div class='row-collapse-btn' title='Collapse row'><i class='fa fa-chevron-up'></i></div>" + iteration + "</div><div class='rowgroups'>";
         var newgroupstart = "<div class='grouprelease'><div class='cell-flex-container'>";
         var newgroupend = "</div></div>";
         var newepic = boxhtml("epic");
@@ -1691,7 +1812,7 @@ $(function () {
                 var iterationtextid = guid();
                 addNewRelease(iterationtextid);
                 var block = document.getElementById(iterationtextid);
-                $(block).find(".textbox").trigger("click"); $("#blockname").focus();
+                focusNewBlock(block);
             }
             event.stopPropagation();
         }
@@ -1766,6 +1887,8 @@ $(function () {
         var $row = $(this).closest(".row");
         $row.find(".rowgroups").toggle();
         $(this).find("i").toggleClass("fa-chevron-up fa-chevron-down");
+        calculateRowTops();
+        updateStickyRowHeaders();
     });
 
 });

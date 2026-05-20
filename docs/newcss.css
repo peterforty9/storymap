@@ -20,14 +20,14 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     white-space: nowrap;
     vertical-align: top;
-    display: inline-block;
+    overflow: hidden;
 }
 .page {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    overflow: hidden;   
+    overflow: hidden;
 }
 i {
     color:white;
@@ -55,11 +55,10 @@ i {
     flex-direction: row;
     flex-grow: 1;
     justify-content: space-between;
-    position: absolute; 
+    position: absolute;
     top:0px; left:0px; height:30px; right:0px;
     overflow: hidden;
     padding: 8px 8px 2px 2px;
-   
 }
 #menuright {
     background-color: gray;
@@ -98,29 +97,24 @@ i {
     display:none;
 }
 
+#quickEdit.active i {
+    color: #ffdd57;
+}
+
 #board {
-    /* display: table;*/
     display: flex;
     flex-direction: column;
-    width:100%;
+    width: 100%;
 
     position: absolute;
     top: 40px;
     bottom: 100px;
 
-    overflow:auto;
-    padding-bottom:5px;
+    overflow: auto;
+    padding-bottom: 5px;
 
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
-    
-    /*   border-collapse: separate;
-    border-spacing: 6px; */
-    /*   -moz-transform: scale(1.0, 1.0);
-    zoom: 1.0;
-    zoom: 100%;
-    position:absolute;
-    top:0px;*/
 }
 #infobox {
     display: flex;
@@ -134,11 +128,12 @@ i {
     right: 0px;
     overflow: hidden;
     border-top: 3px solid grey;
-    width:100%;
+    width: 100%;
 }
 
     #infobox.full {
         height: 95%;
+        z-index: 30;
     }
 
     #infobox.hide {
@@ -149,9 +144,12 @@ i {
     display: flex;
     flex-direction: row;
     background-color: white;
-    top: 0px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
     padding-bottom:5px;
-   }
+}
+
 #headingcontainer {
     display: flex;
     flex-direction: column;
@@ -201,7 +199,11 @@ i {
 .rowheader {
     cursor: grab;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    position: sticky;
+    z-index: 10;
+    background-color: white;
 }
 
 .rowheader:active {
@@ -209,23 +211,25 @@ i {
 }
 
 .row-collapse-btn {
-    position: sticky;
-    left: 5px;
     cursor: pointer;
-    padding: 1px 6px;
-    font-size: 11px;
+    padding: 0 14px;
+    font-size: 16px;
     user-select: none;
     flex-shrink: 0;
-    align-self: flex-start;
+    border-radius: 2px 0 0 2px;
+    margin: 2px 0 2px 2px;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
 }
 
 .row-collapse-btn i {
-    color: #aaa;
+    color: inherit;
     height: auto;
 }
 
-.row-collapse-btn:hover i {
-    color: #444;
+.row-collapse-btn:hover {
+    opacity: 0.75;
 }
 
 #infobox-title {
