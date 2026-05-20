@@ -1065,6 +1065,7 @@ $(function () {
             delay: 500,
             delayOnTouchOnly: true,
             touchStartThreshold: 5,
+            forceFallback: true,
             onStart: function (evt) {
                 groupDragState.originIndex = evt.oldIndex;
             },
@@ -1095,6 +1096,7 @@ $(function () {
             delay: 500,
             delayOnTouchOnly: true,
             touchStartThreshold: 5,
+            forceFallback: true,
             onEnd: function (evt) {
                 updateRowsObj();
             }
@@ -1114,6 +1116,7 @@ $(function () {
             delay: 500,
             delayOnTouchOnly: true,
             touchStartThreshold: 5,
+            forceFallback: true,
             onStart: function (evt) {
                 var item = $(evt.item);
                 activityDragState.originIndex = evt.oldIndex;
@@ -1252,6 +1255,7 @@ $(function () {
             delay: 500,
             delayOnTouchOnly: true,
             touchStartThreshold: 5,
+            forceFallback: true,
             onStart: function (evt) {
                 var item = $(evt.item);
                 var fromgroupindex = item.parents('.grouprelease').index();
