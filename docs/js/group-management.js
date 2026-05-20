@@ -1062,6 +1062,9 @@ $(function () {
             draggable: ".groupcontainer",
             filter: ".groupcolumns",
             preventOnFilter: false,
+            delay: 500,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5,
             onStart: function (evt) {
                 groupDragState.originIndex = evt.oldIndex;
             },
@@ -1089,6 +1092,9 @@ $(function () {
             handle: ".rowheader",
             filter: ".row-collapse-btn",
             preventOnFilter: false,
+            delay: 500,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5,
             onEnd: function (evt) {
                 updateRowsObj();
             }
@@ -1105,6 +1111,9 @@ $(function () {
         if (Sortable.get(el)) return;
         Sortable.create(el, {
             group: { name: "columns", pull: true, put: ["columns", "stories"] },
+            delay: 500,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5,
             onStart: function (evt) {
                 var item = $(evt.item);
                 activityDragState.originIndex = evt.oldIndex;
@@ -1240,6 +1249,9 @@ $(function () {
         if (Sortable.get(el)) return;
         Sortable.create(el, {
             group: { name: "stories", pull: true, put: ["stories"] },
+            delay: 500,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5,
             onStart: function (evt) {
                 var item = $(evt.item);
                 var fromgroupindex = item.parents('.grouprelease').index();
