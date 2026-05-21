@@ -3,8 +3,8 @@ $(function () {
 
     //// GLOBAL VARIABLES /////
 
-    var n, htmlstring, boardid, currentBoardID, newboardform,
-        dialog, textbox, hiddenblockdetails, board, blocktitlearray,
+    var n, htmlstring, boardid, currentBoardID,
+        textbox, hiddenblockdetails, board, blocktitlearray,
         groupsObj, groupColumnsObj, groupColumnsArray, columnsArray, rowsObj, itemsObj, itemsArray, blockdetailsarray, selectedBlock, sleft, stop,
         typeItemsObj, statusItemsObj, subsetsObj, settingsBoard, relationshipArray, boardlistobject, boardTypeBoard,
         boardTypeObject, subsetBoard, subsetBoardData, gro, columnsVisible, columnGroupsVisible, rowsVisible,
@@ -97,129 +97,42 @@ $(function () {
 
 ///////////////////////// MENU MANAGEMENT ///////////////////////////////////////////
 
-    $("#deleteblock-confirm").dialog({
-        autoOpen: false,
-        resizable: false,
-        height: "auto",
-        width: 400,
-        modal: true,
-        buttons: {
-            "Continue": function () {
-                var blockid = document.getElementById(textbox);
-                if ($(blockid).hasClass("story")) {
-                    deletestory($(blockid).find(".textbox"));
-                    console.log("block deleted");
-                    $(this).dialog("close");
-                    $(".blockselected").removeClass("blockselected");
-                    $("#infobox").addClass("hide");
-                    $("#blockname").val("");
-                    $("#blockdetails").html("");
-                } else if ($(blockid).hasClass("column")) {
-                    var column = $(blockid).parents("li");
-                    removecolumn(column);
-                    $(this).dialog("close");
-                    $(".blockselected").removeClass("blockselected");
-                    $("#infobox").addClass("hide");
-                    $("#blockname").val("");
-                    $("#blockdetails").html("");
-                }
-            },
-            Cancel: function () {
-                $(this).dialog("close");
-            }
+    var _modalOnPrimary = null;
+
+    function openModal(opts) {
+        $('#modal-title').text(opts.title);
+        $('.modal-section').removeClass('active');
+        $('#modal-section-' + opts.section).addClass('active');
+        $('#modal-primary').text(opts.primaryLabel || 'Continue');
+        if (opts.cancelLabel === false) {
+            $('#modal-cancel').hide();
+        } else {
+            $('#modal-cancel').show().text(opts.cancelLabel || 'Cancel');
         }
+        _modalOnPrimary = opts.onPrimary || null;
+        $('#modal-overlay').addClass('open');
+    }
+
+    function closeModal() {
+        $('#modal-overlay').removeClass('open');
+        _modalOnPrimary = null;
+    }
+
+    $(document).on('click', '#modal-primary', function () {
+        if (_modalOnPrimary) _modalOnPrimary();
+        closeModal();
     });
 
-    $("#delete-confirm").dialog({
-        autoOpen: false,
-        resizable: false,
-        height: "auto",
-        width: 400,
-        modal: true,
-        buttons: {
-            "Continue": function () {
-                var index = boardlistobject.indexOf(currentBoardID);
-                boardlistobject.splice(index, 1);
-                localStorage.setItem("boardlist", JSON.stringify(boardlistobject));
-                localStorage.removeItem(currentBoardID);
-                currentBoardID = "";
-                localStorage.setItem("currentboard", "");
-                $("#board").empty();
-                console.log("map deleted");
-                $(this).dialog("close");
-            },
-            Cancel: function () {
-                $(this).dialog("close");
-            }
-        }
+    $(document).on('click', '#modal-cancel, #modal-close', function () {
+        closeModal();
     });
 
-    dialog = $("#save-confirm").dialog({
-        autoOpen: false,
-        resizable: false,
-        height: "auto",
-        width: 400,
-        modal: true,
-        buttons: {
-            "Continue": function () {
-                var boardname = $("#filename").val();
-                settingsBoard = $("#settingsBoardNew").val();
-                var boardType = $("#boardType").val();
-                newboard(boardname, settingsBoard, boardType);
-                $(this).dialog("close");
-            },
-            Cancel: function () {
-                $(this).dialog("close");
-            }
-        }
+    $(document).on('click', '#modal-overlay', function (e) {
+        if (e.target === this) closeModal();
     });
 
-    dialog = $("#load-confirm").dialog({
-        autoOpen: false,
-        resizable: false,
-        height: "auto",
-        width: 400,
-        modal: true,
-        buttons: {
-            "Continue": function () {
-                currentBoardID = $("#loadfilename").val();
-                loadJSONobjects(currentBoardID);
-                localStorage.setItem("currentboard", currentBoardID);
-                $(this).dialog("close");
-            },
-            Cancel: function () {
-                $(this).dialog("close");
-            }
-        }
-    });
-
-    dialog = $("#boardSettings").dialog({
-        autoOpen: false,
-        resizable: false,
-        height: "auto",
-        width: 400,
-        modal: true,
-        buttons: {
-            "Continue": function () {
-                settingsBoard = $("#settingsBoard").val();
-                board["settings"] = settingsBoard;
-                saveToLocalStorage(board);
-                console.log("Settings board = " + settingsBoard);
-                var patchstr = '{"op": "replace","path": "/data/settings", "value": "' + settingsBoard + '" }';
-                console.log(patchstr);
-                patchJSON(currentBoardID, patchstr);
-                $(this).dialog("close");
-            },
-            Cancel: function () {
-                $(this).dialog("close");
-            }
-        }
-    });
-
-    newboardform = dialog.find("form").on("submit", function (event) {
-        event.preventDefault();
-        boardid = $("#boardid");
-        createBoardJSON(boardid.val());
+    $('#newboard-form').on('submit', function (e) {
+        e.preventDefault();
     });
 
     function newboard(boardname, settings, boardType) {
@@ -403,7 +316,17 @@ $(function () {
         } else {
             $("#settingsBoard").val(null);
         }
-        $("#boardSettings").dialog("open");
+        openModal({
+            title: 'Board settings',
+            section: 'settings',
+            onPrimary: function () {
+                settingsBoard = $("#settingsBoard").val();
+                board["settings"] = settingsBoard;
+                saveToLocalStorage(board);
+                var patchstr = '{"op": "replace","path": "/data/settings", "value": "' + settingsBoard + '" }';
+                patchJSON(currentBoardID, patchstr);
+            }
+        });
     });
 
     function updateSettingsBoardList() {
@@ -423,8 +346,16 @@ $(function () {
     }
 
     $(document).on("click", "#toggleBoardMenu", function (event) {
-        $("#boardMenu").toggle();
-        $("#boardname").toggle();
+        $("#boardMenu").toggleClass("open");
+        event.stopPropagation();
+    });
+
+    $(document).on("click", "#board-menu-overlay", function () {
+        $("#boardMenu").removeClass("open");
+    });
+
+    $(document).on("click", "#boardMenu .container", function () {
+        $("#boardMenu").removeClass("open");
     });
 
 //////////////////// Board menu actions /////////////////
@@ -434,16 +365,45 @@ $(function () {
         updateBoardTypeList();
         $("#settingsBoardNew").val(null);
         $("#boardType").val(null);
-        $("#save-confirm").dialog("open");
+        openModal({
+            title: 'Create new board',
+            section: 'newboard',
+            onPrimary: function () {
+                var boardname = $("#filename").val();
+                settingsBoard = $("#settingsBoardNew").val();
+                var boardType = $("#boardType").val();
+                newboard(boardname, settingsBoard, boardType);
+            }
+        });
     });
 
     $(document).on("click", "#deleteboard", function () {
-        $("#delete-confirm").dialog("open");
+        openModal({
+            title: 'Delete board',
+            section: 'deleteboard',
+            onPrimary: function () {
+                var index = boardlistobject.indexOf(currentBoardID);
+                boardlistobject.splice(index, 1);
+                localStorage.setItem("boardlist", JSON.stringify(boardlistobject));
+                localStorage.removeItem(currentBoardID);
+                currentBoardID = "";
+                localStorage.setItem("currentboard", "");
+                $("#board").empty();
+            }
+        });
     });
 
     $(document).on("click", "#loadarray", function () {
         updateboardlistoptions();
-        $("#load-confirm").dialog("open");
+        openModal({
+            title: 'Load board',
+            section: 'loadboard',
+            onPrimary: function () {
+                currentBoardID = $("#loadfilename").val();
+                loadJSONobjects(currentBoardID);
+                localStorage.setItem("currentboard", currentBoardID);
+            }
+        });
     });
 
     $(document).on("click", "#savearray", function () {
@@ -487,16 +447,32 @@ $(function () {
                 if (!epicEmpty(i, groupIndex, columnNumber)) { hasStories = true; }
             });
             if (hasStories) {
-                $('<div>This column cannot be deleted because it contains one or more stories.</div>')
-                    .dialog({
-                        title: 'Cannot delete column',
-                        modal: true,
-                        buttons: { OK: function () { $(this).dialog('destroy').remove(); } }
-                    });
+                $('#modal-error-text').text('This column cannot be deleted because it contains one or more stories.');
+                openModal({ title: 'Cannot delete column', section: 'error', primaryLabel: 'OK', cancelLabel: false });
                 return;
             }
         }
-        $("#deleteblock-confirm").dialog("open");
+        openModal({
+            title: 'Delete block',
+            section: 'deleteblock',
+            onPrimary: function () {
+                var blockid = document.getElementById(textbox);
+                if ($(blockid).hasClass("story")) {
+                    deletestory($(blockid).find(".textbox"));
+                    $(".blockselected").removeClass("blockselected");
+                    $("#infobox").addClass("hide");
+                    $("#blockname").val("");
+                    $("#blockdetails").html("");
+                } else if ($(blockid).hasClass("column")) {
+                    var column = $(blockid).parents("li");
+                    removecolumn(column);
+                    $(".blockselected").removeClass("blockselected");
+                    $("#infobox").addClass("hide");
+                    $("#blockname").val("");
+                    $("#blockdetails").html("");
+                }
+            }
+        });
     });
 
 //////////////////// Move board item actions //////////////////////////
@@ -1430,6 +1406,15 @@ $(function () {
         if (quickEditMode) _storySort.option('disabled', true);
     }
 
+    $(document).on("dblclick", ".textbox", function (event) {
+        if (quickEditMode) { event.stopPropagation(); return; }
+        $("#infobox").addClass("full");
+        $("#manageblock").show();
+        $("#blockmenu").hide();
+        $("#subsets").show();
+        event.stopPropagation();
+    });
+
     $(document).on("click", ".textbox", function (event) {
         if (quickEditMode) { event.stopPropagation(); return; }
         console.log("textbox clicked");
@@ -1885,7 +1870,7 @@ $(function () {
     $(document).on("click", ".row-collapse-btn", function (event) {
         event.stopPropagation();
         var $row = $(this).closest(".row");
-        $row.find(".rowgroups").toggle();
+        $row.find(".rowgroups").toggleClass("collapsed");
         $(this).find("i").toggleClass("fa-chevron-up fa-chevron-down");
         calculateRowTops();
         updateStickyRowHeaders();

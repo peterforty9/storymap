@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html>
 <head>
@@ -7,7 +7,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="js/jquery-ui.css" type="text/css">
     <link rel="stylesheet" type="text/css" href="newcss.css">
     <link rel="stylesheet" type="text/css" href="defaulttheme.css">
     <link rel="stylesheet" type="text/css" href="road.css">
@@ -22,7 +21,6 @@
 
 <body>
     <script type="text/javascript" src="js/jquery-3.3.1.js"></script>
-    <script type="text/javascript" src="js/jquery-ui.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
     <script type="text/javascript" src="js/group-management.js"></script>
     <script type="text/javascript" src="js/newjavascript.js"></script>
@@ -32,19 +30,20 @@
                 <label id='boardname' class='title' style="overflow:hidden"></label>
             </div>
             <div id="menuright">
-                <div id="boardMenu">
-                    <label class='container' id="new"><i class="fa fa-table fa-fw" aria-hidden="true"></i></label>
-                    <label class='container' id="loadarray" title='load'><i class='fa fa-upload fa-fw'></i></label>
-                    <label class='container' id="savearray"><i class='fa fa-save fa-fw'></i></label>
-                    <label class='container' id='boardSettingsbutton'><i class='fa fa-cog fa-fw'></i></label>
-                    <label class='container' id='deleteboard'><i class='fa fa-trash fa-fw'></i></label>
-                    <label class='container' id='colwidth'><i class="fa fa-exchange fa-fw"></i></label>
-                    <label class='container' id='quickEdit' title='Quick Edit'><i class='fa fa-pencil fa-fw'></i></label>
-                </div>
                 <div class="togglearea">
                     <label class='blockmenu-item' id='toggleBoardMenu'><i class='fa fa-bars'></i></label>
                 </div>
             </div>
+        </div>
+        <div id="board-menu-overlay"></div>
+        <div id="boardMenu">
+            <label class='container' id="new"><i class="fa fa-table fa-fw" aria-hidden="true"></i><span class="menu-label">New</span></label>
+            <label class='container' id="loadarray"><i class='fa fa-upload fa-fw'></i><span class="menu-label">Load</span></label>
+            <label class='container' id="savearray"><i class='fa fa-save fa-fw'></i><span class="menu-label">Save</span></label>
+            <label class='container' id='boardSettingsbutton'><i class='fa fa-cog fa-fw'></i><span class="menu-label">Settings</span></label>
+            <label class='container' id='deleteboard'><i class='fa fa-trash fa-fw'></i><span class="menu-label">Delete</span></label>
+            <label class='container' id='colwidth'><i class="fa fa-exchange fa-fw"></i><span class="menu-label">Column width</span></label>
+            <label class='container' id='quickEdit'><i class='fa fa-pencil fa-fw'></i><span class="menu-label">Quick edit</span></label>
         </div>
         <div id='board'></div>
         <div id='infobox'>
@@ -80,59 +79,62 @@
 
         </div>
     </div>
-    <div id="deleteblock-confirm" title="Delete block?">
-        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
-    </div>
-    <div id="delete-confirm" title="Delete map?">
-        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
-    </div>
-    <div id="save-confirm" title="Create new board?">
-        <form>
-            <fieldset>
-                <label for="filename">Filename</label>
-                <input type="text" name="filename" id="filename" value="" class="text ui-widget-content ui-corner-all">
 
-                <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-            </fieldset>
-            <fieldset>
-                <label for="boardType">Board type</label>
-                <select id="boardType"></select>
-                <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-            </fieldset>
-            <fieldset>
-                <label for="settingsBoardNew">Settings board</label>
-                <select id="settingsBoardNew"></select>
-                <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-            </fieldset>
-        </form>
-        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
-    </div>
-    <div id="load-confirm" title="Load board?">
-        <form>
-            <fieldset>
-                <label for="loadfilename">Filename</label>
-                <select id="loadfilename"></select>
-                <!--<input type="text" name="loadfilename" id="loadfilename" value="" class="text ui-widget-content ui-corner-all">-->
-                <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-            </fieldset>
-        </form>
-        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
-    </div>
-    <div id="boardSettings" title="Board settings">
-        <form>
-            <fieldset>
-                <label for="settingsBoard">Settings board</label>
-                <select id="settingsBoard"></select>
-                <!--<input type="text" name="loadfilename" id="loadfilename" value="" class="text ui-widget-content ui-corner-all">-->
-                <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-            </fieldset>
-        </form>
-        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Are you sure?</p>
+    <!-- Custom modal -->
+    <div id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="modal-title"></span>
+                <button id="modal-close" aria-label="Close">&#x2715;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-section-deleteblock" class="modal-section">
+                    <p>Are you sure you want to delete this block?</p>
+                </div>
+                <div id="modal-section-deleteboard" class="modal-section">
+                    <p>Are you sure you want to delete this board?</p>
+                </div>
+                <div id="modal-section-newboard" class="modal-section">
+                    <form id="newboard-form">
+                        <fieldset>
+                            <label for="filename">Filename</label>
+                            <input type="text" name="filename" id="filename" value="" autocomplete="off">
+                        </fieldset>
+                        <fieldset>
+                            <label for="boardType">Board type</label>
+                            <select id="boardType"></select>
+                        </fieldset>
+                        <fieldset>
+                            <label for="settingsBoardNew">Settings board</label>
+                            <select id="settingsBoardNew"></select>
+                        </fieldset>
+                    </form>
+                </div>
+                <div id="modal-section-loadboard" class="modal-section">
+                    <form>
+                        <fieldset>
+                            <label for="loadfilename">Filename</label>
+                            <select id="loadfilename"></select>
+                        </fieldset>
+                    </form>
+                </div>
+                <div id="modal-section-settings" class="modal-section">
+                    <form>
+                        <fieldset>
+                            <label for="settingsBoard">Settings board</label>
+                            <select id="settingsBoard"></select>
+                        </fieldset>
+                    </form>
+                </div>
+                <div id="modal-section-error" class="modal-section">
+                    <p id="modal-error-text"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel">Cancel</button>
+                <button id="modal-primary">Continue</button>
+            </div>
+        </div>
     </div>
 
 </body>
